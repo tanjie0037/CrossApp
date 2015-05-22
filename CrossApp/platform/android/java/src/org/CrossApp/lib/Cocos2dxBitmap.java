@@ -212,7 +212,7 @@ public class Cocos2dxBitmap {
 	private static TextProperty computeTextProperty(final String pString,
 			final int pWidth, final int pHeight, final Paint pPaint) {
 		final FontMetricsInt fm = pPaint.getFontMetricsInt();
-		final int h = (int) Math.ceil(fm.bottom - fm.top);
+		final int h = (int) Math.ceil(fm.descent - fm.ascent);
 		int maxContentWidth = 0;
 
 		final String[] lines = Cocos2dxBitmap.splitString(pString, pWidth,
@@ -257,19 +257,19 @@ public class Cocos2dxBitmap {
 	private static int computeY(final FontMetricsInt pFontMetricsInt,
 			final int pConstrainHeight, final int pTotalHeight,
 			final int pVerticalAlignment) {
-		int y = -pFontMetricsInt.top;
+		int y = -pFontMetricsInt.ascent;
 
 		if (pConstrainHeight > pTotalHeight) {
 			switch (pVerticalAlignment) {
 			case VERTICALALIGN_TOP:
-				y = -pFontMetricsInt.top;
+				y = -pFontMetricsInt.ascent;
 				break;
 			case VERTICALALIGN_CENTER:
-				y = -pFontMetricsInt.top + (pConstrainHeight - pTotalHeight)
+				y = -pFontMetricsInt.ascent + (pConstrainHeight - pTotalHeight)
 						/ 2;
 				break;
 			case VERTICALALIGN_BOTTOM:
-				y = -pFontMetricsInt.top + (pConstrainHeight - pTotalHeight);
+				y = -pFontMetricsInt.ascent + (pConstrainHeight - pTotalHeight);
 				break;
 			default:
 				break;
@@ -288,7 +288,7 @@ public class Cocos2dxBitmap {
 		final String[] lines = pString.split("\\n");
 		String[] ret = null;
 		final FontMetricsInt fm = pPaint.getFontMetricsInt();
-		final int heightPerLine = (int) Math.ceil(fm.bottom - fm.top);
+		final int heightPerLine = (int) Math.ceil(fm.descent - fm.ascent);
 		final int maxLines = pMaxHeight / heightPerLine;
 
 		if (pMaxWidth != 0) {
