@@ -784,7 +784,7 @@ void CAScrollView::deaccelerateScrolling(float dt)
         }
     }
 
-    if (speed.getLength() <= minSpeed(dt) / 2)
+    if (speed.getLength() <= 0.1)
     {
         this->getScrollWindowNotOutPoint(point);
         this->setContainerFrame(point);
