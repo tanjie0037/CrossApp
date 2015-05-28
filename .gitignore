@@ -92,5 +92,4 @@ tags
 /extensions/proj.win32/Debug.win32/libExtensions.log
 
 # zpt
-the_third_sdk/share/android
-the_third_sdk/share/ios
+the_third_sdk/share/ios/ShareSDK
