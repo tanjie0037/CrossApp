@@ -90,3 +90,7 @@ tags
 /CocosDenshion/proj.win32/Debug.win32/*.log
 /CocosDenshion/proj.win32/Debug.win32/CocosDenshion.log
 /extensions/proj.win32/Debug.win32/libExtensions.log
+
+# zpt
+the_third_sdk/share/android
+the_third_sdk/share/ios

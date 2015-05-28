@@ -23,19 +23,11 @@ LOCAL_WHOLE_STATIC_LIBRARIES += cocosdenshion_static
 LOCAL_WHOLE_STATIC_LIBRARIES += cocos_curl_static
 LOCAL_WHOLE_STATIC_LIBRARIES += libwebsockets_static
 
-LOCAL_CFLAGS += -DCC_ENABLE_CHIPMUNK_INTEGRATION=1
-LOCAL_EXPORT_CFLAGS += -DCC_ENABLE_CHIPMUNK_INTEGRATION=1
-LOCAL_CPPFLAGS += -DCC_ENABLE_CHIPMUNK_INTEGRATION=1
-LOCAL_EXPORT_CPPFLAGS += -DCC_ENABLE_CHIPMUNK_INTEGRATION=1
-
 LOCAL_EXPORT_C_INCLUDES := $(LOCAL_PATH) \
                            $(LOCAL_PATH)/network \
                            $(LOCAL_PATH)/LocalStorage \
 						   $(LOCAL_PATH)/Json \
 						   $(LOCAL_PATH)/Json/lib_json \
-						   $(LOCAL_PATH)/GUI
-
-
 
 LOCAL_CFLAGS := -fexceptions
                     
