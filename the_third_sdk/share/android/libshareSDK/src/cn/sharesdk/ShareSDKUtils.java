@@ -125,11 +125,12 @@ public class ShareSDKUtils {
 	public static void initSDK(final String appKey,
 			final boolean enableStatistics) {
 		if (DEBUG) {
-			System.out.println("initSDK");
+			System.out.println("initSDK: " + appKey);
 		}
 		UIHandler.sendEmptyMessage(1, new Callback() {
 			@Override
 			public boolean handleMessage(Message msg) {
+				System.out.println("do initSDK");
 				ShareSDK.initSDK(context, appKey, enableStatistics);
 				return true;
 			}
@@ -143,13 +144,20 @@ public class ShareSDKUtils {
 		ShareSDK.stopSDK(context);
 	}
 
-	public static void setPlatformConfig(int platformId, String configs) {
+	public static void setPlatformConfig(final int platformId, final String configs) {
 		if (DEBUG) {
-			System.out.println("setPlatformConfig");
+			System.out.println("setPlatformConfig: " + platformId);
 		}
-		String name = ShareSDK.platformIdToName(platformId);
-		HashMap<String, Object> conf = new Hashon().fromJson(configs);
-		ShareSDK.setPlatformDevInfo(name, conf);
+		UIHandler.sendEmptyMessage(1, new Callback() {
+			@Override
+			public boolean handleMessage(Message msg) {
+				System.out.println("do platformIdToName");
+				String name = ShareSDK.platformIdToName(platformId);
+				HashMap<String, Object> conf = new Hashon().fromJson(configs);
+				ShareSDK.setPlatformDevInfo(name, conf);
+				return true;
+			}
+		});
 	}
 	
 	private static HashMap<String, Object> getPlatformDB(Platform platform){
@@ -292,10 +300,8 @@ public class ShareSDKUtils {
 		if (!(content.get("extInfo") == null)) {
 			map.put("extInfo", content.get("extInfo"));
 		}
-		String type = (String) content.get("type");
-		if (type != null) {
-			int shareType = iosTypeToAndroidType(Integer.parseInt(type));
-			map.put("shareType", shareType);
+		if (!(content.get("type") == null)) {
+			map.put("shareType", content.get("type"));
 		}
 		return map;
 	}

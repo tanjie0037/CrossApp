@@ -12,7 +12,7 @@
 
 #include "ShareHelper.h"
 
-#if CC_TARGET_PLATFORM == CC_PLATFORM_IOS
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_IOS)
 
 #ifndef utf8cstr
 #define utf8cstr(nsstr) (nsstr ? [nsstr cStringUsingEncoding:NSUTF8StringEncoding] : "")
@@ -140,8 +140,8 @@ void ShareHelper::open(const std::string& appKey, bool useAppTrusteeship) {
     [ShareSDK registerApp:appKeyStr useAppTrusteeship:useAppTrusteeship];
 }
 
-void ShareHelper::close() {
-    //todo
+bool ShareHelper::close() {
+    return true;
 }
 
 void ShareHelper::setPlatformConfig(C2DXPlatType platType, CSJsonDictionary& configInfo) {
@@ -353,9 +353,9 @@ void ShareHelper::showShareView(cn::sharesdk::C2DXPlatType platType, CSJsonDicti
                              }];
 }
 
-bool ShareHelper::isClientInstalled(cn::sharesdk::C2DXPlatType platType) {
-    id <ISSPlatformApp> app = [ShareSDK getClientWithType:(ShareType)platType];
-    return  [app isClientInstalled] ? true : false ;
-}
+//bool ShareHelper::isClientInstalled(cn::sharesdk::C2DXPlatType platType) {
+//    id <ISSPlatformApp> app = [ShareSDK getClientWithType:(ShareType)platType];
+//    return  [app isClientInstalled] ? true : false ;
+//}
 
 #endif

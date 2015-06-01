@@ -5,168 +5,173 @@
 //  Created by tanjie on 15/5/28.
 //
 //
-
 #include "ShareHelper.h"
 
-#if CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
 
-void ShareHelper::open(const std::string& appKey, bool useAppTrusteeship) {
-    NSString *appKeyStr = [NSString stringWithCString:appKey.c_str() encoding:NSUTF8StringEncoding];
-    [ShareSDK registerApp:appKeyStr useAppTrusteeship:useAppTrusteeship];
-}
+#include "platform/android/jni/JniHelper.h"
+#include <jni.h>
+#include <android/log.h>
 
-void ShareHelper::close() {
-    //todo
-}
+USING_NS_CC;
+USING_NS_CC_EXT;
+using namespace CSJson;
+using namespace cn::sharesdk;
 
-void ShareHelper::setPlatformConfig(C2DXPlatType platType, CSJsonDictionary& configInfo) {
-    NSDictionary* dic = nil;
-    NSMutableDictionary *configDict = nil;
+#if 1
+#define  LOG_TAG    "ShareHelper"
+#define  LOGD(...)  __android_log_print(ANDROID_LOG_DEBUG,LOG_TAG,__VA_ARGS__)
+#else
+#define  LOGD(...)
+#endif
+
+#ifdef __cplusplus
+extern "C" {
+#endif
     
-    if (!configInfo.isEmpty()) {
-        dic = dictionaryWithJsonString([NSString stringWithUTF8String:configInfo.getDescription().c_str()]);
-        configDict = [NSMutableDictionary dictionaryWithDictionary:dic];
+    C2DXAuthResultEvent authCb = NULL;
+    C2DXGetUserInfoResultEvent infoCb = NULL;
+    C2DXShareResultEvent shareCb = NULL;
+    
+    JNIEXPORT void JNICALL Java_cn_sharesdk_ShareSDKUtils_onJavaCallback
+    (JNIEnv * env, jclass thiz, jstring resp) {
         
-        switch (platType) {
-            case ShareTypeWeixiSession:
-            case ShareTypeYiXinSession:
-                [configDict setObject:[NSNumber numberWithInt:0] forKey:@"scene"];
-                break;
-            case ShareTypeWeixiTimeline:
-            case ShareTypeYiXinTimeline:
-                [configDict setObject:[NSNumber numberWithInt:1] forKey:@"scene"];
-                break;
-            case ShareTypeWeixiFav:
-                [configDict setObject:[NSNumber numberWithInt:2] forKey:@"scene"];
-                break;
-            default:
-                break;
+        CSJsonDictionary jsonDict, resDict, emptyDic;
+        const char* ccResp = env->GetStringUTFChars(resp, JNI_FALSE);
+        jsonDict.initWithDescription(ccResp);
+        env->ReleaseStringUTFChars(resp, ccResp);
+        
+        int status = jsonDict.getItemIntValue("status", -1);
+        int action = jsonDict.getItemIntValue("action", -1);
+        int platform = jsonDict.getItemIntValue("platform", -1);
+        jsonDict.getSubDictionary("res", resDict);
+        
+        if (status == -1 || action == -1 || platform == -1) {
+            assert(0);
+            return;
+        }
+        
+        if (action == 1 && NULL != authCb) { // 1 = ACTION_AUTHORIZING
+            authCb((C2DXResponseState)status, (C2DXPlatType) platform, emptyDic);
+        } else if (action == 8 && NULL != infoCb) { // 8 = ACTION_USER_INFOR
+            infoCb((C2DXResponseState)status, (C2DXPlatType) platform, resDict, emptyDic);
+        } else if (action == 9 && NULL != shareCb) { // 9 = ACTION_SHARE
+            shareCb((C2DXResponseState)status, (C2DXPlatType) platform, resDict, emptyDic);
         }
     }
     
-    [ShareSDK connectPlatformWithType:(ShareType)platType
-                             platform:nil
-                              appInfo:configDict];
+    bool getMethod(JniMethodInfo &mi, const char *methodName, const char *paramCode) {
+        return JniHelper::getStaticMethodInfo(mi, "cn/sharesdk/ShareSDKUtils", methodName, paramCode);
+    }
+    
+    void releaseMethod(JniMethodInfo &mi) {
+        mi.env->DeleteLocalRef(mi.classID);
+    }
+#ifdef __cplusplus
+}
+#endif
+
+void ShareHelper::open(const std::string& appKey, bool useAppTrusteeship) {
+    JniMethodInfo mi;
+    bool isHave = getMethod(mi, "initSDK", "(Ljava/lang/String;Z)V");
+    if (!isHave) {
+        assert(0);
+        return;
+    }
+    
+    jstring appKeyStr = mi.env->NewStringUTF(appKey.c_str());
+    mi.env->CallStaticVoidMethod(mi.classID, mi.methodID, appKeyStr, useAppTrusteeship);
+    releaseMethod(mi);
+}
+
+bool ShareHelper::close() {
+    JniMethodInfo mi;
+    bool isHave = getMethod(mi, "stopSDK", "()V");
+    if (!isHave) {
+        assert(0);
+        return false;
+    }
+    
+    mi.env->CallStaticVoidMethod(mi.classID, mi.methodID);
+    releaseMethod(mi);
+    return true;
+}
+
+void ShareHelper::setPlatformConfig(C2DXPlatType platType, CSJsonDictionary& configInfo) {
+    
+    // This is not a necessary method for Android, you can setup your platform configs more efficiently in "assets/ShareSDK.xml"
+    return;
+    
+//    JniMethodInfo mi;
+//    bool isHave = getMethod(mi, "setPlatformConfig", "(ILjava/lang/String;)V");
+//    if (!isHave) {
+//        assert(0);
+//        return;
+//    }
+//    
+//    jstring jInfo = mi.env->NewStringUTF(configInfo.getDescription().c_str());
+//    
+//    mi.env->CallStaticVoidMethod(mi.classID, mi.methodID, platType, jInfo);
+//    releaseMethod(mi);
 }
 
 void ShareHelper::authorize(C2DXPlatType platType, C2DXAuthResultEvent callback) {
-    [ShareSDK authWithType:(ShareType)platType
-                   options:nil
-                    result:^(SSAuthState state, id<ICMErrorInfo> error) {
-     
-     CSJsonDictionary errorInfo;
-     
-     if (error)
-     {
-     errorInfo.insertItem("error_code", (int)[error errorCode]);
-     errorInfo.insertItem("error_msg", [[error errorDescription] UTF8String]);
-     }
-     
-     if (callback)
-     {
-     callback ((C2DXResponseState)state, platType, errorInfo);
-     }
-     
-     }];
+    JniMethodInfo mi;
+    bool isHave = getMethod(mi, "authorize", "(I)V");
+    if (!isHave) {
+        assert(0);
+        return;
+    }
     
+    mi.env->CallStaticVoidMethod(mi.classID, mi.methodID, platType);
+    releaseMethod(mi);
+    authCb = callback;
 }
 
 void ShareHelper::cancelAuthorize(C2DXPlatType platType) {
-    [ShareSDK cancelAuthWithType:(ShareType)platType];
+    JniMethodInfo mi;
+    bool isHave = getMethod(mi, "removeAccount", "(I)V");
+    if (!isHave) {
+        assert(0);
+        return;
+    }
+    
+    mi.env->CallStaticVoidMethod(mi.classID, mi.methodID, platType);
+    releaseMethod(mi);
 }
 
 bool ShareHelper::hasAutorized(C2DXPlatType platType) {
-    return [ShareSDK hasAuthorizedWithType:(ShareType)platType] ? true : false;
+    JniMethodInfo mi;
+    bool isHave = getMethod(mi, "isValid", "(I)Z");
+    if (!isHave) {
+        assert(0);
+        return false;
+    }
+    
+    jboolean valid = mi.env->CallStaticBooleanMethod(mi.classID, mi.methodID, platType);
+    releaseMethod(mi);
+    return valid == JNI_TRUE;
 }
 
 void ShareHelper::getUserInfo(C2DXPlatType platType, C2DXGetUserInfoResultEvent callback) {
-    [ShareSDK getUserInfoWithType:(ShareType)platType
-                      authOptions:nil
-                           result:^(BOOL result, id<ISSPlatformUser> userInfo, id<ICMErrorInfo> error) {
-     
-     CSJsonDictionary userInfoDict;
-     CSJsonDictionary errorInfo;
-     
-     NSError *parseError = nil;
-     
-     if (result) {
-     NSData* jsonData = [NSJSONSerialization dataWithJSONObject:[userInfo sourceData] options:NSJSONWritingPrettyPrinted error:&parseError];
-     
-     if (parseError) {
-     assert(0);
-     NSLog(@"parseError:%@", parseError);
-     return;
-     } else {
-     NSString* str = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
-     userInfoDict.initWithDescription(utf8cstr(str));
-     [str release];
-     }
-     }
-     
-     if (error)
-     {
-     NSInteger errCode = [error errorCode];
-     NSString *errDesc = [error errorDescription];
-     
-     errorInfo.insertItem("error_code", (int)errCode);
-     if (errDesc)
-     {
-     errorInfo.insertItem("error_msg", [errDesc UTF8String]);
-     }
-     
-     }
-     
-     if (callback)
-     {
-     callback (result ? C2DXResponseStateSuccess : C2DXResponseStateFail, platType, userInfoDict, errorInfo);
-     }
-     
-     }];
+    //todo
 }
 
 void ShareHelper::shareContent(cn::sharesdk::C2DXPlatType platType, CSJsonDictionary &content, cn::sharesdk::C2DXShareResultEvent callback) {
-    id<ISSContent> publishContent = convertPublishContent(content);
-    [ShareSDK shareContent:publishContent
-                      type:(ShareType)platType
-               authOptions:nil
-              shareOptions:nil
-             statusBarTips:YES
-                    result:^(ShareType type, SSResponseState state, id<ISSPlatformShareInfo> statusInfo, id<ICMErrorInfo> error, BOOL end) {
-     
-     CSJsonDictionary shareInfo;
-     CSJsonDictionary errorInfo;
-     
-     NSError *parseError = nil;
-     
-     if (state == SSResponseStateSuccess) {
-     NSData* jsonData = [NSJSONSerialization dataWithJSONObject:[statusInfo sourceData] options:NSJSONWritingPrettyPrinted error:&parseError];
-     
-     if (parseError) {
-     assert(0);
-     NSLog(@"parseError:%@", parseError);
-     return;
-     } else {
-     NSString* str = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
-     shareInfo.initWithDescription(utf8cstr(str));
-     [str release];
-     }
-     }
-     
-     if (error) {
-     NSInteger errCode = [error errorCode];
-     NSString *errDesc = [error errorDescription];
-     
-     errorInfo.insertItem("error_code", (int)errCode);
-     if (errDesc) {
-     errorInfo.insertItem("error_msg", utf8cstr(errDesc));
-     }
-     }
-     
-     if (callback) {
-     callback ((C2DXResponseState)state, (C2DXPlatType)type, shareInfo, errorInfo);
-     }
-     
-     }];
+    
+    JniMethodInfo mi;
+    bool isHave = getMethod(mi, "share", "(ILjava/lang/String;)V");
+    if (!isHave) {
+        assert(0);
+        return;
+    }
+    
+    jstring jContent = mi.env->NewStringUTF(content.getDescription().c_str());
+    // free(ccContent);
+    
+    mi.env->CallStaticVoidMethod(mi.classID, mi.methodID, platType, jContent);
+    releaseMethod(mi);
+    shareCb = callback;
 }
 
 void ShareHelper::oneKeyShareContent(const std::vector<cn::sharesdk::C2DXPlatType>& platTypes, CSJsonDictionary& content, cn::sharesdk::C2DXShareResultEvent callback) {
@@ -182,56 +187,13 @@ void ShareHelper::showShareMenu(const std::vector<cn::sharesdk::C2DXPlatType>& p
 }
 
 void ShareHelper::showShareView(cn::sharesdk::C2DXPlatType platType, CSJsonDictionary& content, cn::sharesdk::C2DXShareResultEvent callback) {
-    id<ISSContent> publishContent = convertPublishContent(content);
-    
-    [ShareSDK showShareViewWithType:(ShareType)platType
-                          container:nil
-                            content:publishContent
-                      statusBarTips:YES
-                        authOptions:nil
-                       shareOptions:nil
-                             result:^(ShareType type, SSResponseState state, id<ISSPlatformShareInfo> statusInfo, id<ICMErrorInfo> error, BOOL end) {
-     
-     CSJsonDictionary shareInfo;
-     CSJsonDictionary errorInfo;
-     
-     NSError *parseError = nil;
-     
-     if (state == SSResponseStateSuccess) {
-     NSData* jsonData = [NSJSONSerialization dataWithJSONObject:[statusInfo sourceData] options:NSJSONWritingPrettyPrinted error:&parseError];
-     
-     if (parseError) {
-     assert(0);
-     NSLog(@"parseError:%@", parseError);
-     } else {
-     NSString* str = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
-     shareInfo.initWithDescription(utf8cstr(str));
-     [str release];
-     }
-     }
-     
-     if (error) {
-     NSInteger errCode = [error errorCode];
-     NSString *errDesc = [error errorDescription];
-     
-     errorInfo.insertItem("error_code", (int)errCode);
-     if (errDesc) {
-     errorInfo.insertItem("error_msg", utf8cstr(errDesc));
-     }
-     }
-     
-     if (callback) {
-     callback ((C2DXResponseState)state, (C2DXPlatType)type, shareInfo, errorInfo);
-     }
-     
-     
-     }];
+    //todo
 }
 
-bool ShareHelper::isClientInstalled(cn::sharesdk::C2DXPlatType platType) {
-    id <ISSPlatformApp> app = [ShareSDK getClientWithType:(ShareType)platType];
-    return  [app isClientInstalled] ? true : false ;
-}
+//bool ShareHelper::isClientInstalled(cn::sharesdk::C2DXPlatType platType) {
+//    //todo
+//    return true;
+//}
 
 
 #endif

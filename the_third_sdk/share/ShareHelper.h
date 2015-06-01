@@ -31,7 +31,7 @@ public:
     /**
      *	@brief	关闭ShareSDK
      */
-    static void close();
+    static bool close();
     
     /**
      *	@brief	设置平台配置信息
@@ -128,7 +128,7 @@ public:
      *
      *	@return true 安装有客户端, false 没有安装客户端
      */
-    static bool isClientInstalled(cn::sharesdk::C2DXPlatType platType);
+//    static bool isClientInstalled(cn::sharesdk::C2DXPlatType platType);
 };
 
 #endif /* defined(__AppGift__ShareHelper__) */
