@@ -27,7 +27,7 @@ JNIEXPORT void JNICALL Java_cn_sharesdk_ShareSDKUtils_onJavaCallback(JNIEnv * en
 	CCDictionary* res = (CCDictionary*) dic->objectForKey("res");
 
 	// TODO add codes here
-	if (!status || !action || !platform || !res) {
+	if (!status || !action || !platform) {
 		dic->release();
 		assert(0);
 		return;

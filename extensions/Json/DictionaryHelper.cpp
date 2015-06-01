@@ -189,7 +189,7 @@ const char* DictionaryHelper::getStringValue_json(CSJsonDictionary* root,const c
     {
         return NULL;
     }
-    return root->getItemStringValue(key);
+    return root->getItemCStringValue(key);
 }
 
 bool DictionaryHelper::getBooleanValue_json(CSJsonDictionary* root,const char* key)

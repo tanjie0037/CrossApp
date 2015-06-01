@@ -43,13 +43,16 @@ public:
     void    insertItem(const char *pszKey, bool bValue);
     bool    deleteItem(const char *pszKey);
     void    cleanUp();
+    bool    isEmpty();
     bool    isKeyValidate(const char *pszKey);
 
     int             getItemIntValue(const char *pszKey, int nDefaultValue);
     double          getItemFloatValue(const char *pszKey, double fDefaultValue);
-    const char *    getItemStringValue(const char *pszKey);
+    const char *    getItemCStringValue(const char *pszKey);
+    std::string     getItemStringValue(const char *pszKey);
     bool            getItemBoolvalue(const char *pszKey, bool bDefaultValue);
     CSJsonDictionary *   getSubDictionary(const char *pszKey);
+    bool getSubDictionary(const char *pszKey, CSJsonDictionary& subDict);
 
     std::string          getDescription();
 

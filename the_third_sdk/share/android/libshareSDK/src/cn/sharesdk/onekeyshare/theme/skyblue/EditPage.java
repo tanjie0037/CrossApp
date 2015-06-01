@@ -1,9 +1,9 @@
 /*
- * 官网地站:http://www.mob.com
- * 技术支持QQ: 4006852216
- * 官方微信:ShareSDK   （如果发布新版本的话，我们将会第一时间通过微信将版本更新内容推送给您。如果使用过程中有任何问题，也可以通过微信与我们取得联系，我们将会在24小时内给予回复）
+ * Offical Website:http://www.mob.com
+ * Support QQ: 4006852216
+ * Offical Wechat Account:ShareSDK   (We will inform you our updated news at the first time by Wechat, if we release a new version. If you get any problem, you can also contact us with Wechat, we will reply you within 24 hours.)
  *
- * Copyright (c) 2013年 mob.com. All rights reserved.
+ * Copyright (c) 2013 mob.com. All rights reserved.
  */
 
 package cn.sharesdk.onekeyshare.theme.skyblue;
@@ -32,11 +32,16 @@ import static com.mob.tools.utils.R.getIdRes;
 import static com.mob.tools.utils.R.getLayoutRes;
 import static com.mob.tools.utils.R.getStringRes;
 
-/** 执行图文分享的页面，此页面不支持微信平台的分享 */
+/**
+ * Photo-text Sharing will be handling in this page
+ * <p>
+ * note:
+ * wechat, yixin, qzone, etc. are shared in their clients, not in this page
+ */
 public class EditPage extends EditPageFakeActivity implements OnClickListener, TextWatcher {
 	private static final int MAX_TEXT_COUNT = 140;
 
-	// 字数计算器
+	// Words counter
 	private TextView textCounterTextView;
 	private EditText titleEditText;
 	private EditText textEditText;
@@ -178,7 +183,7 @@ public class EditPage extends EditPageFakeActivity implements OnClickListener, T
 			return;
 		String tag = (String) v.getTag();
 		if (tag.equals("close")) {
-			// 取消分享的统计
+			// a statistics of Cancel-sharing
 			for(Platform plat : platforms) {
 				ShareSDK.logDemoEvent(5, plat);
 			}

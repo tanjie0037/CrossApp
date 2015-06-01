@@ -16,7 +16,7 @@ import cn.sharesdk.framework.Platform.ShareParams;
 import cn.sharesdk.framework.PlatformActionListener;
 import cn.sharesdk.framework.PlatformDb;
 import cn.sharesdk.framework.ShareSDK;
-//import cn.sharesdk.onekeyshare.OnekeyShare;
+import cn.sharesdk.onekeyshare.OnekeyShare;
 
 import com.mob.tools.utils.Hashon;
 import com.mob.tools.utils.UIHandler;
@@ -323,51 +323,51 @@ public class ShareSDKUtils {
 		return Platform.SHARE_TEXT;
 	}
 
-//	public static void onekeyShare(String contentJson) {
-//		onekeyShare(0, contentJson);
-//	}
-//
-//	public static void onekeyShare(int platformId, String contentJson) {
-//		if (DEBUG) {
-//			System.out.println("OnekeyShare");
-//		}
-//		HashMap<String, Object> content = hashon.fromJson(contentJson);
-//		HashMap<String, Object> map = nativeMapToJavaMap(content);
-//
-//		OnekeyShare oks = new OnekeyShare();
-//		if (map.containsKey("text")) {
-//			oks.setText(String.valueOf(map.get("text")));
-//		}
-//		if (map.containsKey("imagePath")) {
-//			oks.setImagePath(String.valueOf(map.get("imagePath")));
-//		}
-//		if (map.containsKey("imageUrl")) {
-//			oks.setImageUrl(String.valueOf(map.get("imageUrl")));
-//		}
-//		if (map.containsKey("title")) {
-//			oks.setTitle(String.valueOf(map.get("title")));
-//		}
-//		if (map.containsKey("comment")) {
-//			oks.setComment(String.valueOf(map.get("comment")));
-//		}
-//		if (map.containsKey("url")) {
-//			oks.setUrl(String.valueOf(map.get("url")));
-//		}
-//		if (map.containsKey("titleUrl")) {
-//			oks.setTitleUrl(String.valueOf(map.get("titleUrl")));
-//		}
-//		if (map.containsKey("site")) {
-//			oks.setSite(String.valueOf(map.get("site")));
-//		}
-//		if (map.containsKey("siteUrl")) {
-//			oks.setSiteUrl(String.valueOf(map.get("siteUrl")));
-//		}
-//		oks.setCallback(paListaner);
-//		if (platformId > 0) {
-//			oks.setPlatform(ShareSDK.platformIdToName(platformId));
-//		}
-//		oks.show(context);
-//	}
+	public static void onekeyShare(String contentJson) {
+		onekeyShare(0, contentJson);
+	}
+
+	public static void onekeyShare(int platformId, String contentJson) {
+		if (DEBUG) {
+			System.out.println("OnekeyShare");
+		}
+		HashMap<String, Object> content = hashon.fromJson(contentJson);
+		HashMap<String, Object> map = nativeMapToJavaMap(content);
+
+		OnekeyShare oks = new OnekeyShare();
+		if (map.containsKey("text")) {
+			oks.setText(String.valueOf(map.get("text")));
+		}
+		if (map.containsKey("imagePath")) {
+			oks.setImagePath(String.valueOf(map.get("imagePath")));
+		}
+		if (map.containsKey("imageUrl")) {
+			oks.setImageUrl(String.valueOf(map.get("imageUrl")));
+		}
+		if (map.containsKey("title")) {
+			oks.setTitle(String.valueOf(map.get("title")));
+		}
+		if (map.containsKey("comment")) {
+			oks.setComment(String.valueOf(map.get("comment")));
+		}
+		if (map.containsKey("url")) {
+			oks.setUrl(String.valueOf(map.get("url")));
+		}
+		if (map.containsKey("titleUrl")) {
+			oks.setTitleUrl(String.valueOf(map.get("titleUrl")));
+		}
+		if (map.containsKey("site")) {
+			oks.setSite(String.valueOf(map.get("site")));
+		}
+		if (map.containsKey("siteUrl")) {
+			oks.setSiteUrl(String.valueOf(map.get("siteUrl")));
+		}
+		oks.setCallback(paListaner);
+		if (platformId > 0) {
+			oks.setPlatform(ShareSDK.platformIdToName(platformId));
+		}
+		oks.show(context);
+	}
 
 	public static void toast(final String message) {
 		Log.e(ShareSDKUtils.class.getName(), message);

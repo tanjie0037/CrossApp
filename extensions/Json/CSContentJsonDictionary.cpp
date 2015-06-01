@@ -104,6 +104,10 @@ void CSJsonDictionary::cleanUp()
 	m_cValue.clear();
 }
 
+bool CSJsonDictionary::isEmpty()
+{
+    return m_cValue.empty();
+}
 
 bool CSJsonDictionary::isKeyValidate(const char *pszKey)
 {
@@ -129,12 +133,20 @@ double CSJsonDictionary::getItemFloatValue(const char *pszKey, double fDefaultVa
 }
 
 
-const char * CSJsonDictionary::getItemStringValue(const char *pszKey)
+const char * CSJsonDictionary::getItemCStringValue(const char *pszKey)
 {
 	if (!isKeyValidate(pszKey, m_cValue) || !m_cValue[pszKey].isString())
 		return NULL;
 
 	return m_cValue[pszKey].asCString();
+}
+
+std::string CSJsonDictionary::getItemStringValue(const char *pszKey)
+{
+    if (!isKeyValidate(pszKey, m_cValue) || !m_cValue[pszKey].isString())
+        return "";
+    
+    return m_cValue[pszKey].asString();
 }
 
 bool CSJsonDictionary::getItemBoolvalue(const char *pszKey, bool bDefaultValue)
@@ -164,6 +176,22 @@ CSJsonDictionary * CSJsonDictionary::getSubDictionary(const char *pszKey)
 	return pNewDictionary;
 }
 
+bool CSJsonDictionary::getSubDictionary(const char *pszKey, CSJsonDictionary& subDict)
+{
+    if (!isKeyValidate(pszKey, m_cValue) || (!m_cValue[pszKey].isArray() &&
+                                             !m_cValue[pszKey].isObject() &&
+                                             !m_cValue[pszKey].isConvertibleTo(CSJson::arrayValue) &&
+                                             !m_cValue[pszKey].isConvertibleTo(CSJson::objectValue)))
+    {
+        return false;
+    }
+    else
+    {
+        subDict.cleanUp();
+        subDict.initWithValue(m_cValue[pszKey]);
+    }
+    return true;
+}
 
 std::string CSJsonDictionary::getDescription()
 {

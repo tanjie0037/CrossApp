@@ -1,9 +1,9 @@
 /*
- * 官网地站:http://www.mob.com
- * 技术支持QQ: 4006852216
- * 官方微信:ShareSDK   （如果发布新版本的话，我们将会第一时间通过微信将版本更新内容推送给您。如果使用过程中有任何问题，也可以通过微信与我们取得联系，我们将会在24小时内给予回复）
+ * Offical Website:http://www.mob.com
+ * Support QQ: 4006852216
+ * Offical Wechat Account:ShareSDK   (We will inform you our updated news at the first time by Wechat, if we release a new version. If you get any problem, you can also contact us with Wechat, we will reply you within 24 hours.)
  *
- * Copyright (c) 2013年 mob.com. All rights reserved.
+ * Copyright (c) 2013 mob.com. All rights reserved.
  */
 
 package cn.sharesdk.onekeyshare;
@@ -32,9 +32,9 @@ import cn.sharesdk.framework.ShareSDK;
 import com.mob.tools.utils.UIHandler;
 
 /**
- * 快捷分享的入口
+ * entrance of onekeyshare
  * <p>
- * 通过不同的setter设置参数，然后调用{@link #show(Context)}方法启动快捷分享
+ * by setting different setter parameter, then call the Show method to start the shortcut to share
  */
 public class OnekeyShare implements PlatformActionListener, Callback {
 	private static final int MSG_TOAST = 1;
@@ -66,16 +66,15 @@ public class OnekeyShare implements PlatformActionListener, Callback {
 		ShareSDK.initSDK(context);
 		this.context = context;
 
-		// 打开分享菜单的统计
+		// a statistics of opening the platform gridview
 		ShareSDK.logDemoEvent(1, null);
 
-		// 显示方式是由platform和silent两个字段控制的
-		// 如果platform设置了，则无须显示九宫格，否则都会显示；
-		// 如果silent为true，表示不进入编辑页面，否则会进入。
-		// 本类只判断platform，因为九宫格显示以后，事件交给PlatformGridView控制
-		// 当platform和silent都为true，则直接进入分享；
-		// 当platform设置了，但是silent为false，则判断是否是“使用客户端分享”的平台，
-		// 若为“使用客户端分享”的平台，则直接分享，否则进入编辑页面
+		// display mode of onekeyshare is controled by the field of platform and silent,
+		// if platform is set, platform gridview won't be display, onekeyshare will jump to editpage directly
+		// if silent is true, onekeyshare will skip the editpage and shares directly
+		// the class only determines the value of platform, because after PlatformGridView is shown, all events will be passed into it
+		// when platform is set, and silent is true, onekeyshare will share the selected platform directly
+		// when platform is set, and silent is false, onekeyshare will determine whether to share by the client of the platform or not
 		if (shareParamsMap.containsKey("platform")) {
 			String name = String.valueOf(shareParamsMap.get("platform"));
 			Platform platform = ShareSDK.getPlatform(name);
@@ -131,137 +130,134 @@ public class OnekeyShare implements PlatformActionListener, Callback {
 		this.theme = theme;
 	}
 
-	/** address是接收人地址，仅在信息和邮件使用，否则可以不提供 */
+	/** short message address or email address */
 	public void setAddress(String address) {
 		shareParamsMap.put("address", address);
 	}
 
-	/**
-	 * title标题，在印象笔记、邮箱、信息、微信（包括好友、朋友圈和收藏）、
-	 * 易信（包括好友、朋友圈）、人人网和QQ空间使用，否则可以不提供
-	 */
+	/** title of share content */
 	public void setTitle(String title) {
 		shareParamsMap.put("title", title);
 	}
 
-	/** titleUrl是标题的网络链接，仅在人人网和QQ空间使用，否则可以不提供 */
+	/** the url of title */
 	public void setTitleUrl(String titleUrl) {
 		shareParamsMap.put("titleUrl", titleUrl);
 	}
 
-	/** text是分享文本，所有平台都需要这个字段 */
+	/** share content */
 	public void setText(String text) {
 		shareParamsMap.put("text", text);
 	}
 
-	/** 获取text字段的值 */
+	/** returns share content */
 	public String getText() {
 		return shareParamsMap.containsKey("text") ? String.valueOf(shareParamsMap.get("text")) : null;
 	}
 
-	/** imagePath是本地的图片路径，除Linked-In外的所有平台都支持这个字段 */
+	/** local path of the image to share */
 	public void setImagePath(String imagePath) {
 		if(!TextUtils.isEmpty(imagePath))
 			shareParamsMap.put("imagePath", imagePath);
 	}
 
-	/** imageUrl是图片的网络路径，新浪微博、人人网、QQ空间和Linked-In支持此字段 */
+	/** url of the image to share */
 	public void setImageUrl(String imageUrl) {
 		if (!TextUtils.isEmpty(imageUrl))
 			shareParamsMap.put("imageUrl", imageUrl);
 	}
 
-	/** url在微信（包括好友、朋友圈收藏）和易信（包括好友和朋友圈）中使用，否则可以不提供 */
+	/** webpage link to share in wechat and yixin etc.*/
  	public void setUrl(String url) {
 		shareParamsMap.put("url", url);
 	}
 
-	/** filePath是待分享应用程序的本地路劲，仅在微信（易信）好友和Dropbox中使用，否则可以不提供 */
+ 	/** local path of the file to share in wechat */
 	public void setFilePath(String filePath) {
 		shareParamsMap.put("filePath", filePath);
 	}
 
-	/** comment是我对这条分享的评论，仅在人人网和QQ空间使用，否则可以不提供 */
+	/** comment field of platform renren */
 	public void setComment(String comment) {
 		shareParamsMap.put("comment", comment);
 	}
 
-	/** site是分享此内容的网站名称，仅在QQ空间使用，否则可以不提供 */
+	/** app name or site name of your program */
 	public void setSite(String site) {
 		shareParamsMap.put("site", site);
 	}
 
-	/** siteUrl是分享此内容的网站地址，仅在QQ空间使用，否则可以不提供 */
+	/** the url of the website or appname */
 	public void setSiteUrl(String siteUrl) {
 		shareParamsMap.put("siteUrl", siteUrl);
 	}
 
-	/** foursquare分享时的地方名 */
+	/** location name */
 	public void setVenueName(String venueName) {
 		shareParamsMap.put("venueName", venueName);
 	}
 
-	/** foursquare分享时的地方描述 */
+	/** description of your sharing location */
 	public void setVenueDescription(String venueDescription) {
 		shareParamsMap.put("venueDescription", venueDescription);
 	}
 
-	/** 分享地纬度，新浪微博、腾讯微博和foursquare支持此字段 */
+	/** latitude */
 	public void setLatitude(float latitude) {
 		shareParamsMap.put("latitude", latitude);
 	}
 
-	/** 分享地经度，新浪微博、腾讯微博和foursquare支持此字段 */
+	/** longitude */
 	public void setLongitude(float longitude) {
 		shareParamsMap.put("longitude", longitude);
 	}
 
-	/** 是否直接分享 */
+	/** determine whether to share directly */
 	public void setSilent(boolean silent) {
 		this.silent = silent;
 	}
 
-	/** 设置编辑页的初始化选中平台 */
+	/** Setting the selected platform of EditPage when initializing */
 	public void setPlatform(String platform) {
 		shareParamsMap.put("platform", platform);
 	}
 
-	/** 设置KakaoTalk的应用下载地址 */
+	/** Setting the selected platform of KakaoTalk ，go to the url when click the share msg */
 	public void setInstallUrl(String installurl) {
 		shareParamsMap.put("installurl", installurl);
 	}
 
-	/** 设置KakaoTalk的应用打开地址 */
+	/** Setting the selected platform of KakaoTalk  ，open the app-url when click the share msg */
 	public void setExecuteUrl(String executeurl) {
 		shareParamsMap.put("executeurl", executeurl);
 	}
 
-	/** 设置微信分享的音乐的地址 */
+	/** Setting the musicUrl when share msg using Wechat*/
 	public void setMusicUrl(String musicUrl) {
 		shareParamsMap.put("musicUrl", musicUrl);
 	}
 
-	/** 设置自定义的外部回调 */
+	/** setting custom external callback */
 	public void setCallback(PlatformActionListener callback) {
 		this.callback = callback;
 	}
 
-	/** 返回操作回调 */
+	/** returns sharing callback */
 	public PlatformActionListener getCallback() {
 		return callback;
 	}
 
-	/** 设置用于分享过程中，根据不同平台自定义分享内容的回调 */
+	/** setting the share content customizing callback for sharing process */
 	public void setShareContentCustomizeCallback(ShareContentCustomizeCallback callback) {
 		customizeCallback = callback;
 	}
 
-	/** 返回自定义分享内容的回调 */
+	/** returns share content customizing callback */
 	public ShareContentCustomizeCallback getShareContentCustomizeCallback() {
 		return customizeCallback;
 	}
 
-	/** 设置自己图标和点击事件，可以重复调用添加多次 */
+	/** add a custom icon and its click event listener */
 	public void setCustomerLogo(Bitmap enableLogo,Bitmap disableLogo, String label, OnClickListener ocListener) {
 		CustomerLogo cl = new CustomerLogo();
 		cl.label = label;
@@ -271,23 +267,23 @@ public class OnekeyShare implements PlatformActionListener, Callback {
 		customers.add(cl);
 	}
 
-	/** 设置一个总开关，用于在分享前若需要授权，则禁用sso功能 */
+	/** disable SSO authorizing before sharing */
  	public void disableSSOWhenAuthorize() {
 		disableSSO = true;
 	}
 
-	/** 设置编辑页面的显示模式为Dialog模式 */
+	/** set the display mode of editpage to be the dialog mode */
 	public void setDialogMode() {
 		dialogMode = true;
 		shareParamsMap.put("dialogMode", dialogMode);
 	}
 
-	/** 添加一个隐藏的platform */
+	/** add a hidden platform */
 	public void addHiddenPlatform(String platform) {
 		hiddenPlatforms.put(platform, platform);
 	}
 
-	/** 设置一个将被截图分享的View , surfaceView是截不了图片的*/
+	/** add a view to be captured to share */
 	public void setViewToShare(View viewToShare) {
 		try {
 			Bitmap bm = captureView(viewToShare, viewToShare.getWidth(), viewToShare.getHeight());
@@ -297,7 +293,7 @@ public class OnekeyShare implements PlatformActionListener, Callback {
 		}
 	}
 
-	/** 腾讯微博分享多张图片 */
+	/** share multi local pic to tencent weibo */
 	public void setImageArray(String[] imageArray) {
 		shareParamsMap.put("imageArray", imageArray);
 	}
@@ -310,7 +306,7 @@ public class OnekeyShare implements PlatformActionListener, Callback {
 		this.onShareButtonClickListener = onShareButtonClickListener;
 	}
 
-	/** 循环执行分享 */
+	/** execute the loop of share */
 	public void share(HashMap<Platform, HashMap<String, Object>> shareData) {
 		boolean started = false;
 		for (Entry<Platform, HashMap<String, Object>> ent : shareData.entrySet()) {
@@ -486,7 +482,7 @@ public class OnekeyShare implements PlatformActionListener, Callback {
 		msg.obj = t;
 		UIHandler.sendMessage(msg, this);
 
-		// 分享失败的统计
+		// a statistics of cancel sharing
 		ShareSDK.logDemoEvent(4, platform);
 	}
 
@@ -509,7 +505,7 @@ public class OnekeyShare implements PlatformActionListener, Callback {
 			case MSG_ACTION_CCALLBACK: {
 				switch (msg.arg1) {
 					case 1: {
-						// 成功
+						// success
 						int resId = getStringRes(context, "share_completed");
 						if (resId > 0) {
 							showNotification(context.getString(resId));
@@ -517,7 +513,7 @@ public class OnekeyShare implements PlatformActionListener, Callback {
 					}
 					break;
 					case 2: {
-						// 失败
+						// failed
 						String expName = msg.obj.getClass().getSimpleName();
 						if ("WechatClientNotExistException".equals(expName)
 								|| "WechatTimelineNotSupportedException".equals(expName)
@@ -566,7 +562,7 @@ public class OnekeyShare implements PlatformActionListener, Callback {
 					}
 					break;
 					case 3: {
-						// 取消
+						// canceled
 						int resId = getStringRes(context, "share_canceled");
 						if (resId > 0) {
 							showNotification(context.getString(resId));
@@ -587,12 +583,12 @@ public class OnekeyShare implements PlatformActionListener, Callback {
 		return false;
 	}
 
-	// 在状态栏提示分享操作
+	// notify the share result
 	private void showNotification(String text) {
 		Toast.makeText(context, text, Toast.LENGTH_SHORT).show();
 	}
 
-	/** 是否支持QQ,QZone授权登录后发微博 */
+	/** QQ,QZone login after send weibo */
 	public void setShareFromQQAuthSupport(boolean shareFromQQLogin)
 	{
 		shareParamsMap.put("isShareTencentWeibo", shareFromQQLogin);

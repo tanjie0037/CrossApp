@@ -59,7 +59,7 @@ CCDictionary* convertNSDictToCCDict(NSDictionary *dict)
         CCDictionary *ccDict = CCDictionary::create();
 
         NSArray *allKeys = [dict allKeys];
-                NSLog(@"%d",[allKeys count]);
+                NSLog(@"%ld",[allKeys count]);
         for (int i = 0; i < [allKeys count]; i++)
         {
             NSString *key = [allKeys objectAtIndex:i];
@@ -324,6 +324,9 @@ void C2DXiOSShareSDK::setPlatformConfig(C2DXPlatType platType, CCDictionary *con
 {
     NSMutableDictionary *configDict = nil;
     
+//    NSJSONSerialization
+
+    
     if (configInfo)
     {
         //转换配置信息
@@ -380,7 +383,7 @@ void C2DXiOSShareSDK::authorize(C2DXPlatType platType, C2DXAuthResultEvent callb
                         if (error)
                         {
                             errorInfo = CCDictionary::create();
-                            errorInfo -> setObject(CCString::createWithFormat("%d",[error errorCode]), "error_code");
+                            errorInfo -> setObject(CCString::createWithFormat("%ld",[error errorCode]), "error_code");
                             errorInfo -> setObject(CCString::create([[error errorDescription] UTF8String]), "error_msg");
                         }
                         
@@ -421,7 +424,7 @@ void C2DXiOSShareSDK::getUserInfo(C2DXPlatType platType, C2DXGetUserInfoResultEv
                                    NSInteger errCode = [error errorCode];
                                    NSString *errDesc = [error errorDescription];
                                    errorInfo = CCDictionary::create();
-                                   errorInfo -> setObject(CCString::createWithFormat("%d",errCode), "error_code");
+                                   errorInfo -> setObject(CCString::createWithFormat("%ld",errCode), "error_code");
                                    if (errDesc)
                                    {
                                        errorInfo -> setObject(CCString::create([errDesc UTF8String]), "error_msg");
@@ -461,7 +464,7 @@ void C2DXiOSShareSDK::shareContent(C2DXPlatType platType, CCDictionary *content,
                             NSString *errDesc = [error errorDescription];
                             
                             errorInfo = CCDictionary::create();
-                            errorInfo -> setObject(CCString::createWithFormat("%d",errCode), "error_code");
+                            errorInfo -> setObject(CCString::createWithFormat("%ld",errCode), "error_code");
                             if (errDesc)
                             {
                                 errorInfo -> setObject(CCString::create([errDesc UTF8String]), "error_msg");
@@ -513,7 +516,7 @@ void C2DXiOSShareSDK::oneKeyShareContent(CCArray *platTypes, CCDictionary *conte
                                   NSString *errDesc = [error errorDescription];
                                   
                                   errorInfo = CCDictionary::create();
-                                  errorInfo -> setObject(CCString::createWithFormat("%d",errCode), "error_code");
+                                  errorInfo -> setObject(CCString::createWithFormat("%ld",errCode), "error_code");
                                   if (errDesc)
                                   {
                                       errorInfo -> setObject(CCString::create([errDesc UTF8String]), "error_msg");
@@ -592,7 +595,7 @@ void C2DXiOSShareSDK::showShareMenu(CCArray *platTypes, CCDictionary *content, C
                                     NSString *errDesc = [error errorDescription];
                                     
                                     errorInfo = CCDictionary::create();
-                                    errorInfo -> setObject(CCString::createWithFormat("%d",errCode), "error_code");
+                                    errorInfo -> setObject(CCString::createWithFormat("%ld",errCode), "error_code");
                                     if (errDesc)
                                     {
                                         errorInfo -> setObject(CCString::create([errDesc UTF8String]), "error_msg");
@@ -639,7 +642,7 @@ void C2DXiOSShareSDK::showShareView(C2DXPlatType platType, CCDictionary *content
                                      NSString *errDesc = [error errorDescription];
                                      
                                      errorInfo = CCDictionary::create();
-                                     errorInfo -> setObject(CCString::createWithFormat("%d",errCode), "error_code");
+                                     errorInfo -> setObject(CCString::createWithFormat("%ld",errCode), "error_code");
                                      if (errDesc)
                                      {
                                          errorInfo -> setObject(CCString::create([errDesc UTF8String]), "error_msg");
