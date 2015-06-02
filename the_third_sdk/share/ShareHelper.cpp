@@ -18,11 +18,9 @@ USING_NS_CC_EXT;
 using namespace CSJson;
 using namespace cn::sharesdk;
 
-#if 1
-#define  LOG_TAG    "ShareHelper"
+#ifndef LOG_TAG
+#define  LOG_TAG    "jni"
 #define  LOGD(...)  __android_log_print(ANDROID_LOG_DEBUG,LOG_TAG,__VA_ARGS__)
-#else
-#define  LOGD(...)
 #endif
 
 #ifdef __cplusplus
@@ -60,16 +58,17 @@ extern "C" {
         }
     }
     
-    bool getMethod(JniMethodInfo &mi, const char *methodName, const char *paramCode) {
-        return JniHelper::getStaticMethodInfo(mi, "cn/sharesdk/ShareSDKUtils", methodName, paramCode);
-    }
-    
-    void releaseMethod(JniMethodInfo &mi) {
-        mi.env->DeleteLocalRef(mi.classID);
-    }
 #ifdef __cplusplus
 }
 #endif
+
+bool getMethod(JniMethodInfo &mi, const char *methodName, const char *paramCode) {
+    return JniHelper::getStaticMethodInfo(mi, "cn/sharesdk/ShareSDKUtils", methodName, paramCode);
+}
+
+void releaseMethod(JniMethodInfo &mi) {
+    mi.env->DeleteLocalRef(mi.classID);
+}
 
 void ShareHelper::open(const std::string& appKey, bool useAppTrusteeship) {
     JniMethodInfo mi;

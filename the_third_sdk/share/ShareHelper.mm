@@ -6,13 +6,13 @@
 //
 //
 
-#import <Foundation/Foundation.h>
-#import <ShareSDK/ShareSDK.h>
-#import <AGCommon/CMRegexKitLite.h>
-
 #include "ShareHelper.h"
 
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_IOS)
+
+#import <Foundation/Foundation.h>
+#import <ShareSDK/ShareSDK.h>
+#import <AGCommon/CMRegexKitLite.h>
 
 #ifndef utf8cstr
 #define utf8cstr(nsstr) (nsstr ? [nsstr cStringUsingEncoding:NSUTF8StringEncoding] : "")
