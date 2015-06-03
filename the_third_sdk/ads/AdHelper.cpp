@@ -8,7 +8,7 @@
 
 #include "AdHelper.h"
 
-//#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
 
 #include "platform/android/jni/JniHelper.h"
 #include <jni.h>
@@ -51,6 +51,4 @@ void AdHelper::playVideo(AdType type) {
     //todo
 }
 
-
-
-//#endif
+#endif

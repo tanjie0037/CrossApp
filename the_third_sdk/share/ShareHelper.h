@@ -129,6 +129,10 @@ public:
      *	@return true 安装有客户端, false 没有安装客户端
      */
 //    static bool isClientInstalled(cn::sharesdk::C2DXPlatType platType);
+    
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_IOS)
+    static void initIOS();
+#endif
 };
 
 #endif /* defined(__AppGift__ShareHelper__) */

@@ -13,6 +13,12 @@
 #import <Foundation/Foundation.h>
 #import <ShareSDK/ShareSDK.h>
 #import <AGCommon/CMRegexKitLite.h>
+#import <FacebookConnection/ISSFacebookApp.h>
+#import "WXApi.h"
+#import "WeiboApi.h"
+#import <TencentOpenAPI/QQApiInterface.h>
+#import <TencentOpenAPI/TencentOAuth.h>
+
 
 #ifndef utf8cstr
 #define utf8cstr(nsstr) (nsstr ? [nsstr cStringUsingEncoding:NSUTF8StringEncoding] : "")
@@ -357,5 +363,21 @@ void ShareHelper::showShareView(cn::sharesdk::C2DXPlatType platType, CSJsonDicti
 //    id <ISSPlatformApp> app = [ShareSDK getClientWithType:(ShareType)platType];
 //    return  [app isClientInstalled] ? true : false ;
 //}
+
+void ShareHelper::initIOS()
+{
+    //开启Facebook网页授权开关(optional)
+    id<ISSFacebookApp> facebookApp =(id<ISSFacebookApp>)[ShareSDK getClientWithType:ShareTypeFacebook];
+    [facebookApp setIsAllowWebAuthorize:YES];
+    
+    //导入微信类型
+    [ShareSDK importWeChatClass:[WXApi class]];
+    
+    //导入腾讯微博类型
+    [ShareSDK importTencentWeiboClass:[WeiboApi class]];
+    
+    //导入QQ类型
+    [ShareSDK importQQClass:[QQApiInterface class] tencentOAuthCls:[TencentOAuth class]];
+}
 
 #endif
