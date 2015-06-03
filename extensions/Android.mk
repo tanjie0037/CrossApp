@@ -17,6 +17,9 @@ Json/lib_json/json_writer.cpp \
 sqlite3/include/sqlite3.c \
 device/Device_android/CADevice.cpp \
 studio/CAStudioViewParser.cpp \
+crypto/CACrypto.cpp \
+crypto/base64/libbase64.c \
+crypto/xxtea/xxtea.c
 
 LOCAL_WHOLE_STATIC_LIBRARIES := CrossApp_static
 LOCAL_WHOLE_STATIC_LIBRARIES += cocosdenshion_static
@@ -28,6 +31,10 @@ LOCAL_EXPORT_C_INCLUDES := $(LOCAL_PATH) \
                            $(LOCAL_PATH)/LocalStorage \
 						   $(LOCAL_PATH)/Json \
 						   $(LOCAL_PATH)/Json/lib_json \
+						   $(LOCAL_PATH)/crypto \
+						   $(LOCAL_PATH)/crypto/xxtea \
+						   $(LOCAL_PATH)/crypto/md5 \
+						   $(LOCAL_PATH)/crypto/base64
 
 LOCAL_CFLAGS := -fexceptions
                     
