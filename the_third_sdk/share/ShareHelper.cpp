@@ -11,17 +11,12 @@
 
 #include "platform/android/jni/JniHelper.h"
 #include <jni.h>
-#include <android/log.h>
+#include "SDKCommon.h"
 
 USING_NS_CC;
 USING_NS_CC_EXT;
 using namespace CSJson;
 using namespace cn::sharesdk;
-
-#ifndef LOG_TAG
-#define  LOG_TAG    "jni"
-#define  LOGD(...)  __android_log_print(ANDROID_LOG_DEBUG,LOG_TAG,__VA_ARGS__)
-#endif
 
 #ifdef __cplusplus
 extern "C" {

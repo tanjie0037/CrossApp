@@ -54,7 +54,8 @@ public:
     CSJsonDictionary *   getSubDictionary(const char *pszKey);
     bool getSubDictionary(const char *pszKey, CSJsonDictionary& subDict);
 
-    std::string          getDescription();
+    std::string getDescription();
+    std::string getStyledDescription();
 
     bool    insertItemToArray(const char *pszArrayKey, int nValue);
     bool    insertItemToArray(const char *pszArrayKey, double fValue);

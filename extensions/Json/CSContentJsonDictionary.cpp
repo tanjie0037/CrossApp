@@ -195,10 +195,17 @@ bool CSJsonDictionary::getSubDictionary(const char *pszKey, CSJsonDictionary& su
 
 std::string CSJsonDictionary::getDescription()
 {
-	std::string strReturn = m_cValue.toStyledString();
-	return strReturn;
+    CSJson::FastWriter writer;
+    std::string strReturn = writer.write(m_cValue);
+    strReturn = strReturn.substr(0, strReturn.length() - 1);
+    return strReturn;
 }
 
+std::string CSJsonDictionary::getStyledDescription()
+{
+    std::string strReturn = m_cValue.toStyledString();
+    return strReturn;
+}
 
 bool CSJsonDictionary::insertItemToArray(const char *pszArrayKey, int nValue)
 {

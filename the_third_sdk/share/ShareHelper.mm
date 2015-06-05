@@ -19,10 +19,7 @@
 #import <TencentOpenAPI/QQApiInterface.h>
 #import <TencentOpenAPI/TencentOAuth.h>
 
-
-#ifndef utf8cstr
-#define utf8cstr(nsstr) (nsstr ? [nsstr cStringUsingEncoding:NSUTF8StringEncoding] : "")
-#endif
+#include "SDKCommon.h"
 
 //static UIView *_refView = nil;
 
@@ -115,31 +112,6 @@ id<ISSContent> convertPublishContent(CSJsonDictionary& content) {
     
     return contentObj;
 }
-
-/*!
- * @brief 把格式化的JSON格式的字符串转换成字典
- * @param jsonString JSON格式的字符串
- * @return 返回字典
- */
-NSDictionary* dictionaryWithJsonString(NSString *jsonString) {
-    if (jsonString == nil) {
-        return nil;
-    }
-    
-    NSData *jsonData = [jsonString dataUsingEncoding:NSUTF8StringEncoding];
-    NSError *err = nil;
-    NSDictionary *dic = [NSJSONSerialization JSONObjectWithData:jsonData
-                                                        options:NSJSONReadingMutableContainers
-                                                          error:&err];
-    if(err) {
-        NSLog(@"json解析失败：%@",err);
-        NSLog(@"jsonString: %@", jsonString);
-        assert(0);
-        return nil;
-    }
-    return dic;
-}
-
 
 void ShareHelper::open(const std::string& appKey, bool useAppTrusteeship) {
     NSString *appKeyStr = [NSString stringWithCString:appKey.c_str() encoding:NSUTF8StringEncoding];
@@ -366,7 +338,7 @@ void ShareHelper::showShareView(cn::sharesdk::C2DXPlatType platType, CSJsonDicti
 
 void ShareHelper::initIOS()
 {
-    //开启Facebook网页授权开关(optional)
+    //开启Facebook网页授权开关(optional). todo: fb审核需要关闭
     id<ISSFacebookApp> facebookApp =(id<ISSFacebookApp>)[ShareSDK getClientWithType:ShareTypeFacebook];
     [facebookApp setIsAllowWebAuthorize:YES];
     
