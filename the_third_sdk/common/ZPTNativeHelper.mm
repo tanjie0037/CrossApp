@@ -8,12 +8,12 @@
 
 #include "ZPTNativeHelper.h"
 
-
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_IOS)
 
 #include "SDKCommon.h"
 #import <Foundation/Foundation.h>
 #import "AppController.h"
+#import <AdSupport/ASIdentifierManager.h>
 
 void ZPTNativeHelper::getDeviceInfo(CSJsonDictionary& dic)
 {
@@ -57,5 +57,9 @@ void ZPTNativeHelper::sendMail(const char *target, const char *title, CSJsonDict
     [[UIApplication sharedApplication] openURL: [NSURL URLWithString:email]];
 }
 
+string ZPTNativeHelper::getDeviceId()
+{
+    return string(utf8cstr([[[ASIdentifierManager sharedManager] advertisingIdentifier] UUIDString]));
+}
 
 #endif

@@ -58,4 +58,9 @@ void ZPTNativeHelper::sendMail(const char *target, const char *title, CSJsonDict
     mi.env->DeleteLocalRef(mi.classID);
 }
 
+string ZPTNativeHelper::getDeviceId()
+{
+    return "todo-android";
+}
+
 #endif

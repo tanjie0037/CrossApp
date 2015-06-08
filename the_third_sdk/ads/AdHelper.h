@@ -15,7 +15,8 @@ class AdHelper {
 public:
     enum AdType {
         AdFyber = 0,
-        AdSupersonic = 1
+        AdSupersonic = 1,
+        AdNativeX = 2
     };
     
 public:

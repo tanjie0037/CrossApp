@@ -20,6 +20,7 @@ public:
     static void getDeviceInfo(CSJsonDictionary& dic);
     static void openUrl(const char* url);
     static void sendMail(const char *target, const char *title, CSJsonDictionary& extra);
+    static string getDeviceId();
 };
 
 #endif /* defined(__AppGift__ZPTNativeHelper__) */
