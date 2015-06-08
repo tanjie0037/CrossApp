@@ -10,11 +10,16 @@
 #define __AppGift__ZPTNativeHelper__
 
 #include <stdio.h>
+#include <map>
+#include "CrossApp.h"
+#include "CrossAppExt.h"
 
 class ZPTNativeHelper
 {
-    static void openUrl(const char* url) {}
-    static void sendMail() {}
+public:
+    static void getDeviceInfo(CSJsonDictionary& dic);
+    static void openUrl(const char* url);
+    static void sendMail(const char *target, const char *title, CSJsonDictionary& extra);
 };
 
 #endif /* defined(__AppGift__ZPTNativeHelper__) */

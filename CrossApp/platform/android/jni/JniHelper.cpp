@@ -2,6 +2,7 @@
 #include "JniHelper.h"
 #include <android/log.h>
 #include <string.h>
+#include "assert.h"
 
 #if 1
 #define  LOG_TAG    "JniHelper"
@@ -30,6 +31,12 @@ extern "C"
     static bool getEnv(JNIEnv **env)
     {
         bool bRet = false;
+
+        if (!JAVAVM) 
+        {
+            LOGD("Failed to get the environment using GetEnv(), JAVAVM is NULL");
+            return false;
+        }
 
         switch(JAVAVM->GetEnv((void**)env, JNI_VERSION_1_4))
         {
@@ -173,6 +180,10 @@ JavaVM* JniHelper::m_psJavaVM = NULL;
 
 JavaVM* JniHelper::getJavaVM()
 {
+    if (!m_psJavaVM) {
+        LOGD("---JavaVM is NULL!");
+        return NULL;
+    }
     return m_psJavaVM;
 }
 

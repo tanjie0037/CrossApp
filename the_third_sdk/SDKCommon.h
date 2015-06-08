@@ -43,10 +43,8 @@ static NSDictionary* dictionaryWithJsonString(NSString *jsonString) {
     }
     return dic;
 }
-#endif  //CC_PLATFORM_IOS
 
-
-#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
+#elif (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
 
 #include <android/log.h>
 

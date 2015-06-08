@@ -11,11 +11,10 @@
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_IOS)
 
 #include "MobClick.h"
-#include "SDKCommon.h"
 #import <Foundation/Foundation.h>
 #import "AppController.h"
 #import "UMFeedback.h"
-
+#include "SDKCommon.h"
 
 void UMHelper::startWithAppkey(const char* appkey, const char* channel)
 {
