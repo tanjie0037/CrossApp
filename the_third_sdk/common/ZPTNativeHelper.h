@@ -19,7 +19,7 @@ class ZPTNativeHelper
 public:
     static void getDeviceInfo(CSJsonDictionary& dic);
     static void openUrl(const char* url);
-    static void sendMail(const char *target, const char *title, CSJsonDictionary& extra);
+    static void sendMail(const string &target, const string &title, CSJsonDictionary& extra, const string &format);
     static string getDeviceId();
 };
 

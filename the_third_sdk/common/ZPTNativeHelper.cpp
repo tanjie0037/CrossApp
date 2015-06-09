@@ -42,7 +42,7 @@ void ZPTNativeHelper::openUrl(const char* url)
     mi.env->DeleteLocalRef(mi.classID);
 }
 
-void ZPTNativeHelper::sendMail(const char *target, const char *title, CSJsonDictionary& extra)
+void ZPTNativeHelper::sendMail(const string &target, const string &title, CSJsonDictionary &extra, const string &format)
 {
     JniMethodInfo mi;
     if (!JniHelper::getStaticMethodInfo(mi, "com.zpt.utils.ZPTNativeHelper", "sendMail", "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V")) {
@@ -50,9 +50,9 @@ void ZPTNativeHelper::sendMail(const char *target, const char *title, CSJsonDict
         return;
     }
     
-    jstring j_target = mi.env->NewStringUTF(target);
-    jstring j_title = mi.env->NewStringUTF(title);
-    jstring j_extra = mi.env->NewStringUTF(extra.getStyledDescription().c_str());
+    jstring j_target = mi.env->NewStringUTF(target.c_str());
+    jstring j_title = mi.env->NewStringUTF(title.c_str());
+    jstring j_extra = mi.env->NewStringUTF(("\n\n" + extra.getStyledDescription() + format).c_str());
         
     mi.env->CallStaticVoidMethod(mi.classID, mi.methodID, j_target, j_title, j_extra);
     mi.env->DeleteLocalRef(mi.classID);

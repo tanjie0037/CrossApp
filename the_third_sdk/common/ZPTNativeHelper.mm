@@ -35,11 +35,11 @@ void ZPTNativeHelper::openUrl(const char* url)
 }
 
 
-void ZPTNativeHelper::sendMail(const char *target, const char *title, CSJsonDictionary& extra)
+void ZPTNativeHelper::sendMail(const string &target, const string &title, CSJsonDictionary& extra, const string &format)
 {
     NSMutableString *mailUrl = [[[NSMutableString alloc]init]autorelease];
     //添加收件人
-    [mailUrl appendFormat:@"mailto:%@", nsstr(target)];
+    [mailUrl appendFormat:@"mailto:%@", nsstr(target.c_str())];
 //    //添加抄送
 //    NSArray *ccRecipients = [NSArray arrayWithObjects:@"second@example.com", @"third@example.com", nil];
 //    [mailUrl appendFormat:@"?cc=%@", [ccRecipients componentsJoinedByString:@","]];
@@ -47,10 +47,10 @@ void ZPTNativeHelper::sendMail(const char *target, const char *title, CSJsonDict
 //    NSArray *bccRecipients = [NSArray arrayWithObjects:@"fourth@example.com", nil];
 //    [mailUrl appendFormat:@"&bcc=%@", [bccRecipients componentsJoinedByString:@","]];
     //添加主题
-    [mailUrl appendFormat:@"?subject=%@", nsstr(title)];
+    [mailUrl appendFormat:@"?subject=%@", nsstr(title.c_str())];
     //添加邮件内容
     if (!extra.isEmpty()) {
-        [mailUrl appendFormat:@"&body=%@", nsstr(extra.getStyledDescription().c_str())];
+        [mailUrl appendFormat:@"&body=%@", nsstr(("\n\n" + extra.getStyledDescription() + format).c_str()) ];
     }
     
     NSString* email = [mailUrl stringByAddingPercentEscapesUsingEncoding: NSUTF8StringEncoding];
