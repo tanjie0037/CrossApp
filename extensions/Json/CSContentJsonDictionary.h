@@ -30,6 +30,7 @@ class CSJsonDictionary
 {
 public:
     CSJsonDictionary();
+    CSJsonDictionary(CSJson::Value &value);
     ~CSJsonDictionary();
 
 public:

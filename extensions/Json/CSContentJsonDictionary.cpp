@@ -34,6 +34,10 @@ CSJsonDictionary::CSJsonDictionary()
 	m_cValue.clear();
 }
 
+CSJsonDictionary::CSJsonDictionary(CSJson::Value &value)
+{
+    m_cValue = value;
+}
 
 CSJsonDictionary::~CSJsonDictionary()
 {
