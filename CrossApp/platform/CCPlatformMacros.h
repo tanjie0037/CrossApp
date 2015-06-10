@@ -154,8 +154,8 @@ public: virtual void set##funName(varType var)   \
 #define CC_BREAK_IF(cond)           if(cond) break
 #define CC_CONTINUE_IF(cond)        if(cond) continue
 
-#define __CCLOGWITHFUNCTION(s, ...) \
-    CCLog("%s : %s",__FUNCTION__, CCString::createWithFormat(s, ##__VA_ARGS__)->getCString())
+#define __CCLOGWITHFUNCTION(format, ...) \
+CrossApp::CCLog("Func:[%s], Line:[%d]:\n> "format"", __PRETTY_FUNCTION__, __LINE__, ##__VA_ARGS__)
 
 // CrossApp debug
 #if !defined(CROSSAPP_DEBUG) || CROSSAPP_DEBUG == 0
@@ -165,16 +165,16 @@ public: virtual void set##funName(varType var)   \
 #define CCLOGWARN(...)   do {} while (0)
 
 #elif CROSSAPP_DEBUG == 1
-#define CCLOG(format, ...)      CrossApp::CCLog(format, ##__VA_ARGS__)
-#define CCLOGERROR(format,...)  CrossApp::CCLog(format, ##__VA_ARGS__)
+#define CCLOG(format, ...)      __CCLOGWITHFUNCTION(format, ##__VA_ARGS__)
+#define CCLOGERROR(format,...)  __CCLOGWITHFUNCTION(format, ##__VA_ARGS__)
 #define CCLOGINFO(format,...)   do {} while (0)
-#define CCLOGWARN(...) __CCLOGWITHFUNCTION(__VA_ARGS__)
+#define CCLOGWARN(format, ...)  __CCLOGWITHFUNCTION(format, ##__VA_ARGS__)
 
 #elif CROSSAPP_DEBUG > 1
-#define CCLOG(format, ...)      CrossApp::CCLog(format, ##__VA_ARGS__)
-#define CCLOGERROR(format,...)  CrossApp::CCLog(format, ##__VA_ARGS__)
-#define CCLOGINFO(format,...)   CrossApp::CCLog(format, ##__VA_ARGS__)
-#define CCLOGWARN(...) __CCLOGWITHFUNCTION(__VA_ARGS__)
+#define CCLOG(format, ...)      __CCLOGWITHFUNCTION(format, ##__VA_ARGS__)
+#define CCLOGERROR(format,...)  __CCLOGWITHFUNCTION(format, ##__VA_ARGS__)
+#define CCLOGINFO(format,...)   __CCLOGWITHFUNCTION(format, ##__VA_ARGS__)
+#define CCLOGWARN(format,...)   __CCLOGWITHFUNCTION(format, ##__VA_ARGS__)
 #endif // CROSSAPP_DEBUG
 
 // Lua engine debug

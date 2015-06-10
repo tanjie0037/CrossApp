@@ -1,12 +1,5 @@
 #include "ShareSDKUtils.h"
 
-#if 1
-#define  LOG_TAG    "ShareSDKUtils"
-#define  LOGD(...)  __android_log_print(ANDROID_LOG_DEBUG,LOG_TAG,__VA_ARGS__)
-#else
-#define  LOGD(...) 
-#endif
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -18,7 +11,7 @@ C2DXShareResultEvent shareCb;
 JNIEXPORT void JNICALL Java_cn_sharesdk_ShareSDKUtils_onJavaCallback(JNIEnv * env, jclass thiz, jstring resp) {
 	CCJSONConverter* json = CCJSONConverter::sharedConverter();
 	const char* ccResp = env->GetStringUTFChars(resp, JNI_FALSE);
-	CCLog("ccResp = %s", ccResp);
+	CCLOG("ccResp = %s", ccResp);
 	CCDictionary* dic = json->dictionaryFrom(ccResp);
 	env->ReleaseStringUTFChars(resp, ccResp);
 	CCNumber* status = dynamic_cast<CCNumber*>(dic->objectForKey("status")); // Success = 1, Fail = 2, Cancel = 3

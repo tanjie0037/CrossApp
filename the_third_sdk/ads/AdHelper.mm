@@ -25,34 +25,34 @@ USING_NS_CC;
 @implementation MySupersonicDelegate
 - (void)sendLog:(NSString *)log level:(LogLevel)level tag:(LogTag)tag
 {
-    CCLog("MySupersonicDelegate:[tag:%d][msg:%s]", tag, [log UTF8String]);
+    CCLOG("MySupersonicDelegate:[tag:%d][msg:%s]", tag, [log UTF8String]);
 }
 
 - (void)supersonicOWInitSuccess
 {
-    CCLog("supersonicOWInitSuccess");
+    CCLOG("supersonicOWInitSuccess");
 }
 
 - (void)supersonicOWShowSuccess
 {
-    CCLog("supersonicOWShowSuccess");
+    CCLOG("supersonicOWShowSuccess");
 }
 
 - (void)supersonicOWInitFailedWithError:(NSError *)error
 {
-    CCLog("supersonicOWInitFailedWithError");
+    CCLOG("supersonicOWInitFailedWithError");
     NSLog(@"error:%@", error);
 }
 
 - (void)supersonicOWShowFailedWithError:(NSError *)error
 {
-    CCLog("supersonicOWShowFailedWithError");
+    CCLOG("supersonicOWShowFailedWithError");
     NSLog(@"error:%@", error);
 }
 
 - (void)supersonicOWAdClosed
 {
-    CCLog("supersonicOWAdClosed");
+    CCLOG("supersonicOWAdClosed");
 }
 
 - (BOOL)supersonicOWDidReceiveCredit:(NSDictionary *)creditInfo
@@ -63,7 +63,7 @@ USING_NS_CC;
 
 - (void)supersonicOWFailGettingCreditWithError:(NSError *)error
 {
-    CCLog("supersonicOWFailGettingCreditWithError");
+    CCLOG("supersonicOWFailGettingCreditWithError");
     NSLog(@"error:%@", error);
 }
 @end
@@ -74,7 +74,7 @@ USING_NS_CC;
 @implementation MyNaviteXDeleagte
 /** Called when the Offer Wall is successfully initialized. */
 - (void)nativeXSDKDidCreateSession {
-    CCLog("nativeXSDKDidCreateSession");
+    CCLOG("nativeXSDKDidCreateSession");
 }
 
 /** Called when there is an error trying to initialize the Offer Wall.
@@ -83,7 +83,7 @@ USING_NS_CC;
  *          reason why create session call failed
  */
 - (void)nativeXSDKDidFailToCreateSession: (NSError *) error {
-    CCLog("nativeXSDKDidFailToCreateSession");
+    CCLOG("nativeXSDKDidFailToCreateSession");
     NSLog(@"error:%@", error);
 }
 
@@ -93,7 +93,7 @@ USING_NS_CC;
  *          reason why redeem currency call failed
  */
 - (void)nativeXSDKDidRedeemWithError:(NSError *)error {
-    CCLog("nativeXSDKDidRedeemWithError");
+    CCLOG("nativeXSDKDidRedeemWithError");
     NSLog(@"error:%@", error);
 }
 
@@ -105,7 +105,7 @@ USING_NS_CC;
  * @param placement     NSString representation of placement, used to distinquish which ad is loaded
  */
 - (void)nativeXAdView:(NativeXAdView *)adView didLoadWithPlacement:(NSString *)placement {
-    CCLog("nativeXAdView:didLoadWithPlacement, placement:%s", utf8cstr(placement));
+    CCLOG("nativeXAdView:didLoadWithPlacement, placement:%s", utf8cstr(placement));
     [[NativeXSDK sharedInstance] showReadyAdWithPlacement:kAdPlacementStoreOpen];
 }
 
@@ -114,7 +114,7 @@ USING_NS_CC;
  * @param adView        the NativeX adView that has NOT been loaded
  */
 - (void)nativeXAdViewNoAdContent:(NativeXAdView *)adView {
-    CCLog("nativeXAdView:nativeXAdViewNoAdContent");
+    CCLOG("nativeXAdView:nativeXAdViewNoAdContent");
 }
 
 /** Called when error loading an ad (was the SDK initialized correctly?)
@@ -123,7 +123,7 @@ USING_NS_CC;
  * @param error         reason why ad failed to load
  */
 - (void)nativeXAdView:(NativeXAdView *)adView didFailWithError:(NSError *)error {
-    CCLog("nativeXAdView:didFailWithError");
+    CCLOG("nativeXAdView:didFailWithError");
     NSLog(@"error:%@", error);
 }
 
@@ -132,7 +132,7 @@ USING_NS_CC;
  * @param adView        the NativeX adView that has expired
  */
 - (void)nativeXAdViewDidExpire:(NativeXAdView *)adView {
-    CCLog("nativeXAdView::nativeXAdViewDidExpire");
+    CCLOG("nativeXAdView::nativeXAdViewDidExpire");
 }
 
 - (void) nativeXSDKDidRedeemWithRewardInfo:(NativeXRewardInfo *)rewardInfo {
@@ -180,7 +180,7 @@ void AdHelper::callOfferwall(AdHelper::AdType type) {
         case AdFyber:
             [SponsorPaySDK showOfferWallWithParentViewController:(UIViewController*)[AppController getRootView] completion: ^(int status) {
                 if (SPONSORPAY_ERR_NETWORK == status) {
-                    CCLog("call offerwall failed.[%s, %s]", "Fyber", "SPONSORPAY_ERR_NETWORK");
+                    CCLOG("call offerwall failed.[%s, %s]", "Fyber", "SPONSORPAY_ERR_NETWORK");
                 }
             }];
             break;
