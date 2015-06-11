@@ -14,10 +14,10 @@
 #import <ShareSDK/ShareSDK.h>
 #import <AGCommon/CMRegexKitLite.h>
 #import <FacebookConnection/ISSFacebookApp.h>
-#import "WXApi.h"
-#import "WeiboApi.h"
-#import <TencentOpenAPI/QQApiInterface.h>
-#import <TencentOpenAPI/TencentOAuth.h>
+//#import "WXApi.h"
+//#import "WeiboApi.h"
+//#import <TencentOpenAPI/QQApiInterface.h>
+//#import <TencentOpenAPI/TencentOAuth.h>
 
 #include "SDKCommon.h"
 
@@ -347,14 +347,14 @@ void ShareHelper::initIOS()
     id<ISSFacebookApp> facebookApp =(id<ISSFacebookApp>)[ShareSDK getClientWithType:ShareTypeFacebook];
     [facebookApp setIsAllowWebAuthorize:YES];
     
-    //导入微信类型
-    [ShareSDK importWeChatClass:[WXApi class]];
-    
-    //导入腾讯微博类型
-    [ShareSDK importTencentWeiboClass:[WeiboApi class]];
-    
-    //导入QQ类型
-    [ShareSDK importQQClass:[QQApiInterface class] tencentOAuthCls:[TencentOAuth class]];
+//    //导入微信类型
+//    [ShareSDK importWeChatClass:[WXApi class]];
+//    
+//    //导入腾讯微博类型
+//    [ShareSDK importTencentWeiboClass:[WeiboApi class]];
+//    
+//    //导入QQ类型
+//    [ShareSDK importQQClass:[QQApiInterface class] tencentOAuthCls:[TencentOAuth class]];
 }
 
 #endif

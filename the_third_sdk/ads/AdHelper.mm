@@ -136,13 +136,7 @@ USING_NS_CC;
 }
 
 - (void) nativeXSDKDidRedeemWithRewardInfo:(NativeXRewardInfo *)rewardInfo {
-    // Add code to handle the reward info and credit your user here.
-    int totalRewardAmount = 0;
-    for (NativeXReward *reward in rewardInfo.rewards) {
-        NSLog(@"Reward: rewardName:%@ rewardId:%@ amount:%@", reward.rewardName, reward.rewardId, reward.amount);
-        // grab the amount and add it to total
-        totalRewardAmount += [reward.amount intValue];
-    }
+    // do it server side
 }
 
 @end

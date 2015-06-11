@@ -52,7 +52,7 @@ void ZPTNativeHelper::sendMail(const string &target, const string &title, CSJson
     
     jstring j_target = mi.env->NewStringUTF(target.c_str());
     jstring j_title = mi.env->NewStringUTF(title.c_str());
-    jstring j_extra = mi.env->NewStringUTF(("\n\n" + extra.getStyledDescription() + format).c_str());
+    jstring j_extra = mi.env->NewStringUTF(("\n\n\n\n" + extra.getStyledDescription() + format).c_str());
         
     mi.env->CallStaticVoidMethod(mi.classID, mi.methodID, j_target, j_title, j_extra);
     mi.env->DeleteLocalRef(mi.classID);

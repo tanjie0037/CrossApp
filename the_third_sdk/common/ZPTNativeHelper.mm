@@ -50,7 +50,7 @@ void ZPTNativeHelper::sendMail(const string &target, const string &title, CSJson
     [mailUrl appendFormat:@"?subject=%@", nsstr(title.c_str())];
     //添加邮件内容
     if (!extra.isEmpty()) {
-        [mailUrl appendFormat:@"&body=%@", nsstr(("\n\n" + extra.getStyledDescription() + format).c_str()) ];
+        [mailUrl appendFormat:@"&body=%@", nsstr(("\n\n\n\n" + extra.getStyledDescription() + format).c_str()) ];
     }
     
     NSString* email = [mailUrl stringByAddingPercentEscapesUsingEncoding: NSUTF8StringEncoding];
