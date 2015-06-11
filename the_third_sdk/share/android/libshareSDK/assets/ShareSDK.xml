@@ -137,9 +137,10 @@
     <Twitter
         Id="9"
         SortId="9"
-        ConsumerKey="LRBM0H75rWrU9gNHvlEAA2aOy"
-        ConsumerSecret="gbeWsZvA9ELJSdoBzJ5oLKX0TU09UOwrzdGfo9Tg7DjyGuMe8G"
+        ConsumerKey="TwVrOKh5pN6UuJTNh6z0LIvL9"
+        ConsumerSecret="Zex7wvJmuvZXKNGwass1uRBi31otJ9pukwLfkC1i2s0A7Fr8zB"
         CallbackUrl="http://mob.com"
+        RedirectUrl="http://mob.com"
         Enable="true" />
 
     <Renren
