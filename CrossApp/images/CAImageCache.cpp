@@ -94,12 +94,10 @@ static CAImage::Format computeImageFormatType(string& filename)
     {
         ret = CAImage::TIFF;
     }
-#if (CC_TARGET_PLATFORM != CC_PLATFORM_WINRT) && (CC_TARGET_PLATFORM != CC_PLATFORM_WP8)
     else if ((std::string::npos != filename.find(".webp")) || (std::string::npos != filename.find(".WEBP")))
     {
         ret = CAImage::WEBP;
     }
-#endif
    
     return ret;
 }
@@ -115,7 +113,6 @@ static void loadImageData(AsyncStruct *pAsyncStruct)
         //CCLOG("unsupported format %s",filename);
         //delete pAsyncStruct;
     }
-    
     CAImage* image = new CAImage();
     if (image && !image->initWithImageFileThreadSafe(filename))
     {
@@ -297,13 +294,9 @@ void CAImageCache::addImageAsyncCallBack(float dt)
     // the image is generated in loading thread
     std::queue<ImageInfo*> *imagesQueue = s_pImageQueue;
 
-    pthread_mutex_lock(&s_ImageInfoMutex);
-    if (imagesQueue->empty())
+    if (!imagesQueue->empty())
     {
-        pthread_mutex_unlock(&s_ImageInfoMutex);
-    }
-    else
-    {
+        pthread_mutex_lock(&s_ImageInfoMutex);
         ImageInfo *pImageInfo = imagesQueue->front();
         imagesQueue->pop();
         pthread_mutex_unlock(&s_ImageInfoMutex);
@@ -433,22 +426,6 @@ void CAImageCache::removeAllImages()
 
 void CAImageCache::removeUnusedImages()
 {
-    /*
-    CCDictElement* pElement = NULL;
-    CCDICT_FOREACH(m_pImages, pElement)
-    {
-        CCLOG("CrossApp: CAImageCache: texture: %s", pElement->getStrKey());
-        CAImage* value = (CAImage*)pElement->getObject();
-        if (value->retainCount() == 1)
-        {
-            CCLOG("CrossApp: CAImageCache: removing unused texture: %s", pElement->getStrKey());
-            m_pImages->removeObjectForElememt(pElement);
-        }
-    }
-     */
-    
-    /** Inter engineer zhuoshi sun finds that this way will get better performance
-     */    
     if (m_pImages->count())
     {   
         // find elements to be removed
@@ -505,7 +482,7 @@ CAImage* CAImageCache::imageForKey(const std::string& key)
 
 void CAImageCache::reloadAllImages()
 {
-
+    CAImage::reloadAllImages();
 }
 
 void CAImageCache::dumpCachedImageInfo()
@@ -548,6 +525,10 @@ CAImageAtlas::CAImageAtlas()
 
 CAImageAtlas::~CAImageAtlas()
 {
+#if CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID
+    CANotificationCenter::sharedNotificationCenter()->removeObserver(this, EVENT_COME_TO_FOREGROUND);
+#endif
+    
     CCLOGINFO("CrossApp: CAImageAtlas deallocing %p.", this);
     
     CC_SAFE_FREE(m_pQuads);
@@ -560,6 +541,7 @@ CAImageAtlas::~CAImageAtlas()
     ccGLBindVAO(0);
 #endif
     CC_SAFE_RELEASE(m_pImage);
+    
 }
 
 unsigned int CAImageAtlas::getTotalQuads()
@@ -638,6 +620,14 @@ bool CAImageAtlas::initWithImage(CAImage *image, unsigned int capacity)
     
     memset( m_pQuads, 0, m_uCapacity * sizeof(ccV3F_C4B_T2F_Quad) );
     memset( m_pIndices, 0, m_uCapacity * 6 * sizeof(GLushort) );
+    
+#if CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID
+    // listen the event when app go to background
+    CANotificationCenter::sharedNotificationCenter()->addObserver(this,
+                                                                  callfuncO_selector(CAImageAtlas::listenBackToForeground),
+                                                                  EVENT_COME_TO_FOREGROUND,
+                                                                  NULL);
+#endif
     
     this->setupIndices();
     

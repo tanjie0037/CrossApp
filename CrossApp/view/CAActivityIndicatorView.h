@@ -48,7 +48,6 @@ public:
     // will set CAActivityIndicatorViewStyleImage when call this func
     CC_PROPERTY(CAView*, m_pImageView, ActivityIndicatorView);
     
-    // 
     CC_PROPERTY(CAView*, m_pBackView, ActivityBackView);
     
     void startAnimating();
@@ -61,6 +60,9 @@ public:
     
     CC_SYNTHESIZE_READONLY_PASS_BY_REF(CAColor4B, m_color, Color);
     
+protected:
+    void setContentSize(const CCSize & var);
+
 private:
     float m_fLoadingTime;
     float m_duration;

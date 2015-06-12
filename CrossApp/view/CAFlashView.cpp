@@ -1,136 +1,62 @@
 //
 //  CAFlashView.cpp
-//  GSGGameSWF
+//  CrossApp
 //
 //  Created by qiaoxin on 15-05-12.
 //
 
 #include "CrossApp.h"
 #include "CAFlashView.h"
-#include "../support/gameswf/gameswf/gameswf.h"
-#include "../support/gameswf/gameswf/gameswf_player.h"
-#include "../support/gameswf/gameswf/gameswf_root.h"
-#include "../support/gameswf/gameswf/gameswf_types.h"
-#include "../support/gameswf/gameswf/gameswf_impl.h"
-#include "../support/gameswf/base/tu_file.h"
 
 
 NS_CC_BEGIN
 
-
-void CCGameSWF_fscommand_handler (gameswf::character* movie, const char* command, const char* arg)
-{
-    
-}
-
-tu_file* CCGameSWF_file_opener (const char* url_or_path)
-{
-    assert(url_or_path);
-    unsigned long pSize = 0;
-    unsigned char* data = CCFileUtils::sharedFileUtils()->getFileData(url_or_path, "rb", &pSize);
-    return new tu_file(tu_file::memory_buffer, (int)pSize, data);
-}
-
-static void CCGameSWF_log_handler (bool error, const char* message)
-{
-    if (error) {
-        CCLog("qiaoxin::ERROR:: %s",message);
-    }else{
-        //CCLog("qiaoxin:::: %s",message);
-    }
-}
-
 CAFlashView::CAFlashView()
-:m_fScaleX(1)
-,m_fScaleY(1)
-,m_bIsRuning(false)
-,m_bIsRepeat(false)
-,m_nFrameCount(0)
+:m_pFlash(NULL)
+,m_bIsRepeatForever(false)
+,m_bIsRunning(false)
 {
-    
+
 }
 
 CAFlashView::~CAFlashView()
 {
-    this->stopAction();
-    this->m_pMovie = NULL;
-    this->m_pPlayer= NULL;
+    this->stopAnimation();
+    CC_SAFE_DELETE(m_pFlash);
 }
 
-std::string CAFlashView::movieName()
+CAFlashView* CAFlashView::createWithFlash(CAFlash* flash)
 {
-    return this->m_pMovie->m_movie->m_name.c_str();
-}
-
-void CAFlashView::setMovieName(char *movieName)
-{
-    m_pMovie->m_movie->m_name = movieName;
-}
-
-CAFlashView* CAFlashView::create(const std::string& file)
-{
-    CAFlashView* swf = new CAFlashView();
-    if ( swf && swf->initWithSWFFile(file)) {
-        swf->autorelease();
-        return swf;
+    CAFlashView* view = new CAFlashView();
+    if ( view && view->initWithFlash(flash)) {
+        view->autorelease();
+        return view;
     }
     return NULL;
 }
 
-bool CAFlashView::initWithSWFFile(const std::string& file)
+bool CAFlashView::initWithFlash(CAFlash* flash)
 {
-    if(!CAView::init())
+    if (!this->init())
     {
         return false;
     }
-    CCRect rect = CCRectZero;
-    this->setImage(NULL);
-    this->setImageRect(rect, false, rect.size);
-    std::string pathKey = CCFileUtils::sharedFileUtils()->fullPathForFilename(file.c_str());
-    if (pathKey.size() == 0)
-    {
-        return false;
-    }
-    gameswf::register_file_opener_callback(&CCGameSWF_file_opener);
-    gameswf::register_fscommand_callback(&CCGameSWF_fscommand_handler);
-    gameswf::register_log_callback(&CCGameSWF_log_handler);
-    gameswf::set_sound_handler(0);
-    gameswf::render_handler* render = gameswf::create_render_handler_ogles();
-    gameswf::set_render_handler(render);
-    gameswf::set_glyph_provider(gameswf::create_glyph_provider_tu());
-    m_pPlayer = new gameswf::player();
-    m_pMovie = m_pPlayer->load_file(pathKey.c_str());
-    if (m_pPlayer == NULL)
-    {
-        return false;
-    }
-    if (m_pMovie == NULL)
-    {
-        return false;
-    }
-    m_movieWidth = m_pMovie->m_def->m_frame_size.m_x_max - m_pMovie->m_def->m_frame_size.m_x_min;
-    m_movieHeight = m_pMovie->m_def->m_frame_size.m_y_max - m_pMovie->m_def->m_frame_size.m_y_min;
-    m_localScaleX = (m_pMovie->get_movie_width() / m_movieWidth);
-    m_localScaleY = -(m_pMovie->get_movie_height() / m_movieHeight);
-    m_nFrameCount = m_pMovie->get_frame_count();
+    
+    this->setFlash(flash);
     return true;
 }
 
-void CAFlashView::setScale(float scale)
+bool CAFlashView::init()
 {
-    m_fScaleX = m_fScaleY = scale;
-    setScaleX(m_fScaleX);
-    setScaleY(m_fScaleY);
+    this->setShaderProgram(CAShaderCache::sharedShaderCache()->programForKey(kCCShader_PositionTextureA8Color));
+    return true;
 }
 
-void CAFlashView::setScaleX(float scaleX)
+void CAFlashView::setFlash(CAFlash* flash)
 {
-    CAView::setScaleX(m_fScaleX);
-}
-
-void CAFlashView::setScaleY(float scaleY)
-{
-    CAView::setScaleY(m_fScaleY);
+    CC_SAFE_RETAIN(flash);
+    CC_SAFE_DELETE(m_pFlash);
+    m_pFlash = flash;
 }
 
 void CAFlashView::onEnter()
@@ -141,58 +67,48 @@ void CAFlashView::onEnter()
 void CAFlashView::onExit()
 {
     CAView::onExit();
-    if(! m_bIsRuning)
+    if(!this->isRunning())
         return;
     CAScheduler::unschedule(schedule_selector(CAFlashView::update), this);
-    m_bIsRuning = false;
+    this->setRunning(false);
 }
 
-void CAFlashView::runAction()
+void CAFlashView::runAnimation()
 {
-    if(m_bIsRuning)
+    if(this->isRunning())
         return;
-    m_bIsRuning = true;
-    m_pMovie->goto_frame(0);
-    m_pMovie->set_play_run();
+    this->setRunning(true);
+    m_pFlash->setIndex(0);
+    m_pFlash->playRun();
     CAScheduler::schedule(schedule_selector(CAFlashView::update), this, 0.01f);
 }
 
-void CAFlashView::stopAction()
+void CAFlashView::stopAnimation()
 {
-    if(! m_bIsRuning)
+    if(! this->isRunning())
         return;
     CAScheduler::unschedule(schedule_selector(CAFlashView::update), this);
-    this->m_bIsRuning = false;
-}
-
-void CAFlashView::setRepeat(bool flag)
-{
-    m_bIsRepeat = flag;
-}
-
-bool CAFlashView::getRepeat()
-{
-    return m_bIsRepeat;
+    this->setRunning(false);
 }
 
 void CAFlashView::update(float dt)
 {
     CAView::update(dt);
-    int iFrame = m_pMovie->get_current_frame();
-    m_nFrameCount = m_pMovie->get_frame_count();
+    int index = m_pFlash->getIndex();
+    int counts = m_pFlash->getCounts();
 
     bool tobestop = false;
-    if(! m_bIsRepeat)
+    if(! m_bIsRepeatForever)
     {
-        if (iFrame == m_nFrameCount - 1)
+        if (index == counts - 1)
         {
             tobestop = true;
         }
     }
-    m_pMovie->advance(dt);
+    m_pFlash->advance(dt);
     if(tobestop)
     {
-        this->stopAction();
+        this->stopAnimation();
     }
     this->updateDraw();
 }
@@ -213,12 +129,34 @@ void CAFlashView::draw()
     ccGLUseProgram(0);//valid program is NON_ZERO unsigned int
 #endif
     CCSize size = this->getFrame().size;
-    m_localScaleX = size.width/ m_movieWidth;
-    m_localScaleY = -(size.height / m_movieHeight);
+    float localScaleX = size.width/ m_pFlash->getWidth()/this->getScaleX();
+    float localScaleY = -(size.height / m_pFlash->getHeight()/this->getScaleY());
+    float localScale = localScaleX > -localScaleY ? -localScaleY : localScaleX;
     kmMat4 matrixs;
-    kmMat4Scaling(&matrixs, m_localScaleX , m_localScaleY , getZOrder());
+    kmMat4Scaling(&matrixs, localScale, -localScale, getZOrder());
     kmMat4Multiply(&matrixMVP, &matrixMVP, &matrixs);
-    m_pMovie->display(&matrixMVP.mat[0]);
+    m_pFlash->display(&matrixMVP);
     CHECK_GL_ERROR_DEBUG();
 }
+
+void CAFlashView::setRepeatForever(bool repeatForever)
+{
+    m_bIsRepeatForever = repeatForever;
+}
+
+bool CAFlashView::isRepeatForever()
+{
+    return m_bIsRepeatForever;
+}
+
+void CAFlashView::setRunning(bool running)
+{
+    m_bIsRunning = running;
+}
+
+bool CAFlashView::isRunning()
+{
+    return m_bIsRunning;
+}
+
 NS_CC_END

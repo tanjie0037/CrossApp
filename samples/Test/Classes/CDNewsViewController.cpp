@@ -75,7 +75,7 @@ void CDNewsTableCell::initWithCell()
     CommonUrlImageView* temImage = CommonUrlImageView::createWithCenter(CADipRect(120,_size.height/2,200,_size.height-40));
     temImage->setTag(101);
     temImage->setImageViewScaleType(CAImageViewScaleTypeFitImageCrop);
-    temImage->setImage(CAImage::create("HelloWorld.png"));
+    temImage->setImage(CAImage::create("image/HelloWorld.png"));
     this->addSubview(temImage);
 }
 
@@ -119,12 +119,17 @@ void CDNewsViewController::viewDidLoad()
 
 void CDNewsViewController::showAlert()
 {
+    if (p_alertView) {
+        this->getView()->removeSubview(p_alertView);
+        p_alertView= NULL;
+    }
+
     p_alertView = CAView::createWithFrame(this->getView()->getBounds());
     this->getView()->addSubview(p_alertView);
     
     CAImageView* bg = CAImageView::createWithFrame(CADipRect(0,0,winSize.width,winSize.height));
     bg->setImageViewScaleType(CAImageViewScaleTypeFitImageCrop);
-    bg->setImage(CAImage::create("HelloWorld.png"));
+    bg->setImage(CAImage::create("image/HelloWorld.png"));
     
     CAButton* btn5 = CAButton::create(CAButtonTypeSquareRect);
     btn5->setTag(100);
@@ -186,7 +191,6 @@ void CDNewsViewController::onRequestFinished(const HttpResponseStatus& status, c
                 temp_msg.m_imageUrl.push_back(value[index]["pic"][i].asString());
             }
             m_msg.push_back(temp_msg);
-            CCLog("title==%s",value[index]["title"].asString().c_str());
         }
         
         for (int i=0; i<length1; i++) {
@@ -232,7 +236,6 @@ void CDNewsViewController::onRefreshRequestFinished(const HttpResponseStatus& st
                 temp_msg.m_imageUrl.push_back(value[index]["pic"][i].asString());
             }
             m_msg.push_back(temp_msg);
-            CCLog("title==%s",value[index]["title"].asString().c_str());
         }
     }
     
@@ -291,7 +294,7 @@ void CDNewsViewController::initNewsPageView()
     CAVector<CAView* > viewList;
     CommonUrlImageView* temImage0 = CommonUrlImageView::createWithFrame(CADipRect(winSize.width/2,100,winSize.width,winSize.width/2));
     temImage0->setImageViewScaleType(CAImageViewScaleTypeFitImageCrop);
-    temImage0->setImage(CAImage::create("HelloWorld.png"));
+    temImage0->setImage(CAImage::create("image/HelloWorld.png"));
     temImage0->setUrl(m_page[m_page.size()-1].m_pic);
     
     viewList.pushBack(temImage0);
@@ -299,13 +302,13 @@ void CDNewsViewController::initNewsPageView()
         //初始化viewList
         CommonUrlImageView* temImage = CommonUrlImageView::createWithFrame(CADipRect(winSize.width/2,100,winSize.width,winSize.width/2));
         temImage->setImageViewScaleType(CAImageViewScaleTypeFitImageCrop);
-        temImage->setImage(CAImage::create("HelloWorld.png"));
+        temImage->setImage(CAImage::create("image/HelloWorld.png"));
         temImage->setUrl(m_page[i].m_pic);
         viewList.pushBack(temImage);
     }
     CommonUrlImageView* temImage1 = CommonUrlImageView::createWithFrame(CADipRect(winSize.width/2,100,winSize.width,winSize.width/2));
     temImage1->setImageViewScaleType(CAImageViewScaleTypeFitImageCrop);
-    temImage1->setImage(CAImage::create("HelloWorld.png"));
+    temImage1->setImage(CAImage::create("image/HelloWorld.png"));
     temImage1->setUrl(m_page[0].m_pic);
     viewList.pushBack(temImage1);
     
@@ -368,7 +371,6 @@ CATableViewCell* CDNewsViewController::tableCellAtIndex(CATableView* table, cons
         cell = CDNewsTableCell::create("CrossApp", CADipRect(0, 0, _size.width, _size.height));
         cell->initWithCell();
     }
-    CCLog("section==%d,row===%d",section,row);
     CALabel* cellText = (CALabel*)cell->getSubviewByTag(100);
     cellText->setText(m_msg[row].m_title);
     
@@ -377,7 +379,7 @@ CATableViewCell* CDNewsViewController::tableCellAtIndex(CATableView* table, cons
     
     CommonUrlImageView* temImage = (CommonUrlImageView*)cell->getSubviewByTag(101);
     temImage->setImageViewScaleType(CAImageViewScaleTypeFitImageCrop);
-    temImage->setImage(CAImage::create("HelloWorld.png"));
+    temImage->setImage(CAImage::create("image/HelloWorld.png"));
     if (m_msg[row].m_imageUrl.size()>0) {
         temImage->setUrl(m_msg[row].m_imageUrl[0]);
     }
@@ -423,7 +425,6 @@ void CDNewsViewController::scrollViewFooterBeginRefreshing(CAScrollView* view)
 
 void CDNewsViewController::pageViewDidSelectPageAtIndex(CAPageView* pageView, unsigned int index, const CCPoint& point)
 {
-    CCLog("adadf==%d",index);
     CDWebViewController* _webController = new CDWebViewController();
     _webController->init();
     _webController->setTitle(" ");
@@ -432,7 +433,6 @@ void CDNewsViewController::pageViewDidSelectPageAtIndex(CAPageView* pageView, un
     RootWindow::getInstance()->getDrawerController()->hideLeftViewController(true);
     RootWindow::getInstance()->getRootNavigationController()->pushViewController(_webController, true);
     _webController->initWebView(m_page[index-1].m_url);
-    CCLog("adadf==%s",m_page[index-1].m_url.c_str());
 }
 
 void CDNewsViewController::pageViewDidBeginTurning(CAPageView* pageView)
@@ -456,7 +456,6 @@ void CDNewsViewController::pageViewDidEndTurning(CAPageView* pageView)
 
 void CDNewsViewController::pageControlCallBack(CrossApp::CAControl *btn, CrossApp::CCPoint point){
     CAPageControl* button = (CAPageControl*)btn;
-    CCLog("btn_tag===%d",button->getCurrentPage());
     p_PageView->setCurrPage(button->getCurrentPage()+1, true);
     if (m_page.size()>0) {
         pageViewTitle->setText(m_page[button->getCurrentPage()].m_title);
