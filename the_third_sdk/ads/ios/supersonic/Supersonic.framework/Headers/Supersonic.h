@@ -14,6 +14,8 @@
 #import "SupersonicISDelegate.h"
 #import "SupersonicLogDelegate.h"
 
+@class UIViewController;
+
 @interface Supersonic : NSObject
 
 
@@ -29,6 +31,7 @@
 - (void)initRVWithAppKey:(NSString*)appKey withUserId:(NSString *)userId;
 - (void)setRVDelegate:(id<SupersonicRVDelegate>) rvDelegate;
 - (void)showRV;
+- (void)showRVWithViewController:(UIViewController*)viewController;
 - (BOOL)isAdAvailable;
 
 /*-----------------------------------------------*/
@@ -37,6 +40,7 @@
 - (void)initISWithAppKey:(NSString*)appKey withUserId:(NSString *)userId;
 - (void)setISDelegate:(id<SupersonicISDelegate>) isDelegate;
 - (void)showIS;
+- (void)showISWithViewController:(UIViewController*)viewController;
 - (void)forceShowIS;
 - (BOOL)isISAdAvailable;
 
@@ -46,6 +50,7 @@
 - (void)initOWWithAppKey:(NSString*)appKey withUserId:(NSString *)userId;
 - (void)setOWDelegate:(id<SupersonicOWDelegate>) owDelegate;
 - (void)showOW;
+- (void)showOWWithViewController:(UIViewController*)viewController;
 - (void)getOWCredits;
 - (BOOL)isOWAvailable;
 

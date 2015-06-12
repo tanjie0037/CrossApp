@@ -18,6 +18,7 @@
 void ZPTNativeHelper::getDeviceInfo(CSJsonDictionary& dic)
 {
     UIDevice *device=[[UIDevice alloc] init];
+    [device autorelease];
     NSDictionary *infoDictionary = [[NSBundle mainBundle] infoDictionary];
     
 //    dic.insertItem("name", [device.name UTF8String]);
@@ -26,7 +27,15 @@ void ZPTNativeHelper::getDeviceInfo(CSJsonDictionary& dic)
     dic.insertItem("systemName", [device.systemName UTF8String]);
     dic.insertItem("systemVersion", [device.systemVersion UTF8String]);
     dic.insertItem("appVersion", utf8cstr([infoDictionary objectForKey:@"CFBundleShortVersionString"]));
-    [device dealloc];
+}
+
+string ZPTNativeHelper::getAppVersion()
+{
+    UIDevice *device=[[UIDevice alloc] init];
+    [device autorelease];
+    NSDictionary *infoDictionary = [[NSBundle mainBundle] infoDictionary];
+    
+    return utf8cstr([infoDictionary objectForKey:@"CFBundleShortVersionString"]);
 }
 
 void ZPTNativeHelper::openUrl(const char* url)

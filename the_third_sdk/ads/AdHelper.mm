@@ -19,7 +19,9 @@
 
 USING_NS_CC;
 
-@interface MySupersonicDelegate : NSObject <SupersonicLogDelegate, SupersonicOWDelegate> {}
+#pragma mark MySupersonicDelegate
+
+@interface MySupersonicDelegate : NSObject <SupersonicLogDelegate, SupersonicOWDelegate, SupersonicRVDelegate> {}
 @end
 
 @implementation MySupersonicDelegate
@@ -66,8 +68,58 @@ USING_NS_CC;
     CCLOG("supersonicOWFailGettingCreditWithError");
     NSLog(@"error:%@", error);
 }
+
+//SupersonicRVDelegate func
+- (void)supersonicRVInitSuccess
+{
+    CCLOG("supersonicRVInitSuccess");
+}
+
+- (void)supersonicRVInitFailedWithError:(NSError *)error
+{
+    CCLOG("supersonicRVInitFailedWithError");
+    NSLog(@"error:%@", error);
+}
+
+- (void)supersonicRVAdAvailabilityChanged:(BOOL)hasAvailableAds
+{
+    CCLOG("supersonicRVAdAvailabilityChanged: %s", hasAvailableAds ? "true" : "no");
+}
+
+- (void)supersonicRVAdOpened
+{
+    CCLOG("supersonicRVAdOpened");
+}
+
+- (void)supersonicRVAdStarted
+{
+    CCLOG("supersonicRVAdStarted");
+}
+
+- (void)supersonicRVAdEnded
+{
+    CCLOG("supersonicRVAdEnded");
+}
+
+- (void)supersonicRVAdClosed
+{
+    CCLOG("supersonicRVAdClosed");
+}
+
+- (void)supersonicRVAdRewarded:(NSInteger)amount
+{
+    CCLOG("supersonicRVAdRewarded:%d", (int)amount);
+}
+
+- (void)supersonicRVAdFailedWithError:(NSError *)error
+{
+    CCLOG("supersonicRVAdFailedWithError");
+    NSLog(@"error:%@", error);
+}
+
 @end
 
+#pragma mark MyNaviteXDeleagte
 @interface MyNaviteXDeleagte : NSObject <NativeXSDKDelegate, NativeXAdViewDelegate> {}
 @end
 
@@ -82,7 +134,8 @@ USING_NS_CC;
  * @param   error
  *          reason why create session call failed
  */
-- (void)nativeXSDKDidFailToCreateSession: (NSError *) error {
+- (void)nativeXSDKDidFailToCreateSession: (NSError *) error
+{
     CCLOG("nativeXSDKDidFailToCreateSession");
     NSLog(@"error:%@", error);
 }
@@ -92,7 +145,8 @@ USING_NS_CC;
  * @param   error
  *          reason why redeem currency call failed
  */
-- (void)nativeXSDKDidRedeemWithError:(NSError *)error {
+- (void)nativeXSDKDidRedeemWithError:(NSError *)error
+{
     CCLOG("nativeXSDKDidRedeemWithError");
     NSLog(@"error:%@", error);
 }
@@ -104,7 +158,8 @@ USING_NS_CC;
  * @param adView        the NativeX adView that has been loaded
  * @param placement     NSString representation of placement, used to distinquish which ad is loaded
  */
-- (void)nativeXAdView:(NativeXAdView *)adView didLoadWithPlacement:(NSString *)placement {
+- (void)nativeXAdView:(NativeXAdView *)adView didLoadWithPlacement:(NSString *)placement
+{
     CCLOG("nativeXAdView:didLoadWithPlacement, placement:%s", utf8cstr(placement));
     [[NativeXSDK sharedInstance] showReadyAdWithPlacement:kAdPlacementStoreOpen];
 }
@@ -113,7 +168,8 @@ USING_NS_CC;
  *
  * @param adView        the NativeX adView that has NOT been loaded
  */
-- (void)nativeXAdViewNoAdContent:(NativeXAdView *)adView {
+- (void)nativeXAdViewNoAdContent:(NativeXAdView *)adView
+{
     CCLOG("nativeXAdView:nativeXAdViewNoAdContent");
 }
 
@@ -122,7 +178,8 @@ USING_NS_CC;
  * @param adView        the NativeX adView that has NOT been loaded because of an error
  * @param error         reason why ad failed to load
  */
-- (void)nativeXAdView:(NativeXAdView *)adView didFailWithError:(NSError *)error {
+- (void)nativeXAdView:(NativeXAdView *)adView didFailWithError:(NSError *)error
+{
     CCLOG("nativeXAdView:didFailWithError");
     NSLog(@"error:%@", error);
 }
@@ -131,11 +188,13 @@ USING_NS_CC;
  *
  * @param adView        the NativeX adView that has expired
  */
-- (void)nativeXAdViewDidExpire:(NativeXAdView *)adView {
+- (void)nativeXAdViewDidExpire:(NativeXAdView *)adView
+{
     CCLOG("nativeXAdView::nativeXAdViewDidExpire");
 }
 
-- (void) nativeXSDKDidRedeemWithRewardInfo:(NativeXRewardInfo *)rewardInfo {
+- (void) nativeXSDKDidRedeemWithRewardInfo:(NativeXRewardInfo *)rewardInfo
+{
     // do it server side
 }
 
@@ -144,7 +203,10 @@ USING_NS_CC;
 static MySupersonicDelegate *_mySupersonicDelegate = [[MySupersonicDelegate alloc] init];
 static MyNaviteXDeleagte *_myNaviteXDeleagte = [[MyNaviteXDeleagte alloc] init];
 
-void AdHelper::initAd(AdType type, const std::string &uId, const std::string &appkey, const std::string &token) {
+#pragma mark AdHelper
+
+void AdHelper::initAd(AdType type, const std::string &uId, const std::string &appkey, const std::string &token)
+{
     switch (type) {
         case AdFyber:
 //            [SponsorPaySDK startForAppId:[NSString stringWithUTF8String:appkey.c_str()]
@@ -157,19 +219,26 @@ void AdHelper::initAd(AdType type, const std::string &uId, const std::string &ap
             [Supersonic sharedInstance];
             [[Supersonic sharedInstance] setOWDelegate:_mySupersonicDelegate];
             [[Supersonic sharedInstance] setLogDelegate:_mySupersonicDelegate];
+            [[Supersonic sharedInstance] setRVDelegate:_mySupersonicDelegate];
             [[Supersonic sharedInstance] initOWWithAppKey:[NSString stringWithUTF8String:appkey.c_str()]
                                                withUserId:[NSString stringWithUTF8String:uId.c_str()]];
+            
+            [[Supersonic sharedInstance] initRVWithAppKey:[NSString stringWithUTF8String:appkey.c_str()]
+                                               withUserId:[NSString stringWithUTF8String:uId.c_str()]];
             break;
+            
          case AdNativeX:
             [[NativeXSDK sharedInstance] setDelegate:_myNaviteXDeleagte];
             [[NativeXSDK sharedInstance] createSessionWithAppId:nsstr(appkey.c_str())
                                              andPublisherUserId:nsstr(uId.c_str())];
+            break;
         default:
             break;
     }
 }
 
-void AdHelper::callOfferwall(AdHelper::AdType type) {
+void AdHelper::callOfferwall(AdHelper::AdType type)
+{
     switch (type) {
         case AdFyber:
 //            [SponsorPaySDK showOfferWallWithParentViewController:(UIViewController*)[AppController getRootView] completion: ^(int status) {
@@ -184,13 +253,29 @@ void AdHelper::callOfferwall(AdHelper::AdType type) {
             break;
         case AdNativeX:
             [[NativeXSDK sharedInstance] fetchAdWithPlacement:kAdPlacementStoreOpen delegate:_myNaviteXDeleagte];
+            break;
         default:
             break;
     }
 }
 
-void AdHelper::playVideo(AdHelper::AdType type) {
-    //todo
+void AdHelper::playVideo(AdHelper::AdType type)
+{
+    switch (type) {
+        case AdFyber:
+            break;
+            
+        case AdSupersonic:
+            if ([[Supersonic sharedInstance] isAdAvailable]) {
+                CCLOG("Supersonic AdAvailable");
+                [[Supersonic sharedInstance] showRV];
+            }
+            break;
+        case AdNativeX:
+            break;
+        default:
+            break;
+    }
 }
 
 #endif
