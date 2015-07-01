@@ -16,6 +16,9 @@
 
 USING_NS_CC;
 
+void AdHelper::autoRequesNativeX() {
+}
+
 void AdHelper::initAd(AdType type, const std::string &uId, const std::string &appkey, const std::string &token) {
     JniMethodInfo mi;
     if (!JniHelper::getStaticMethodInfo(mi, "com.zpt.utils.AdHelper", "initAd", "(ILjava/lang/String;Ljava/lang/String;Ljava/lang/String;)V")) {
@@ -43,7 +46,14 @@ void AdHelper::callOfferwall(AdType type) {
 }
 
 void AdHelper::playVideo(AdType type) {
-    //todo
+    JniMethodInfo mi;
+    if (!JniHelper::getStaticMethodInfo(mi, "com.zpt.utils.AdHelper", "playVideo", "(I)V")) {
+        assert(0);
+        return;
+    }
+    
+    mi.env->CallStaticVoidMethod(mi.classID, mi.methodID, (int)type);
+    mi.env->DeleteLocalRef(mi.classID);
 }
 
 #endif

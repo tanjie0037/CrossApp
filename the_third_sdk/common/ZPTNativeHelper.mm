@@ -29,13 +29,21 @@ void ZPTNativeHelper::getDeviceInfo(CSJsonDictionary& dic)
     dic.insertItem("appVersion", utf8cstr([infoDictionary objectForKey:@"CFBundleShortVersionString"]));
 }
 
-string ZPTNativeHelper::getAppVersion()
+string ZPTNativeHelper::getAppVersion(bool replaceDot)
 {
     UIDevice *device=[[UIDevice alloc] init];
     [device autorelease];
     NSDictionary *infoDictionary = [[NSBundle mainBundle] infoDictionary];
     
-    return utf8cstr([infoDictionary objectForKey:@"CFBundleShortVersionString"]);
+    string appversion = string(utf8cstr([infoDictionary objectForKey:@"CFBundleShortVersionString"]));
+    
+    if (replaceDot) {
+        char *outStr = str_replace(appversion.c_str(), ".", "_");
+        appversion = string(outStr);
+        delete[] (outStr);
+    }
+    
+    return appversion;
 }
 
 void ZPTNativeHelper::openUrl(const char* url)
@@ -69,6 +77,11 @@ void ZPTNativeHelper::sendMail(const string &target, const string &title, CSJson
 string ZPTNativeHelper::getDeviceId()
 {
     return string(utf8cstr([[[ASIdentifierManager sharedManager] advertisingIdentifier] UUIDString]));
+}
+
+string ZPTNativeHelper::getStatusKey()
+{
+    return "status-v" + ZPTNativeHelper::getAppVersion(true);
 }
 
 #endif

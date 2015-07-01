@@ -9,6 +9,66 @@
 #ifndef AppGift_SDKCommon_h
 #define AppGift_SDKCommon_h
 
+//static int ReplaceStr(char* sSrc, char* sMatchStr, char* sReplaceStr)
+//{
+//    int StringLen;
+//    char caNewString[128];
+//    char* FindPos;
+//    FindPos =(char *)strstr(sSrc, sMatchStr);
+//    if( (!FindPos) || (!sMatchStr) )
+//        return -1;
+//    
+//    while( FindPos )
+//    {
+//        memset(caNewString, 0, sizeof(caNewString));
+//        StringLen = FindPos - sSrc;
+//        strncpy(caNewString, sSrc, StringLen);
+//        strcat(caNewString, sReplaceStr);
+//        strcat(caNewString, FindPos + strlen(sMatchStr));
+//        strcpy(sSrc, caNewString);
+//        
+//        FindPos =(char *)strstr(sSrc, sMatchStr);
+//    }
+//    free(FindPos);
+//    return 0;
+//}
+
+#include <string.h>
+#include <stdlib.h>
+
+static char *str_copy(const char *str) {
+    int len = strlen(str) + 1;
+    char *buf = (char *)malloc(len);
+    if (NULL == buf) return NULL;
+    memcpy(buf, str, len);
+    return buf;
+}
+
+static char* str_replace(const char *str, const char *sub, const char *replace) {
+    char *pos = (char *) str;
+    char *find = strstr(str, sub);
+        
+    if (!find) return str_copy(str);
+    int size = 128;
+    
+    char *result = (char *) malloc(size);
+    if (NULL == result) return NULL;
+    memset(result, '\0', size);
+    char *current;
+    
+    while ((current = strstr(pos, sub))) {
+        int len = current - pos;
+        strncat(result, pos, len);
+        strncat(result, replace, strlen(replace));
+        pos = current + strlen(sub);
+    }
+    
+    if (pos != (str + strlen(str))) {
+        strncat(result, pos, (str - pos));
+    }
+    
+    return result;
+}
 
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_IOS)
 

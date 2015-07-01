@@ -21,7 +21,8 @@ public:
     static void openUrl(const char* url);
     static void sendMail(const string &target, const string &title, CSJsonDictionary& extra, const string &format);
     static string getDeviceId();
-    static string getAppVersion();
+    static string getAppVersion(bool replaceDot = false);
+    static string getStatusKey();
 };
 
 #endif /* defined(__AppGift__ZPTNativeHelper__) */

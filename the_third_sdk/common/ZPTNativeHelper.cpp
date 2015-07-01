@@ -60,7 +60,43 @@ void ZPTNativeHelper::sendMail(const string &target, const string &title, CSJson
 
 string ZPTNativeHelper::getDeviceId()
 {
-    return "todo-android";
+    JniMethodInfo mi;
+    if (!JniHelper::getStaticMethodInfo(mi, "com.zpt.utils.ZPTNativeHelper", "getDeviceId", "()Ljava/lang/String;")) {
+        assert(0);
+        return "";
+    }
+    
+    jstring returnString = (jstring) mi.env->CallStaticObjectMethod(mi.classID, mi.methodID);
+    string deviceId = string(mi.env->GetStringUTFChars(returnString, NULL));
+    mi.env->DeleteLocalRef(mi.classID);
+                             
+    return deviceId;
+}
+
+string ZPTNativeHelper::getAppVersion(bool replaceDot)
+{
+    JniMethodInfo mi;
+    if (!JniHelper::getStaticMethodInfo(mi, "com.zpt.utils.ZPTNativeHelper", "getAppVersion", "()Ljava/lang/String;")) {
+        assert(0);
+        return "";
+    }
+    
+    jstring returnString = (jstring) mi.env->CallStaticObjectMethod(mi.classID, mi.methodID);
+    string appversion = string(mi.env->GetStringUTFChars(returnString, NULL));
+    mi.env->DeleteLocalRef(mi.classID);
+    
+    if (replaceDot) {
+        char *outStr = str_replace(appversion.c_str(), ".", "_");
+        appversion = string(outStr);
+        delete[] (outStr);
+    }
+    
+    return appversion;
+}
+
+string ZPTNativeHelper::getStatusKey()
+{
+    return "status-v" + ZPTNativeHelper::getAppVersion(true);
 }
 
 #endif

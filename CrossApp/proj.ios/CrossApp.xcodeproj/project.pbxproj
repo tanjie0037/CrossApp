@@ -3201,7 +3201,7 @@
 					"\"$(SRCROOT)/../the_third_party/curl/prebuilt/ios\"",
 					"\"$(SRCROOT)/../the_third_party/SDL/prebuilt/ios\"",
 					"\"$(SRCROOT)/../the_third_party/FFmpeg/prebuilt/ios\"",
-					/Users/tanjie/Desktop/work/ZPT/CrossApp/CrossApp/the_third_party/sdl/prebuilt/ios,
+					"\"$(SRCROOT)/../the_third_party/sdl/prebuilt/ios\"",
 				);
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = CrossApp;
@@ -3243,7 +3243,7 @@
 					"\"$(SRCROOT)/../the_third_party/curl/prebuilt/ios\"",
 					"\"$(SRCROOT)/../the_third_party/SDL/prebuilt/ios\"",
 					"\"$(SRCROOT)/../the_third_party/FFmpeg/prebuilt/ios\"",
-					/Users/tanjie/Desktop/work/ZPT/CrossApp/CrossApp/the_third_party/sdl/prebuilt/ios,
+					"\"$(SRCROOT)/../the_third_party/sdl/prebuilt/ios\"",
 				);
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = CrossApp;
