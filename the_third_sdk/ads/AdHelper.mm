@@ -21,6 +21,8 @@ USING_NS_CC;
 
 #pragma mark MySupersonicDelegate
 
+static int _nativeXStep = 0;
+
 @interface MySupersonicDelegate : NSObject <SupersonicLogDelegate, SupersonicOWDelegate, SupersonicRVDelegate> {}
 @end
 
@@ -127,6 +129,7 @@ USING_NS_CC;
 /** Called when the Offer Wall is successfully initialized. */
 - (void)nativeXSDKDidCreateSession {
     CCLOG("nativeXSDKDidCreateSession");
+    [[NativeXSDK sharedInstance] fetchAdWithPlacement:kAdPlacementStoreOpen delegate:self];
 }
 
 /** Called when there is an error trying to initialize the Offer Wall.
@@ -161,7 +164,12 @@ USING_NS_CC;
 - (void)nativeXAdView:(NativeXAdView *)adView didLoadWithPlacement:(NSString *)placement
 {
     CCLOG("nativeXAdView:didLoadWithPlacement, placement:%s", utf8cstr(placement));
-    [[NativeXSDK sharedInstance] showReadyAdWithPlacement:kAdPlacementStoreOpen];
+    
+    if (_nativeXStep == 1) {
+        [[NativeXSDK sharedInstance] showReadyAdWithPlacement:kAdPlacementStoreOpen];
+    } else if (_nativeXStep == 0) {
+        _nativeXStep = 2;
+    }
 }
 
 /** called if no ad is available at this time
@@ -252,7 +260,14 @@ void AdHelper::callOfferwall(AdHelper::AdType type)
             [[Supersonic sharedInstance] showOW];
             break;
         case AdNativeX:
-            [[NativeXSDK sharedInstance] fetchAdWithPlacement:kAdPlacementStoreOpen delegate:_myNaviteXDeleagte];
+            if (_nativeXStep < 2) {
+                _nativeXStep = 1;
+                [[NativeXSDK sharedInstance] fetchAdWithPlacement:kAdPlacementStoreOpen delegate:_myNaviteXDeleagte];
+            } else if (_nativeXStep == 2) {
+                _nativeXStep = 1;
+                [[NativeXSDK sharedInstance] showReadyAdWithPlacement:kAdPlacementStoreOpen];
+            }
+            
             break;
         default:
             break;
