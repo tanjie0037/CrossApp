@@ -181,8 +181,6 @@ private:
     
     using CAScrollView::getSubviewByTag;
     
-    using CAResponder::setTouchMovedListenHorizontal;
-    
 private:
     
 	CCRect m_rHeaderRect;
@@ -229,7 +227,7 @@ public:
     CC_SYNTHESIZE_IS(bool, m_bControlStateEffect, ControlStateEffect);
     
     CC_SYNTHESIZE_IS(bool, m_bAllowsSelected, AllowsSelected);
-
+    
 protected:
     
     virtual void normalListViewCell();

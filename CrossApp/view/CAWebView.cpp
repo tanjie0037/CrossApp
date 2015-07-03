@@ -67,7 +67,7 @@ bool CAWebView::init()
     
     CCSize size = this->getBounds().size;
     m_pLoadingView = CAActivityIndicatorView::create();
-    m_pLoadingView->setStyle(CAActivityIndicatorViewStyleGray);
+    m_pLoadingView->setStyle(CAActivityIndicatorViewStyleGrayLarge);
 	m_pLoadingView->setVisible(false);
 	this->addSubview(m_pLoadingView);
     
@@ -124,9 +124,22 @@ void CAWebView::goForward()
 	_impl->goForward();
 }
 
-void CAWebView::evaluateJS(const std::string &js)
+std::string CAWebView::evaluateJS(const std::string &js)
 {
-	_impl->evaluateJS(js);
+	return _impl->evaluateJS(js);
+}
+
+std::string CAWebView::getHTMLSource()
+{
+#if( CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID )
+	return evaluateJS(std::string("window.local_obj.showSource('<head>'+") + "document.getElementsByTagName('html')[0].innerHTML+'</head>');");
+#endif
+
+#if( CC_TARGET_PLATFORM == CC_PLATFORM_IOS )
+	return evaluateJS("document.documentElement.innerHTML");
+#endif
+
+	return "";
 }
 
 void CAWebView::setScalesPageToFit(bool const scalesPageToFit)
@@ -177,14 +190,18 @@ void CAWebView::update(float dt)
         CC_BREAK_IF(m_obLastPoint.equals(point) && m_obLastContentSize.equals(contentSize));
         m_obLastPoint = point;
         m_obLastContentSize = contentSize;
-        
-		CCSize size = getBounds().size;
-        //tanjie0037: fix转轴中心错误
-		m_pLoadingView->setCenter(CCRect(size.width*0.5f, size.height*0.5f, size.width*0.2f, size.height*0.2f));
+
+		m_pLoadingView->setCenter(CCRect(contentSize.width*0.5f, contentSize.height*0.5f, contentSize.width*0.2f, contentSize.height*0.2f));
         
         _impl->update(dt);
     }
     while (0);
+}
+
+void CAWebView::setContentSize(const CCSize &contentSize)
+{
+    CAView::setContentSize(contentSize);
+    m_pLoadingView->setFrame(this->getBounds());
 }
 
 NS_CC_END

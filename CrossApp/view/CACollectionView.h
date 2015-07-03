@@ -216,9 +216,7 @@ private:
     using CAScrollView::removeSubviewByTag;
     
     using CAScrollView::getSubviewByTag;
-    
-    using CAResponder::setTouchMovedListenHorizontal;
-    
+
 private:
     
     unsigned int m_nSections;
@@ -275,7 +273,7 @@ public:
     CC_SYNTHESIZE_IS(bool, m_bControlStateEffect, ControlStateEffect);
     
     CC_SYNTHESIZE_IS(bool, m_bAllowsSelected, AllowsSelected);
-
+    
 protected:
     
 	virtual void normalCollectionViewCell();

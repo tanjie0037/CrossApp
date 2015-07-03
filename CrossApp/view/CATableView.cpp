@@ -106,7 +106,7 @@ bool CATableView::init()
     
     this->setShowsHorizontalScrollIndicator(false);
     this->setBounceHorizontal(false);
-    this->setTouchMovedListenHorizontal(false);
+    this->setHorizontalScrollEnabled(false);
     return true;
 }
 
@@ -161,7 +161,6 @@ bool CATableView::ccTouchBegan(CATouch *pTouch, CAEvent *pEvent)
 
 void CATableView::ccTouchMoved(CATouch *pTouch, CAEvent *pEvent)
 {
-    CC_RETURN_IF(m_bscrollEnabled == false);
     CC_RETURN_IF(m_vTouches.contains(pTouch) == false);
     CAScrollView::ccTouchMoved(pTouch, pEvent);
     
@@ -484,7 +483,7 @@ void CATableView::reloadData()
     this->removeAllSubviews();
     
     float width = this->getBounds().size.width;
-    int y = 0;
+    unsigned int y = 0;
     
     if (m_pTableHeaderView)
     {

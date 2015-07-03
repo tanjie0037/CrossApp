@@ -28,7 +28,6 @@ CAViewController::CAViewController()
 ,m_bLifeLock(false)
 ,m_bKeypadEnabled(false)
 {
-    this->setHaveNextResponder(true);
     m_pView = CAView::createWithColor(CAColor_white);
     m_pView->retain();
     m_pView->setViewDelegate(this);
@@ -225,12 +224,9 @@ CANavigationController::CANavigationController()
 {
     m_pView->setColor(CAColor_clear);
     m_pView->setDisplayRange(false);
-    
-    this->setTouchMovedListenVertical(false);
+    this->setHaveNextResponder(false);
     this->setTouchMoved(true);
-    m_bSlidingMaxX = true;
-    m_bSlidingMinX = true;
-    
+
     CCSize winSize = CAApplication::getApplication()->getWinSize();
     m_tNavigationBarSize = CCSize(winSize.width, _px(88));
     
@@ -587,12 +583,14 @@ void CANavigationController::pushViewController(CAViewController* viewController
     this->createWithContainer(viewController);
     this->layoutNewContainer();
     CAView* newContainer = m_pContainers.back();
-    newContainer->setFrameOrigin(CCPoint(x, 0));
+    
     
     CAApplication::getApplication()->getTouchDispatcher()->setDispatchEventsFalse();
     
     if (animated)
     {
+        newContainer->setFrameOrigin(CCPoint(x, 0));
+        
         CAViewAnimation::beginAnimations("", NULL);
         CAViewAnimation::setAnimationDuration(0.25f);
         CAViewAnimation::setAnimationDelay(1/30.0f);
@@ -617,11 +615,8 @@ void CANavigationController::pushViewController(CAViewController* viewController
 
 void CANavigationController::pushViewControllerFinish()
 {
-    float x = this->getView()->getBounds().size.width;
-    
     CAView* lastContainer = m_pContainers.at(m_pContainers.size() - 2);
     lastContainer->setVisible(false);
-    lastContainer->setFrameOrigin(CCPoint(-x/2.0f, 0));
     
     CAView* newContainer = m_pContainers.back();
     newContainer->setFrameOrigin(CCPointZero);
@@ -629,7 +624,6 @@ void CANavigationController::pushViewControllerFinish()
     CAViewController* lastViewController = m_pViewControllers.at(m_pViewControllers.size() - 2);
     lastViewController->viewDidDisappear();
     
-    m_bSlidingMinX = m_pViewControllers.size() <= 1;
     CAApplication::getApplication()->getTouchDispatcher()->setDispatchEventsTrue();
 }
 
@@ -654,7 +648,7 @@ CAViewController* CANavigationController::popViewControllerAnimated(bool animate
     
     CAView* showContainer = m_pContainers.at(index);
     showContainer->setVisible(true);
-    showContainer->setFrameOrigin(CCPoint(-x/2.0f, 0));
+    
     
     {
         CCRect rect = this->getView()->getBounds();
@@ -689,6 +683,8 @@ CAViewController* CANavigationController::popViewControllerAnimated(bool animate
     
     if (animated)
     {
+        showContainer->setFrameOrigin(CCPoint(-x/2.0f, 0));
+        
         CAViewAnimation::beginAnimations("", NULL);
         CAViewAnimation::setAnimationDuration(0.25f);
         CAViewAnimation::setAnimationDelay(1/30.0f);
@@ -729,7 +725,6 @@ void CANavigationController::popViewControllerFinish()
     
     m_pContainers.back()->setFrameOrigin(CCPointZero);
     
-    m_bSlidingMinX = m_pViewControllers.size() <= 1;
     CAApplication::getApplication()->getTouchDispatcher()->setDispatchEventsTrue();
 }
 
@@ -829,7 +824,6 @@ void CANavigationController::popToRootViewControllerFinish()
     
     m_pViewControllers.back()->getView()->setFrameOrigin(CCPointZero);
     
-    m_bSlidingMinX = true;
     CAApplication::getApplication()->getTouchDispatcher()->setDispatchEventsTrue();
 }
 
@@ -837,8 +831,7 @@ void CANavigationController::homingViewControllerFinish()
 {
     size_t index = m_pViewControllers.size() - 2;
     CAViewController* lastViewController = m_pViewControllers.at(index);
-    lastViewController->viewDidDisappear();
-    
+
     CAView* lastContainer = m_pContainers.at(index);
     lastContainer->setVisible(false);
     
@@ -865,8 +858,6 @@ CAViewController* CANavigationController::popFirstViewController()
     m_pSecondContainers.popFront();
     
     m_pNavigationBars.popFront();
-    
-    m_bSlidingMinX = m_pViewControllers.size() <= 1;
     
     return frontViewController;
 }
@@ -1065,8 +1056,7 @@ void CANavigationController::ccTouchEnded(CATouch *pTouch, CAEvent *pEvent)
     float x = this->getView()->getBounds().size.width;
     size_t index = m_pViewControllers.size() - 2;
     CAViewController* lastViewController = m_pViewControllers.at(index);
-    lastViewController->viewDidAppear();
-
+    
     CAView* lastContainer = m_pContainers.at(index);
     lastContainer->setVisible(true);
     
@@ -1076,6 +1066,8 @@ void CANavigationController::ccTouchEnded(CATouch *pTouch, CAEvent *pEvent)
     
     if (m_bPopViewController)
     {
+        lastViewController->viewDidAppear();
+        
         CAViewAnimation::beginAnimations("navigation_animation", NULL);
         CAViewAnimation::setAnimationDuration(0.25f);
         CAViewAnimation::setAnimationDelay(0.02f);
@@ -1117,12 +1109,18 @@ void CANavigationController::ccTouchCancelled(CATouch *pTouch, CAEvent *pEvent)
 
 void CANavigationController::setTouchMoved(bool var)
 {
-    m_bTouchMovedStopSubviews = m_bTouchMoved = var;
+    m_bTouchMoved = var;
+    this->setPriorityScroll(var);
 }
 
 bool CANavigationController::isTouchMoved()
 {
     return m_bTouchMoved;
+}
+
+bool CANavigationController::isReachBoundaryLeft()
+{
+    return m_pViewControllers.size() == 1;
 }
 
 #pragma CATabBarController

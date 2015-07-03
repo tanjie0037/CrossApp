@@ -74,6 +74,8 @@ public:
 
 	virtual void onEnterTransitionDidFinish();
 
+    virtual void onExitTransitionDidStart();
+    
 	virtual bool resignFirstResponder();
 
 	virtual bool becomeFirstResponder();
@@ -101,6 +103,7 @@ protected:
 	virtual void getKeyBoradReturnCallBack();
 	virtual void keyboardWillHide(CCIMEKeyboardNotificationInfo& info);
 	virtual const char* getContentText();
+	virtual int getCursorPos();
 	virtual void visit();
 
     
@@ -161,6 +164,7 @@ protected:
 	void ccPasteFromClipboard() { pasteFromClipboard(); }
     void ccCopyToClipboard() { copyToClipboard(); }
     void ccCutToClipboard() { cutToClipboard(); }
+	int getStringCharCount(const std::string &var);
 
 
 	std::pair<int, int> getLineAndPos(int iPos);
@@ -205,6 +209,7 @@ private:
 
 	CAImageView* m_pImageView;
 
+	bool m_bKeyboardOpen;
     bool m_bMoved;
 	int m_iCurPos;
 	int m_iLineHeight;
