@@ -99,4 +99,19 @@ string ZPTNativeHelper::getStatusKey()
     return "status-v" + ZPTNativeHelper::getAppVersion(true);
 }
 
+string ZPTNativeHelper::getLanguage()
+{
+    JniMethodInfo mi;
+    if (!JniHelper::getStaticMethodInfo(mi, "com.zpt.utils.ZPTNativeHelper", "getLanguage", "()Ljava/lang/String;")) {
+        assert(0);
+        return "";
+    }
+    
+    jstring returnString = (jstring) mi.env->CallStaticObjectMethod(mi.classID, mi.methodID);
+    string language = string(mi.env->GetStringUTFChars(returnString, NULL));
+    mi.env->DeleteLocalRef(mi.classID);
+    
+    return language;
+}
+
 #endif

@@ -84,4 +84,26 @@ string ZPTNativeHelper::getStatusKey()
     return "status-v" + ZPTNativeHelper::getAppVersion(true);
 }
 
+string ZPTNativeHelper::getLanguage()
+{
+    // get the current language and country config
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    NSArray *languages = [defaults objectForKey:@"AppleLanguages"];
+    NSString *currentLanguage = [languages objectAtIndex:0];
+    
+    // get the current language code.(such as English is "en", Chinese is "zh" and so on)
+    NSDictionary* temp = [NSLocale componentsFromLocaleIdentifier:currentLanguage];
+    NSString * languageCode = [temp objectForKey:NSLocaleLanguageCode];
+    
+    string ret = "";
+    
+    if ([languageCode isEqualToString:@"zh"]) {
+        ret = string(utf8cstr(currentLanguage));
+    } else {
+        ret = string(utf8cstr(languageCode));
+    }
+    
+    return ret;
+}
+
 #endif

@@ -23,6 +23,7 @@ public:
     static string getDeviceId();
     static string getAppVersion(bool replaceDot = false);
     static string getStatusKey();
+    static string getLanguage();
 };
 
 #endif /* defined(__AppGift__ZPTNativeHelper__) */

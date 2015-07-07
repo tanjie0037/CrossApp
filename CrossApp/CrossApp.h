@@ -25,6 +25,14 @@
 #include "animation/CAAnimation.h"
 #include "animation/CAViewAnimation.h"
 
+// actions
+#include "actions/CCActionCamera.h"
+#include "actions/CCActionEase.h"
+#include "actions/CCActionInstant.h"
+#include "actions/CCActionInterval.h"
+#include "actions/CCActionManager.h"
+#include "actions/CCActionTween.h"
+
 //basics
 #include "basics/CAApplication.h"
 #include "basics/CAAutoreleasePool.h"
