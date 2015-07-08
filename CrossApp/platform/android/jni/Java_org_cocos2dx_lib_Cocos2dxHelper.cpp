@@ -5,7 +5,7 @@
 #include "JniHelper.h"
 #include "cocoa/CCString.h"
 #include "Java_org_cocos2dx_lib_Cocos2dxHelper.h"
-
+#include "CrossApp.h"
 
 #define  LOG_TAG    "Java_org_cocos2dx_lib_Cocos2dxHelper.cpp"
 #define  LOGD(...)  __android_log_print(ANDROID_LOG_DEBUG,LOG_TAG,__VA_ARGS__)
@@ -45,6 +45,9 @@ extern "C" {
         }
     }
 
+    JNIEXPORT void JNICALL Java_org_CrossApp_lib_Cocos2dxHelper_nativePostNotification(JNIEnv*  env, jobject thiz, jstring noti) {
+        CANotificationCenter::sharedNotificationCenter()->postNotification(JniHelper::jstring2string(noti).c_str());
+    }
 }
 
 const char * getApkPath() {

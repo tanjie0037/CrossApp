@@ -74,6 +74,8 @@ public class Cocos2dxHelper {
 	private static native void nativeSetApkPath(final String pApkPath);
 
 	private static native void nativeSetEditTextDialogResult(final byte[] pBytes);
+	
+	private static native void nativePostNotification(String noti);
 
 	public static String getCocos2dxPackageName() {
 		return Cocos2dxHelper.sPackageName;
@@ -253,6 +255,16 @@ public class Cocos2dxHelper {
 		return -1.0f;
     }
     
+    public static void postNotification(final String noti)
+    {
+    	Cocos2dxHelper.sCocos2dxHelperListener.runOnGLThread(new Runnable() {
+			
+			@Override
+			public void run() {
+				Cocos2dxHelper.nativePostNotification(noti);
+			}
+		});
+    }
     // ===========================================================
  	// Functions for CCUserDefault
  	// ===========================================================
