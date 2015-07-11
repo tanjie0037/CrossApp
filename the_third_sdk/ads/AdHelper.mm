@@ -19,9 +19,13 @@
 
 USING_NS_CC;
 
-#pragma mark MySupersonicDelegate
+static const int NX_FREE = 0;
+static const int NX_READY = 1;
+static const std::string K_NATIVEX_PLACEMENT_OFFER = "Store Open Offerwall";
+static const std::string K_NATIVEX_PLACEMENT_VIDEO = "Game Launch Video";
+static std::map<std::string, int> _nativeXStep;
 
-static int _nativeXStep = 0;
+#pragma mark MySupersonicDelegate
 
 @interface MySupersonicDelegate : NSObject <SupersonicLogDelegate, SupersonicOWDelegate, SupersonicRVDelegate> {}
 @end
@@ -129,7 +133,9 @@ static int _nativeXStep = 0;
 /** Called when the Offer Wall is successfully initialized. */
 - (void)nativeXSDKDidCreateSession {
     CCLOG("nativeXSDKDidCreateSession");
-    [[NativeXSDK sharedInstance] fetchAdWithPlacement:kAdPlacementStoreOpen delegate:self];
+    
+    [[NativeXSDK sharedInstance] fetchAdWithCustomPlacement:nsstr(K_NATIVEX_PLACEMENT_OFFER.c_str()) delegate:self];
+    [[NativeXSDK sharedInstance] fetchAdWithCustomPlacement:nsstr(K_NATIVEX_PLACEMENT_VIDEO.c_str()) delegate:self];
 }
 
 /** Called when there is an error trying to initialize the Offer Wall.
@@ -165,10 +171,30 @@ static int _nativeXStep = 0;
 {
     CCLOG("nativeXAdView:didLoadWithPlacement, placement:%s", utf8cstr(placement));
     
-    if (_nativeXStep == 1) {
-        [[NativeXSDK sharedInstance] showReadyAdWithPlacement:kAdPlacementStoreOpen];
-    } else if (_nativeXStep == 0) {
-        _nativeXStep = 2;
+    NSString *kOffer = nsstr(K_NATIVEX_PLACEMENT_OFFER.c_str());
+    NSString *kVideo = nsstr(K_NATIVEX_PLACEMENT_VIDEO.c_str());
+    
+    if ([placement isEqual:kOffer]) {
+        if (_nativeXStep[K_NATIVEX_PLACEMENT_OFFER] == NX_READY) {
+            _nativeXStep[K_NATIVEX_PLACEMENT_OFFER] = NX_FREE;
+            [[NativeXSDK sharedInstance] showReadyAdWithCustomPlacement:kOffer];
+            
+        } else {
+            _nativeXStep[K_NATIVEX_PLACEMENT_OFFER] = NX_READY;
+        }
+        
+    } else if ([placement isEqual:kVideo]) {
+        if (_nativeXStep[K_NATIVEX_PLACEMENT_VIDEO] == NX_READY) {
+            _nativeXStep[K_NATIVEX_PLACEMENT_VIDEO] = NX_FREE;
+            [[NativeXSDK sharedInstance] showReadyAdWithCustomPlacement:kVideo];
+            
+        } else {
+            _nativeXStep[K_NATIVEX_PLACEMENT_VIDEO] = NX_READY;
+        }
+        
+    } else {
+        assert(0);
+        NSLog(@"unknown placement:%@", placement);
     }
 }
 
@@ -235,7 +261,10 @@ void AdHelper::initAd(AdType type, const std::string &uId, const std::string &ap
                                                withUserId:[NSString stringWithUTF8String:uId.c_str()]];
             break;
             
-         case AdNativeX:
+        case AdNativeX:
+            _nativeXStep[K_NATIVEX_PLACEMENT_OFFER] = NX_FREE;
+            _nativeXStep[K_NATIVEX_PLACEMENT_VIDEO] = NX_FREE;
+        
             [[NativeXSDK sharedInstance] setDelegate:_myNaviteXDeleagte];
             [[NativeXSDK sharedInstance] createSessionWithAppId:nsstr(appkey.c_str())
                                              andPublisherUserId:nsstr(uId.c_str())];
@@ -260,14 +289,16 @@ void AdHelper::callOfferwall(AdHelper::AdType type)
             [[Supersonic sharedInstance] showOW];
             break;
         case AdNativeX:
-            if (_nativeXStep < 2) {
-                _nativeXStep = 1;
-                [[NativeXSDK sharedInstance] fetchAdWithPlacement:kAdPlacementStoreOpen delegate:_myNaviteXDeleagte];
-            } else if (_nativeXStep == 2) {
-                _nativeXStep = 1;
-                [[NativeXSDK sharedInstance] showReadyAdWithPlacement:kAdPlacementStoreOpen];
+            _nativeXStep[K_NATIVEX_PLACEMENT_OFFER] = NX_READY;
+        
+            if ([[NativeXSDK sharedInstance] isAdReadyWithCustomPlacement:nsstr(K_NATIVEX_PLACEMENT_OFFER.c_str())]) {
+                _nativeXStep[K_NATIVEX_PLACEMENT_OFFER] = NX_FREE;
+                [[NativeXSDK sharedInstance] showReadyAdWithCustomPlacement:nsstr(K_NATIVEX_PLACEMENT_OFFER.c_str())];
+                
+            } else {
+                [[NativeXSDK sharedInstance] fetchAdWithCustomPlacement: nsstr(K_NATIVEX_PLACEMENT_OFFER.c_str()) delegate: _myNaviteXDeleagte];
             }
-            
+        
             break;
         default:
             break;
@@ -287,6 +318,15 @@ void AdHelper::playVideo(AdHelper::AdType type)
             }
             break;
         case AdNativeX:
+            _nativeXStep[K_NATIVEX_PLACEMENT_VIDEO] = NX_READY;
+            
+            if ([[NativeXSDK sharedInstance] isAdReadyWithCustomPlacement:nsstr(K_NATIVEX_PLACEMENT_VIDEO.c_str())]) {
+                _nativeXStep[K_NATIVEX_PLACEMENT_VIDEO] = NX_FREE;
+                [[NativeXSDK sharedInstance] showReadyAdWithCustomPlacement:nsstr(K_NATIVEX_PLACEMENT_VIDEO.c_str())];
+                
+            } else {
+                [[NativeXSDK sharedInstance] fetchAdWithCustomPlacement: nsstr(K_NATIVEX_PLACEMENT_VIDEO.c_str()) delegate: _myNaviteXDeleagte];
+            }
             break;
         default:
             break;
