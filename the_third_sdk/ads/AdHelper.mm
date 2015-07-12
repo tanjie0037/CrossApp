@@ -193,8 +193,7 @@ static std::map<std::string, int> _nativeXStep;
         }
         
     } else {
-        assert(0);
-        NSLog(@"unknown placement:%@", placement);
+        NSAssert(NO, @"unknown placement");
     }
 }
 

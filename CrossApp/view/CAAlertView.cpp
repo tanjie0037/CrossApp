@@ -301,7 +301,7 @@ void CAAlertView::adjustButtonView() {
 		m_pBtnTableView = new CATableView();
 		CCAssert(m_pBtnTableView != NULL, "");
 		m_pBtnTableView->init();
-		m_pBtnTableView->setFrame(CADipRect(0,m_fAlertViewLineHeight,ALERT_VIEW_WIDTH,alertViewButtonHeight * 3));
+		m_pBtnTableView->setFrame(CADipRect(0,m_fAlertViewLineHeight,ALERT_VIEW_WIDTH,alertViewButtonHeight * 3.6));
 		m_pBtnTableView->setBackGroundColor(CAColor_clear);
 		m_pBtnTableView->setTableViewDataSource(this);
 		m_pBtnTableView->setTableViewDelegate(this);
@@ -376,10 +376,13 @@ void CAAlertView::calcuAlerViewSize()
 		
 		m_fAlertViewHeight += alertViewButtonHeight;
 	}
+    else if (btnCount == 3)
+    {
+        m_fAlertViewHeight += alertViewButtonHeight * 3;
+    }
     else
     {
-
-		m_fAlertViewHeight += alertViewButtonHeight * 3;
+		m_fAlertViewHeight += alertViewButtonHeight * 3.6;
 	} 
 
 	if (m_fAlertViewMessageHeight > alertViewMessageHeight)
