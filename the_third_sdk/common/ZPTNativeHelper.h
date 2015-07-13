@@ -24,6 +24,7 @@ public:
     static string getAppVersion(bool replaceDot = false);
     static string getStatusKey();
     static string getLanguage();
+    static string getCountyCode();
 };
 
 #endif /* defined(__AppGift__ZPTNativeHelper__) */

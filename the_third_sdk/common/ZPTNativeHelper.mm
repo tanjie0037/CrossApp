@@ -94,7 +94,6 @@ string ZPTNativeHelper::getLanguage()
     // get the current language code.(such as English is "en", Chinese is "zh" and so on)
     NSDictionary* temp = [NSLocale componentsFromLocaleIdentifier:currentLanguage];
     NSString * languageCode = [temp objectForKey:NSLocaleLanguageCode];
-    
     string ret = "";
     
     if ([languageCode isEqualToString:@"zh"]) {
@@ -104,6 +103,12 @@ string ZPTNativeHelper::getLanguage()
     }
     
     return ret;
+}
+
+string ZPTNativeHelper::getCountyCode()
+{
+    NSString *country = [[NSLocale currentLocale] localeIdentifier];
+    return string(utf8cstr(country));
 }
 
 #endif

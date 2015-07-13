@@ -114,4 +114,21 @@ string ZPTNativeHelper::getLanguage()
     return language;
 }
 
+string ZPTNativeHelper::getCountyCode()
+{
+    JniMethodInfo mi;
+    if (!JniHelper::getStaticMethodInfo(mi, "com.zpt.utils.ZPTNativeHelper", "getCountyCode", "()Ljava/lang/String;")) {
+        assert(0);
+        return "";
+    }
+    
+    jstring returnString = (jstring) mi.env->CallStaticObjectMethod(mi.classID, mi.methodID);
+    string countyCode = string(mi.env->GetStringUTFChars(returnString, NULL));
+    mi.env->DeleteLocalRef(mi.classID);
+    
+    CCLOG("---CountyCode:%s", countyCode.c_str());
+    
+    return countyCode;
+}
+
 #endif
