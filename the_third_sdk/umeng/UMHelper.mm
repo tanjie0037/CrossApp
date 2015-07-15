@@ -83,7 +83,7 @@ void UMHelper::onEventMapValue(const char* eventId, CSJsonDictionary& dic, int v
 
 std::string UMHelper::getOnlineParam(const char* key)
 {
-    return utf8cstr([MobClick getConfigParams:nsstr(key)]);
+    return string(utf8cstr([MobClick getConfigParams:nsstr(key)]));
 }
 
 void UMHelper::showFeedback(const char* uId)

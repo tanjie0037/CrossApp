@@ -16,7 +16,8 @@ public:
     enum AdType {
         AdFyber = 0,
         AdSupersonic = 1,
-        AdNativeX = 2
+        AdNativeX = 2,
+        AdAdxmi = 3
     };
     
 public:
