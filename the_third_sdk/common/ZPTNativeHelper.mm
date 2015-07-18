@@ -122,4 +122,8 @@ string ZPTNativeHelper::getCountyCode()
     return string(utf8cstr(country));
 }
 
+void ZPTNativeHelper::getPrivateInfo(CSJsonDictionary& dic)
+{
+}
+
 #endif

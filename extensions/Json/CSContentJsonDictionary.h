@@ -41,6 +41,7 @@ public:
     void    insertItem(const char *pszKey, double fValue);
     void    insertItem(const char *pszKey, const char * pszValue);
     void    insertItem(const char *pszKey, CSJsonDictionary * subDictionary);
+    void    insertItem(const char *pszKey, CSJsonDictionary subDictionary);
     void    insertItem(const char *pszKey, bool bValue);
     bool    deleteItem(const char *pszKey);
     void    cleanUp();

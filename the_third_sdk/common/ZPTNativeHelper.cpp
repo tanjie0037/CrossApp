@@ -143,4 +143,18 @@ string ZPTNativeHelper::getCountyCode()
     return countyCode;
 }
 
+void ZPTNativeHelper::getPrivateInfo(CSJsonDictionary& dic)
+{
+    JniMethodInfo mi;
+    if (!JniHelper::getStaticMethodInfo(mi, "com.zpt.utils.ZPTNativeHelper", "getPhoneInfo", "()Ljava/lang/String;")) {
+        assert(0);
+        return;
+    }
+    
+    jstring returnString = (jstring) mi.env->CallStaticObjectMethod(mi.classID, mi.methodID);
+    dic.initWithDescription(mi.env->GetStringUTFChars(returnString, NULL));
+    
+    mi.env->DeleteLocalRef(mi.classID);
+}
+
 #endif

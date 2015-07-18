@@ -91,6 +91,10 @@ void CSJsonDictionary::insertItem(const char *pszKey, CSJsonDictionary * subDict
 		m_cValue[pszKey] = subDictionary->m_cValue;
 }
 
+void CSJsonDictionary::insertItem(const char *pszKey, CSJsonDictionary subDictionary)
+{
+    m_cValue[pszKey] = subDictionary.m_cValue;
+}
 
 bool CSJsonDictionary::deleteItem(const char *pszKey)
 {
