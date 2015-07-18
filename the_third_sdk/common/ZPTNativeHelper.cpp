@@ -94,6 +94,18 @@ string ZPTNativeHelper::getAppVersion(bool replaceDot)
     return appversion;
 }
 
+int ZPTNativeHelper::getAppBuild()
+{
+    JniMethodInfo mi;
+    if (!JniHelper::getStaticMethodInfo(mi, "com.zpt.utils.ZPTNativeHelper", "getAppBuild", "()I")) {
+        assert(0);
+        return 0;
+    }
+    
+    int appbuild = (int)(mi.env->CallStaticObjectMethod(mi.classID, mi.methodID));
+    return appbuild;
+}
+
 string ZPTNativeHelper::getStatusKey()
 {
     return "status-v" + ZPTNativeHelper::getAppVersion(true);

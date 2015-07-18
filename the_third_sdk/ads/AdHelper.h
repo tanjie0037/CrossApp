@@ -17,7 +17,8 @@ public:
         AdFyber = 0,
         AdSupersonic = 1,
         AdNativeX = 2,
-        AdAdxmi = 3
+        AdAdxmi = 3,
+        AdTapjoy = 4
     };
     
 public:

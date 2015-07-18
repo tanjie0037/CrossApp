@@ -46,6 +46,17 @@ string ZPTNativeHelper::getAppVersion(bool replaceDot)
     return appversion;
 }
 
+int ZPTNativeHelper::getAppBuild()
+{
+    UIDevice *device=[[UIDevice alloc] init];
+    [device autorelease];
+    NSDictionary *infoDictionary = [[NSBundle mainBundle] infoDictionary];
+    
+    NSInteger appBuild = [[infoDictionary objectForKey:@"CFBundleVersion"] integerValue];
+    
+    return (int)appBuild;
+}
+
 void ZPTNativeHelper::openUrl(const char* url)
 {
     [[UIApplication sharedApplication] openURL: [NSURL URLWithString:nsstr(url)]];
