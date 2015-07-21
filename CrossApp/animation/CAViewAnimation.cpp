@@ -436,7 +436,8 @@ void CAViewAnimation::update(float dt)
                 view->setScaleY(model->startScaleY + model->deltaScaleY * s);
                 view->setPoint(model->startPoint + model->deltaPoint * s);
                 view->setContentSize(model->startContentSize + model->deltaContentSize * s);
-                view->setZOrder(model->startZOrder + model->deltaZOrder * s);
+                //tanjie: 注释掉，这行代码导致zorder都为0
+//                view->setZOrder(model->startZOrder + model->deltaZOrder * s);
                 view->setVertexZ(model->startVertexZ + model->deltaVertexZ * s);
                 view->setSkewX(model->startSkewX + model->deltaSkewX * s);
                 view->setSkewY(model->startSkewY + model->deltaSkewY * s);
