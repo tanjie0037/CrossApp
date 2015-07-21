@@ -238,6 +238,14 @@ static MyNaviteXDeleagte *_myNaviteXDeleagte = [[MyNaviteXDeleagte alloc] init];
 
 #pragma mark AdHelper
 
+//AdFyber = 0,
+//AdSupersonic = 1,
+//AdNativeX = 2,
+//AdAdxmi = 3,
+//AdTapjoy = 4
+
+std::map<std::string, AdHelper::AdType> AdHelper::AD_TYPE = AdHelper::createMap();
+
 void AdHelper::initAd(AdType type, const std::string &uId, const std::string &appkey, const std::string &token)
 {
     switch (type) {

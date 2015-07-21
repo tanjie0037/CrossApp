@@ -21,6 +21,18 @@ public:
         AdTapjoy = 4
     };
     
+    static std::map<std::string, AdType> AD_TYPE;
+    
+    static std::map<std::string, AdType> createMap() {
+        std::map<std::string, AdType> map;
+        map["fyber"] = AdFyber;
+        map["supersonic"] = AdSupersonic;
+        map["nativeX"] = AdNativeX;
+        map["adxmi"] = AdAdxmi;
+        map["tapjoy"] = AdTapjoy;
+        return map;
+    }
+    
 public:
     static void initAd(AdType type, const std::string &uId, const std::string &appkey, const std::string &token);
     static void callOfferwall(AdType type);

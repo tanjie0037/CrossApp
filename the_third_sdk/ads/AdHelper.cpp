@@ -16,6 +16,8 @@
 
 USING_NS_CC;
 
+std::map<std::string, AdHelper::AdType> AdHelper::AD_TYPE = AdHelper::createMap();
+
 void AdHelper::initAd(AdType type, const std::string &uId, const std::string &appkey, const std::string &token) {
     JniMethodInfo mi;
     if (!JniHelper::getStaticMethodInfo(mi, "com.zpt.utils.AdHelper", "initAd", "(ILjava/lang/String;Ljava/lang/String;Ljava/lang/String;)V")) {
