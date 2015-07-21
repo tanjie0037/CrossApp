@@ -157,4 +157,16 @@ void ZPTNativeHelper::getPrivateInfo(CSJsonDictionary& dic)
     mi.env->DeleteLocalRef(mi.classID);
 }
 
+void ZPTNativeHelper::closeApp()
+{
+    JniMethodInfo mi;
+    if (!JniHelper::getStaticMethodInfo(mi, "org.CrossApp.lib.Cocos2dxHelper", "terminateProcess", "()V")) {
+        assert(0);
+        return;
+    }
+    
+    mi.env->CallStaticObjectMethod(mi.classID, mi.methodID);
+    mi.env->DeleteLocalRef(mi.classID);
+}
+
 #endif

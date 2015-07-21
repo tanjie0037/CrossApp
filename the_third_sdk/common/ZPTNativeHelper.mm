@@ -124,6 +124,12 @@ string ZPTNativeHelper::getCountyCode()
 
 void ZPTNativeHelper::getPrivateInfo(CSJsonDictionary& dic)
 {
+    //todo
+}
+
+void ZPTNativeHelper::closeApp()
+{
+    exit(0);
 }
 
 #endif
