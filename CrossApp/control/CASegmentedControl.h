@@ -6,8 +6,8 @@
 //  Copyright (c) 2015年 CrossApp. All rights reserved.
 //
 
-#ifndef CrossAppx_CASegmentedControl_h
-#define CrossAppx_CASegmentedControl_h
+#ifndef CrossApp_CASegmentedControl_h
+#define CrossApp_CASegmentedControl_h
 
 #include "CAControl.h"
 #include "basics/CASTLContainer.h"
@@ -57,6 +57,13 @@ public:
     const CAColor4B& getTitleColor();
     
     void setTitleSelectedColor(const CAColor4B& color);
+    const CAColor4B& getTitleSelectedColor();
+    
+    void setImageColor(const CAColor4B& color);
+    const CAColor4B& getImageColor();
+    
+    void setImageSelectedColor(const CAColor4B& color);
+    const CAColor4B& getImageSelectedColor();
     
     void setTintColor(const CAColor4B& color);
     
@@ -80,7 +87,9 @@ public:
     void setEnabledForSegmentAtIndex(bool isEnable, int index);
     bool isEnabledForSegmentAtIndex(int index);
     
-    CC_PROPERTY(CAView*, m_pBackgroundView, BackgroundView);
+    CC_PROPERTY_READONLY(CAView*, m_pBackgroundView, BackgroundView);
+    
+    void setImageSizeAtIndex(CCSize size, int index);
 
 protected:
     virtual bool initWithFrame(const CCRect& rect);
@@ -137,6 +146,8 @@ protected:
     
     std::vector<CCSize>              m_vContentOffset;
     
+    std::vector<CCSize>              m_vImageSize;
+    
     std::vector<float>               m_vSegmentWidth;
     
     CAVector<CAView*>                m_vSegments;
@@ -152,6 +163,10 @@ protected:
     CAColor4B                        m_cTextColor;
     
     CAColor4B                        m_cTextSelectedColor;
+    
+    CAColor4B                        m_cImageColor;
+    
+    CAColor4B                        m_cImageSelectedColor;
     
     CAColor4B                        m_cTintColor;
     

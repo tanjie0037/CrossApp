@@ -110,7 +110,8 @@ public CACollectionViewDataSource,
 public CAScrollViewDelegate,
 public CAPickerViewDelegate,
 public CAPickerViewDataSource,
-public CADatePickerViewDelegate//,
+public CADatePickerViewDelegate,
+public CAMediaDelegate//,
 //public CAVideoPlayerControllerDelegate
 {
 public:
@@ -189,6 +190,7 @@ public:
     
     void showAnimation();
     void doAction(CAControl* btn,CCPoint point);
+    void endAction();
     
     void showDatePickerView();
     
@@ -271,6 +273,7 @@ public:
     virtual void didSelectRow(const struct tm& tm);
 public:
     virtual void onVideoPlayerButtonBack();
+    virtual void getSelectedImage(CAImage *image);
 public:
     
     std::vector<std::string> testList;
@@ -295,10 +298,20 @@ public:
     CAImageView* p_imageView;
     CAPickerView* p_pickerView;
     CALabel* city_value;
-    CAImageView* animationView;
     CAStepper* step;
     CALabel* step_value;
     CAView* renderImage;
+    CAView* renderImage_mb;
+    CAClippingView* m_clvImage;
+    CAClippingView* m_clv;
+    CAButton* render_btn;
+    //Animation
+    CAImageView* animation_1_view;
+    CATextField* animation_2_textfield;
+    CAButton* animation_2_btn_search;
+    CAButton* animation_2_btn_cancel;
+    CAImageView* animation_3_imageview;
+    
     
     int UIINDEX;
     int showIndex;

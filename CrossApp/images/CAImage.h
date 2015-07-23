@@ -67,8 +67,17 @@ public:
     
     virtual ~CAImage();
     
-    static CAImage* createWithString(const char *text, const char *fontName, float fontSize, const CCSize& dimensions,
-                                     CATextAlignment hAlignment, CAVerticalTextAlignment vAlignment, bool isForTextField = false, int iLineSpacing = 0, bool bBold = false, bool bItalics = false, bool bUnderLine = false);
+    static CAImage* createWithString(const char *text,
+                                     const char *fontName,
+                                     float fontSize,
+                                     const CCSize& dimensions,
+                                     CATextAlignment hAlignment,
+                                     CAVerticalTextAlignment vAlignment,
+                                     bool isForTextField = false,
+                                     int iLineSpacing = 0,
+                                     bool bBold = false,
+                                     bool bItalics = false,
+                                     bool bUnderLine = false);
     
     static int getFontHeight(const char* pFontName, unsigned long nSize);
     
@@ -88,6 +97,12 @@ public:
                                int iLimitWidth,
                                int iLineSpace = 0,
                                bool bWordWrap = true);
+    
+    static CAImage* scaleToNewImageWithImage(CAImage* image, const CCSize& size);
+    
+    static CAImage* scaleToNewImageWithImage(CAImage* image, float scaleX, float scaleY);
+    
+    static CAImage* generateMipmapsWithImage(CAImage* image);
     
     static CAImage* create(const std::string& file);
 
@@ -151,10 +166,10 @@ public:
     
     const char* getImageFileType();
     
-    static CAImage* CC_WHITE_IMAGE();
-    
     float getAspectRatio();
     
+    static CAImage* CC_WHITE_IMAGE();
+
     virtual CAImage* copy();
     
     bool hasAlpha() { return m_bHasAlpha; }
@@ -213,6 +228,8 @@ protected:
     
     bool saveImageToPNG(const std::string& filePath, bool isToRGB);
     bool saveImageToJPG(const std::string& filePath);
+    
+    void setData(const unsigned char* data, unsigned long dataLenght);
     
     void convertToRawData();
     
@@ -277,7 +294,9 @@ protected:
     bool checkIfWillBeCleared(const SavedImage* frame);
     void copyLine(unsigned char* dst, const unsigned char* src, const ColorMapObject* cmap, int transparent, int width);
     void setGifImageWithIndex(unsigned int index);
-    
+public:
+    std::wstring m_txt;
+    std::string m_FileName;	
 protected:
     
     bool m_bPremultiplied;
@@ -295,6 +314,10 @@ protected:
     GifFileType* m_pGIF;
     
     int m_iGIFIndex;
+    
+    unsigned char* m_pImageData;
+    
+    unsigned long m_uImageDataLenght;
     
     friend class CAFreeTypeFont;
 };

@@ -6,8 +6,8 @@
 //  Copyright (c) 2014 http://www.9miao.com All rights reserved.
 //
 
-#ifndef __cocos2dx__CACollectionView__
-#define __cocos2dx__CACollectionView__
+#ifndef __CrossApp__CACollectionView__
+#define __CrossApp__CACollectionView__
 
 #include "view/CAView.h"
 #include "view/CAScale9ImageView.h"
@@ -84,6 +84,8 @@ public:
     {
         return 0;
     }
+    
+    virtual void collectionViewWillDisplayCellAtIndex(CACollectionView* table, CACollectionViewCell* cell, unsigned int section, unsigned int row, unsigned int item) {};
 };
 
 
@@ -116,6 +118,10 @@ public:
     void setUnSelectRowAtIndexPath(unsigned int section, unsigned int row, unsigned int item);
     
     virtual void setShowsScrollIndicators(bool var);
+    
+    CACollectionViewCell* cellForRowAtIndexPath(unsigned int section, unsigned int row, unsigned int item);
+    
+    const CAVector<CACollectionViewCell*>& displayingCollectionCell();
     
     CC_SYNTHESIZE(CACollectionViewDataSource*, m_pCollectionViewDataSource, CollectionViewDataSource);
     
@@ -243,9 +249,11 @@ private:
 
 	CACollectionViewCell* m_pHighlightedCollectionCells;
 
-	std::map<CAIndexPath3E, CACollectionViewCell*> m_pUsedCollectionCells;
+	std::map<CAIndexPath3E, CACollectionViewCell*> m_mpUsedCollectionCells;
 
-	std::map<std::string, CAVector<CACollectionViewCell*> > m_pFreedCollectionCells;
+    CAVector<CACollectionViewCell*> m_vpUsedCollectionCells;
+    
+	std::map<std::string, CAVector<CACollectionViewCell*> > m_mpFreedCollectionCells;
 };
 
 class CC_DLL CACollectionViewCell : public CAControl
@@ -260,6 +268,8 @@ public:
 
 	virtual bool initWithReuseIdentifier(const std::string& reuseIdentifier);
 
+    CC_SYNTHESIZE_READONLY(CAView*, m_pContentView, ContentView);
+    
     CC_PROPERTY(CAView*, m_pBackgroundView, BackgroundView);
     
     CC_SYNTHESIZE_PASS_BY_REF(std::string, m_sReuseIdentifier, ReuseIdentifier);

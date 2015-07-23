@@ -1,5 +1,57 @@
 **********************************************************************************
 
+#### CrossApp 1.1.9 更新内容：  
+
+#####1.优化引擎性能
+1.CPU高峰占有率，性能提升
+2.耗电优化
+
+#####2.优化iOS端Http网络请求稳定性
+
+#####3.优化CAScrollView
+1.优化滑动容易惯性算法
+
+#####4.优化CAViewAnimation动画系统
+1.增加对ImageRect的支持
+
+#####5.优化CAImage
+1.增加纹理拉伸缩放接口
+
+#####6.优化Android端从相册、摄像头获取照片
+1.修复之前部分手机不能争取显示照片的问题
+
+#####7.优化CATextView
+1.增加默认背景
+2.增加输入区域与边框距离的接口
+2.优化CATextViewDelegate中getKeyBoardHeight 回调，增加键盘收回的回调
+3.优化CATextViewDelegate中onTextViewInsertText、onTextViewDeleteBackward插入删除监听回调，整理回调参数
+
+#####8.优化CATextField
+1.优化CATextField Delegate中getKeyBoardHeight 回调，增加键盘收回的回调
+2.优化CATextField Delegate中onTextFieldInsertText、onTextFieldDeleteBackward插入删除监听回调，整理回调参数
+
+#####9.优化CAButton
+1.增加Image位置、大小更改接口
+2.增加Title位置、字体大小以及Label大小更改接口
+
+#####10.优化CANavigationBar
+1.增加item单项宽度接口
+
+#####11.优化CAListView、CATableView、CACollectionView
+1.增加displayingXXXCell函数，可以获取当前所有被显示的CAXXXViewCell对象
+2.CAXXXViewDelegate增加 XXXViewWillDisplayCellAtIndex 回调，可以监听已经被加载完成并即将被显示的listViewCell
+3.CAXXXViewCell增加ContentView层
+
+#####12.优化CAWebView接口
+1.修改了webView加载菊花的接口，由用户自己调用，还有添加设置菊花view的接口，用户可以拥有自己的加载动画
+
+#####13.添加UTF8转UTF32接口
+
+#####14.其他一些细节的修改
+
+
+**********************************************************************************
+
 #### CrossApp 1.1.8 更新内容：  
 
 #####1.优化CATextField、CATextView
@@ -29,6 +81,25 @@
 #####12.修复上版本日期控件中文编码不正确的bug
 
 #####13.其他一些细节的修改
+
+
+#### CrossApp 1.1.8 Update:  
+
+#####1. Optimized CATextField and CATextView
+1. Fixed bug that text becomes black block in some circumstances
+2. Changed onTextViewAttachWithIME, onTextViewDetachWithIME and other delegate function callback as main thread
+#####2. Added item alert badge in CATabBar
+#####3. Readjusted and optimized touch event distribution mechanism
+#####4. Fixed bug that CADatePickerView displays wrong time in some certain circumstances
+#####5. Optimized CAActivityIndicatorView default style
+#####6. Added long press event to trigger monitor function
+#####7. Fixed bug that system crashed in iOS 6.x
+#####8. Optimized OpenGL clipping deviation
+#####9. Fixed the memory leak bug of last version
+#####10. Readjusted and optimized the screenshot class interface of CARenderImage
+#####11. Fixed the compiling error bug that caused by not adding CAGif, CAFlash in iOS
+#####12. Fixed the incorrect Chinese compiling of date control of last version
+#####13. Other details tweaking
 
 
 **********************************************************************************

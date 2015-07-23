@@ -1,6 +1,6 @@
 //
 //  CASlider.m
-//  CrossAppx
+//  CrossApp 
 //
 //  Created by juguanhui on 14-5-30.
 //  Copyright (c) 2014年 CrossApp-x. All rights reserved.
@@ -30,7 +30,8 @@ CASlider::CASlider()
     , m_pMaxTrackTintImageView(NULL)
     , m_pThumbTintImageView(NULL)
 {
-    
+    this->setPriorityScroll(true);
+    this->setVerticalScrollEnabled(false);
 }
 
 CASlider::~CASlider()

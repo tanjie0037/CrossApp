@@ -6,8 +6,8 @@
 //  Copyright (c) 2014年 http://9miao.com All rights reserved.
 //
 
-#ifndef __CrossAppx__CAViewController__
-#define __CrossAppx__CAViewController__
+#ifndef __CrossApp__CAViewController__
+#define __CrossApp__CAViewController__
 
 #include <iostream>
 #include "control/CABar.h"
@@ -155,6 +155,8 @@ public:
     
     CAViewController* popFirstViewController();
  
+    CAViewController* popViewControllerAtIndex(int index);
+    
     CAViewController* getViewControllerAtIndex(int index);
     
     CAViewController* getBackViewController();
@@ -361,4 +363,4 @@ protected:
 
 NS_CC_END
 
-#endif /* defined(__CrossAppx__CAViewController__) */
+#endif /* defined(__CrossApp__CAViewController__) */

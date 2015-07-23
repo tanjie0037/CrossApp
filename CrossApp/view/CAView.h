@@ -374,8 +374,6 @@ protected:
     
     virtual void setImageRect(const CCRect& rect);
     
-    virtual void setImageRect(const CCRect& rect, bool rotated, const CCSize& untrimmedSize);
-    
     virtual void setImageCoords(CCRect rect);
     
     virtual void setVertexRect(const CCRect& rect);
@@ -467,7 +465,7 @@ protected:
     bool   m_bRectRotated;                      /// Whether the Image is rotated
     
 
-    CCPoint m_obUnflippedOffsetPositionFromCenter;
+    bool m_bIsAnimation;
     
     // vertex coords, Image coords and color info
     ccV3F_C4B_T2F_Quad m_sQuad;

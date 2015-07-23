@@ -335,7 +335,6 @@ public:
     
     void getPath(const char* path);
     
-    void runDelegate();
 };
     
 #endif
@@ -343,7 +342,6 @@ public:
 
 static CAMediaDelegate *delegate = NULL;
 static ToMainThread *main = NULL;
-static const char *_path = NULL;
 static CALocationDelegate *locationDelegate = NULL;
 static CAWifiDelegate *wifidelegate = NULL;
 static std::vector<CAAddressBookRecord> _addressBookArr;
@@ -481,18 +479,11 @@ ToMainThread * ToMainThread::sharedMain()
     
 void ToMainThread::getPath(const char* path)
 {
-    _path = path;
-    CAScheduler::schedule(schedule_selector(ToMainThread::runDelegate), this, 0,false);
-}
-    
-void ToMainThread::runDelegate()
-{
     if (delegate)
     {
         CAImage *image = new CAImage();
-        if (image->initWithImageFile(_path))
+        if (image->initWithImageFile(path))
         {
-            CAScheduler::unschedule(schedule_selector(ToMainThread::runDelegate), this);
             delegate->getSelectedImage(image);
             image->release();
         }

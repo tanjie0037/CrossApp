@@ -194,7 +194,7 @@ CDListView::~CDListView()
 bool CDListView::init(const CrossApp::CCRect &rect)
 {
     CADipSize size = rect.size;
-    CAListView *listView = CAListView::createWithCenter(CADipRect(size.width/2,size.height/2,size.width,50));
+    CAListView *listView = CAListView::createWithCenter(CADipRect(size.width/2,size.height/2,size.width,100));
     listView->setListViewDelegate(this);
     listView->setListViewDataSource(this);
     listView->setAllowsSelection(true);
@@ -423,7 +423,8 @@ void CDUIShowView::showUiWithIndex(int _index)
             showRenderImage();
             break;
         case 24:
-            showVideo();
+            //showVideo();
+            showAnimation();
             break;
         default:
             break;
@@ -1074,7 +1075,8 @@ void CDUIShowView::showTextView()
     //textView->setLineSpacing(50);
     //textView->setFontColor(CAColor_gray);
     //textView->setBackGroundColor(CAColor_blueStyle);
-    textView->setBackGroundImage(CAImage::create("source_material/btn_square_selected.png"));
+	//textView->setBackgroundView(CAScale9ImageView::createWithImage(CAImage::create("source_material/textField_bg.png")));
+    //textView->setBackGroundImage(CAImage::create("source_material/btn_square_selected.png"));
     this->getView()->addSubview(textView);
 }
 
@@ -1367,10 +1369,10 @@ unsigned int CDUIShowView::tableViewHeightForFooterInSection(CATableView* table,
 
 void CDUIShowView::showListView()
 {
-    CDListView* listview1 = CDListView::createWithFrame(CADipRect(0,0,winSize.width,50));
+    CDListView* listview1 = CDListView::createWithFrame(CADipRect(0,0,winSize.width,100));
     this->getView()->addSubview(listview1);
     
-    p_ListView = CAListView::createWithFrame(CADipRect(0,50,winSize.width,winSize.height));
+    p_ListView = CAListView::createWithFrame(CADipRect(0,100,winSize.width,winSize.height-100));
     p_ListView->setListViewDelegate(this);
     p_ListView->setListViewDataSource(this);
     p_ListView->setAllowsSelection(true);
@@ -1649,7 +1651,6 @@ void CDUIShowView::showDatePickerView()
 void CDUIShowView::didSelectRow(CAPickerView* pickerView, unsigned int row, unsigned int component)
 {
     char tem[100];
-    //sprintf(tem, "请选择你所在的城市：%s",unicode_to_utf8(adressTag[row]).c_str());
 	sprintf(tem, "%s", unicode_to_utf8(adressTag[row]).c_str());
     city_value->setText(tem);
 }
@@ -1682,7 +1683,7 @@ float CDUIShowView::rowHeightForComponent(CAPickerView* pickerView, unsigned int
 
 CCString* CDUIShowView::titleForRow(CAPickerView* pickerView, unsigned int row, unsigned int component)
 {
-    CCLog("ppppp===%s",unicode_to_utf8(adressTag[row]).c_str());
+    //CCLog("ppppp===%s",unicode_to_utf8(adressTag[row]).c_str());
     return CCString::create(unicode_to_utf8(adressTag[row]).c_str());
 }
 
@@ -1693,50 +1694,122 @@ void CDUIShowView::zoomViewBySliderValue(CrossApp::CAControl *btn, CrossApp::CCP
 
 void CDUIShowView::showAnimation()
 {
+//    CAButton* btn1 = CAButton::create(CAButtonTypeRoundedRect);
+//    btn1->setCenter(CADipRect(winSize.width/2, winSize.height/4, 200, 50));
+//    btn1->setTitleForState(CAControlStateNormal, "Play Animation");
+//    btn1->setTitleColorForState(CAControlStateNormal, ccc4(51,204,255,255));
+//    btn1->setTag(100);
+//    btn1->addTarget(this, CAControl_selector(CDUIShowView::doAction), CAControlEventTouchUpInSide);
+//    this->getView()->addSubview(btn1);
+//    animationView = CAImageView::createWithCenter(CADipRect(winSize.width/2, winSize.height/2, 28, 24));
+//    animationView->setImage(CAImage::create("image/heart1.png"));
+//    this->getView()->addSubview(animationView);
+
+    //Animation 2
+//    CAImageView* bg = CAImageView::createWithCenter(CADipRect(winSize.width/2,winSize.height/2,winSize.width,80));
+//    bg->setImage(CAImage::create("image/navbg.jpg"));
+//    this->getView()->addSubview(bg);
+//    
+//    animation_2_textfield = CATextField::createWithFrame(CADipRect(90,winSize.height/2-25,100,50));
+//    animation_2_textfield->setFontSize(_px(40));
+//    animation_2_textfield->setKeyboardType(KEY_BOARD_TYPE_NORMAL);
+//    this->getView()->addSubview(animation_2_textfield);
+//    animation_2_textfield->setVisible(false);
+//    
+//    animation_2_btn_search = CAButton::createWithCenter(CADipRect(70,winSize.height/2,56,48), CAButtonTypeCustom);
+//    animation_2_btn_search->setImageForState(CAControlStateNormal, CAImage::create("image/search_btn.png"));
+//    animation_2_btn_search->addTarget(this, CAControl_selector(CDUIShowView::doAction), CAControlEventTouchUpInSide);
+//    animation_2_btn_search->setTag(201);
+//    this->getView()->addSubview(animation_2_btn_search);
+//    
+//    animation_2_btn_cancel = CAButton::createWithCenter(CADipRect(winSize.width-60,winSize.height/2,100,50), CAButtonTypeCustom);
+//    animation_2_btn_cancel->setTitleForState(CAControlStateNormal, "Cancel");
+//    animation_2_btn_cancel->setTag(202);
+//    animation_2_btn_cancel->setTitleColorForState(CAControlStateNormal, CAColor_white);
+//    animation_2_btn_cancel->addTarget(this, CAControl_selector(CDUIShowView::doAction), CAControlEventTouchUpInSide);
+//    this->getView()->addSubview(animation_2_btn_cancel);
+//    animation_2_btn_cancel->setVisible(false);
+    animation_3_imageview = CAImageView::createWithFrame(CADipRect(0,0,winSize.width,winSize.height));
+    animation_3_imageview->setImage(CAImage::create("image/2.jpg"));
+    this->getView()->addSubview(animation_3_imageview);
+    
     CAButton* btn1 = CAButton::create(CAButtonTypeRoundedRect);
     btn1->setCenter(CADipRect(winSize.width/2, winSize.height/4, 200, 50));
     btn1->setTitleForState(CAControlStateNormal, "Play Animation");
     btn1->setTitleColorForState(CAControlStateNormal, ccc4(51,204,255,255));
+    btn1->setTag(100);
     btn1->addTarget(this, CAControl_selector(CDUIShowView::doAction), CAControlEventTouchUpInSide);
     this->getView()->addSubview(btn1);
-    animationView = CAImageView::createWithCenter(CADipRect(winSize.width/2, winSize.height/2, 28, 24));
-    animationView->setImage(CAImage::create("image/heart1.png"));
-    this->getView()->addSubview(animationView);
     heart_index = 0;
 }
 
 void CDUIShowView::doAction(CAControl* btn,CCPoint point)
 {
-    animationView->setScale(1);
-    //开始执行动画
-    CAViewAnimation::beginAnimations("", NULL);
-    //动画时长
-    CAViewAnimation::setAnimationDuration(0.2f);
-    //动画延迟时长执行
-    //CAViewAnimation::setAnimationDelay(0.3f);
-    //动画波频控制
-    //CAViewAnimation::setAnimationCurve(CAViewAnimationCurveEaseInOut);
+//    animationView->setScale(1);
+//    //开始执行动画
+//    CAViewAnimation::beginAnimations("", NULL);
+//    //动画时长
+//    CAViewAnimation::setAnimationDuration(0.3f);
+//    //动画延迟时长执行
+//    //CAViewAnimation::setAnimationDelay(0.3f);
+//    //动画波频控制
+//    //CAViewAnimation::setAnimationCurve(CAViewAnimationCurveEaseInOut);
+//    
+//    //CAViewAnimation::setAnimationRepeatCount(1.5);
+//    
+//    CAViewAnimation::setAnimationRepeatAutoreverses(true);
+//    //动画开始前回调(两参数)
+//    //CAViewAnimation::setAnimationWillStartSelector(this, CAViewAnimation2_selector(FourthViewController::willStartAction));
+//    //动画完成回调(两参数)
+//    //CAViewAnimation::setAnimationDidStopSelector(this, CAViewAnimation2_selector(FourthViewController::didStopAction));
+//    if (heart_index==0) {
+//        animationView->setImage(CAImage::create("image/heart2.png"));
+//        heart_index = 1;
+//    }else{
+//        animationView->setImage(CAImage::create("image/heart1.png"));
+//        heart_index = 0;
+//    }
+//    animationView->setScale(2);
+//    CAViewAnimation::commitAnimations();
+    CAButton* button = (CAButton*)btn;
+    int tag = button->getTag();
     
-    //CAViewAnimation::setAnimationRepeatCount(1.5);
-    
-    CAViewAnimation::setAnimationRepeatAutoreverses(true);
-    //动画开始前回调(两参数)
-    //CAViewAnimation::setAnimationWillStartSelector(this, CAViewAnimation2_selector(FourthViewController::willStartAction));
-    //动画完成回调(两参数)
-    //CAViewAnimation::setAnimationDidStopSelector(this, CAViewAnimation2_selector(FourthViewController::didStopAction));
-    
-    //this->refreshView(true);
-    if (heart_index==0) {
-        animationView->setImage(CAImage::create("image/heart2.png"));
-        heart_index = 1;
-    }else{
-        animationView->setImage(CAImage::create("image/heart1.png"));
-        heart_index = 0;
+    if (tag==100) {
+        CAViewAnimation::beginAnimations("", NULL);
+        CAViewAnimation::setAnimationDuration(0.8f);
+        animation_3_imageview->setImageRect(CCRect(0,0,100,winSize.height));
+        animation_3_imageview->setFrame(CCRect(winSize.width-100,0,100,winSize.height));
+        CAViewAnimation::commitAnimations();
+    }else if (tag==201) {
+        animation_2_textfield->setVisible(true);
+        animation_2_btn_cancel->setVisible(false);
+        animation_2_textfield->setAlpha(0);
+        animation_2_textfield->setFrame(CADipRect(90,winSize.height/2-25,100,50));
+        
+        CAViewAnimation::beginAnimations("", NULL);
+        CAViewAnimation::setAnimationDuration(0.3f);
+        animation_2_textfield->setFrame(CADipRect(90,winSize.height/2-25,winSize.width-200,50));
+        animation_2_textfield->setAlpha(1);
+        CAViewAnimation::setAnimationDidStopSelector(this, CAViewAnimation0_selector(CDUIShowView::endAction));
+        CAViewAnimation::commitAnimations();
+    }else if(tag==202){
+        CAViewAnimation::beginAnimations("", NULL);
+        CAViewAnimation::setAnimationDuration(0.3f);
+        animation_2_textfield->setFrame(CADipRect(90,winSize.height/2-25,0,50));
+        animation_2_textfield->setAlpha(0);
+        CAViewAnimation::setAnimationDidStopSelector(this, CAViewAnimation0_selector(CDUIShowView::endAction));
+        CAViewAnimation::commitAnimations();
     }
-    animationView->setScale(2);
+}
+
+void CDUIShowView::endAction()
+{
+    if (animation_2_btn_cancel->isVisible()) {
+        animation_2_btn_cancel->setVisible(false);
+    }else{
+        animation_2_btn_cancel->setVisible(true);
+    }
     
-    //执行动画
-    CAViewAnimation::commitAnimations();
 }
 
 void CDUIShowView::showStepper()
@@ -1783,11 +1856,11 @@ void CDUIShowView::showGifView()
 
 void CDUIShowView::showVideo()
 {
-    //http://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4
-    //mnt/sdcard/video.mp4
-    
+//    //http://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4
+//    //mnt/sdcard/video.mp4
 //    string path = CCFileUtils::sharedFileUtils()->fullPathForFilename("image/video.mp4");
-//    CAVideoPlayerController* pv = CAVideoPlayerController::createWithUrl(path.c_str(), "asdas");
+//    CAVideoPlayerController* pv = CAVideoPlayerController::createWithPath(path.c_str(), "asdas");
+//    //CAVideoPlayerController* pv = CAVideoPlayerController::createWithUrl("http://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4", "asdas");
 //    this->getView()->addSubview(pv->getView());
 //    pv->retain();
 //    pv->play();
@@ -1801,35 +1874,149 @@ void CDUIShowView::onVideoPlayerButtonBack()
 
 void CDUIShowView::showRenderImage()
 {
-    CAImageView* im = CAImageView::createWithCenter(CADipRect(winSize.width/2,winSize.height/2,winSize.width/2,winSize.height/2));
-    im->setImage(CAImage::create("image/HelloWorld.png"));
-    im->setImageViewScaleType(CAImageViewScaleTypeFitImageInside);
-    this->getView()->addSubview(im);
+    CAButton* btn = CAButton::create(CAButtonTypeSquareRect);
+    btn->setCenter(CADipRect(winSize.width/2, winSize.height/2, 100, 50));
+    btn->setTitleForState(CAControlStateNormal, "Click");
+    btn->setTitleColorForState(CAControlStateNormal, ccc4(51,204,255,255));
+    btn->setTag(1);
+    btn->addTarget(this, CAControl_selector(CDUIShowView::renderCallBack), CAControlEventTouchUpInSide);
+    this->getView()->addSubview(btn);
     
-    CAButton* btn1 = CAButton::create(CAButtonTypeSquareRect);
-    btn1->setCenter(CADipRect(winSize.width/2, winSize.height-100, 100, 50));
-    btn1->setTitleForState(CAControlStateNormal, "Click");
-    btn1->setTitleColorForState(CAControlStateNormal, ccc4(51,204,255,255));
-    btn1->addTarget(this, CAControl_selector(CDUIShowView::renderCallBack), CAControlEventTouchUpInSide);
-    this->getView()->addSubview(btn1);
 }
 
 void CDUIShowView::renderCallBack(CAControl* control, CCPoint point)
 {
-    if (dle_ren_index==0)
-    {
-        CARenderImage* rm = CARenderImage::create(_px(winSize.width), _px(winSize.height));
-        rm->printscreenWithView(this->getView());
+    CAButton* button = (CAButton*)control;
+    if (button->getTag()==1) {
+        CADevice::openAlbum(this,false);
+    }else if(button->getTag()==2) {
+
+        m_clvImage->setClippingEnabled(true);
+        CARenderImage* rm = CARenderImage::create(_px(winSize.width-100), _px(winSize.width-100));
+        rm->printscreenWithView(m_clvImage);
         
-        renderImage = CAView::createWithFrame(this->getView()->getBounds());
+        renderImage = CAView::createWithFrame(CADipRect(50,winSize.height/4,winSize.width-100,winSize.width-100));
         this->getView()->addSubview(renderImage);
         
-        CAImageView* imageView = CAImageView::createWithFrame(CADipRect(winSize.width/4,winSize.height/4,winSize.width/2,winSize.height/2));
+        m_clvImage->setClippingEnabled(false);
+        
+        if (m_clv!=NULL)
+        {
+            this->getView()->removeSubview(m_clv);
+            m_clv = NULL;
+            this->getView()->removeSubview(m_clvImage);
+            m_clvImage = NULL;
+            this->getView()->removeSubview(render_btn);
+            render_btn = NULL;
+        }
+        
+        CAImageView* imageView = CAImageView::createWithFrame(CADipRect(0,0,winSize.width-100,winSize.width-100));
         imageView->setImage(rm->getImageView()->getImage());
         renderImage->addSubview(imageView);
         
         CAScheduler::schedule(schedule_selector(CDUIShowView::scheduleFuck), this, 3);
     }
+
+    
+}
+
+CADrawView* getStencil(const CCSize& size, int index)
+{
+    if (index == 0)
+    {
+        CCPoint ver[4];
+        ver[0] = CCPoint(0, 0);
+        ver[1] = CCPoint(0, size.height);
+        ver[2] = CCPoint(size.width, size.height);
+        ver[3] = CCPoint(size.width, 0);
+        CADrawView* stencil = CADrawView::create();
+        stencil->drawPolygon(ver, 4, ccc4f(255, 0, 0, 0), 2, ccc4f(255, 0, 0, 0));
+        stencil->setFrameOrigin(CCPoint(0, size.height));
+        return stencil;
+    }
+    else if (index == 1)
+    {
+        CCPoint cir[720];
+        for (int i=0; i<720; i++)
+        {
+            float x = cosf(i * M_PI/180.f) * size.width/2;
+            float y = sinf(i * M_PI/180.f) * size.width/2;
+            cir[i] = CCPoint(x, y);
+        }
+        CADrawView* stencil = CADrawView::create();
+        stencil->drawPolygon(cir, 720, ccc4f(1, 1, 1, 0.5), 0, ccc4f(1, 1, 1, 0));
+        stencil->setCenterOrigin(CCPoint(size.width/2, size.height/2));
+        return stencil;
+    }
+    return NULL;
+}
+
+void CDUIShowView::getSelectedImage(CAImage *image)
+{
+    int index = 0;
+    
+    CADipRect scrollRect;
+    scrollRect.origin.x = 50;
+    scrollRect.origin.y = winSize.height/4;
+    scrollRect.size.width = winSize.width-100;
+    scrollRect.size.height = scrollRect.size.width;
+    
+    m_clvImage = CAClippingView::create();
+    m_clvImage->setStencil(getStencil(scrollRect.size, index));
+    m_clvImage->setFrame(scrollRect);
+    m_clvImage->setInverted(false);
+    m_clvImage->setClippingEnabled(false);
+    this->getView()->addSubview(m_clvImage);
+    
+    float temp_mini = 0;
+    if (image->getContentSize().width>image->getContentSize().height) {
+        temp_mini = scrollRect.size.height/image->getContentSize().height;
+    }else{
+        temp_mini = scrollRect.size.width/image->getContentSize().width;
+    }
+    CAScrollView* scrollView = CAScrollView::createWithFrame(m_clvImage->getBounds());
+    scrollView->setViewSize(CADipSize(image->getContentSize()));
+    scrollView->setContentOffset(CADipPoint(0,winSize.height/4), false);
+    scrollView->setMinimumZoomScale(temp_mini);
+    scrollView->setMaximumZoomScale(2.5f);
+    scrollView->setBackGroundColor(CAColor_clear);
+    scrollView->setShowsScrollIndicators(false);
+    scrollView->setBounces(false);
+    scrollView->setScrollViewDelegate(this);
+    scrollView->setDisplayRange(true);
+    m_clvImage->addSubview(scrollView);
+    
+    CADipRect rect;
+    rect.origin = CADipPointZero;
+    rect.size = scrollView->getViewSize();
+    CAImageView* imv = CAImageView::createWithFrame(rect);
+    imv->setImage(image);
+    imv->setImageViewScaleType(CAImageViewScaleTypeFitImageInside);
+    scrollView->addSubview(imv);
+    
+    
+    
+    m_clv = CAClippingView::create();
+    m_clv->setStencil(getStencil(scrollRect.size, index));
+    m_clv->setFrame(scrollRect);
+    m_clv->setInverted(true);
+    m_clv->setTouchEnabled(false);
+    this->getView()->addSubview(m_clv);
+
+    CADipRect ivRect;
+    ivRect.size = winSize;
+    ivRect.origin = ccpMult(scrollRect.origin, -1);
+    CAView* iv = CAView::createWithColor(ccc4(0,0,0,128));
+    iv->setFrame(ivRect);
+    m_clv->addSubview(iv);
+    
+    render_btn = CAButton::create(CAButtonTypeSquareRect);
+    render_btn->setCenter(CADipRect(winSize.width/2, winSize.height-100, 100, 50));
+    render_btn->setTitleForState(CAControlStateNormal, "Click");
+    render_btn->setTitleColorForState(CAControlStateNormal, ccc4(51,204,255,255));
+    render_btn->addTarget(this, CAControl_selector(CDUIShowView::renderCallBack), CAControlEventTouchUpInSide);
+    render_btn->setTag(2);
+    this->getView()->addSubview(render_btn);
 }
 
 void CDUIShowView::scheduleFuck(float dt)

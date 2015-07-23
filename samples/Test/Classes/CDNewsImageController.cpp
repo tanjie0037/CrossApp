@@ -226,9 +226,30 @@ void CDNewsImageController::scrollViewFooterBeginRefreshing(CAScrollView* view)
     char temurl[200];
     p_section++;
     sprintf(temurl,  "http://123.183.220.246:8090/pic?num=%d&tag=%s",p_section,imageTag[urlID]);
-    CCLog("ssssssss======%s",temurl);
+
     CommonHttpManager::getInstance()->send_get(temurl, key_value, this,
                                                CommonHttpJson_selector(CDNewsImageController::onRefreshRequestFinished));
+}
+
+void CDNewsImageController::scrollViewStopMoved(CrossApp::CAScrollView *view)
+{
+    CAVector<CATableViewCell*> temVec =  p_TableView->displayingTableCell();
+    for(int i=0;i<temVec.size();i++)
+    {
+        CDNewsImageTableCell* cell = (CDNewsImageTableCell*)temVec.at(i);
+        CCLog("cell-index===%d",cell->getRow());
+        int row = cell->getRow();
+        int img_num = m_ImageNum[row];
+        
+        for (int i=0; i<img_num; i++)
+        {
+            CommonUrlImageView* temImage = dynamic_cast<CommonUrlImageView*>(cell->getSubviewByTag(200 + i));
+            if (temImage)
+            {
+                temImage->setUrl(m_ImageMsg[row].m_imageUrl[1 + i]);
+            }
+        }
+    }
 }
 
 void CDNewsImageController::onRequestFinished(const HttpResponseStatus& status, const CSJson::Value& json)
@@ -252,7 +273,7 @@ void CDNewsImageController::onRequestFinished(const HttpResponseStatus& status, 
 
             m_ImageMsg.push_back(temp_msg);
             m_ImageNum.push_back((int)getRandNum());
-            CCLog("title==%s===%d",value[index]["title"].asString().c_str(),value[index]["piccon"].size());
+            //CCLog("title==%s===%d",value[index]["title"].asString().c_str(),value[index]["piccon"].size());
         }
         
     }
@@ -291,7 +312,7 @@ void CDNewsImageController::onRefreshRequestFinished(const HttpResponseStatus& s
             
             m_ImageMsg.push_back(temp_msg);
             m_ImageNum.push_back((int)getRandNum());
-            CCLog("title==%s===%d",value[index]["title"].asString().c_str(),value[index]["piccon"].size());
+            //CCLog("title==%s===%d",value[index]["title"].asString().c_str(),value[index]["piccon"].size());
         }
         
     }else{
@@ -320,7 +341,7 @@ void CDNewsImageController::viewDidUnload()
 
 void CDNewsImageController::tableViewDidSelectRowAtIndexPath(CATableView* table, unsigned int section, unsigned int row)
 {
-    CCLog("title====%d",(int)getRandNum());
+    //CCLog("title====%d",(int)getRandNum());
     CDShowNewsImage* _controller = new CDShowNewsImage();
     _controller->init();
     _controller->setTitle(" ");
@@ -353,6 +374,7 @@ CATableViewCell* CDNewsImageController::tableCellAtIndex(CATableView* table, con
     cellTextdsc->setText(m_ImageMsg[row].m_imageDesc[1]);
     
     int img_num = m_ImageNum[row];
+    
     if (img_num==1)
     {
         CommonUrlImageView* temImage = dynamic_cast<CommonUrlImageView*>(cell->getSubviewByTag(200));
@@ -361,7 +383,7 @@ CATableViewCell* CDNewsImageController::tableCellAtIndex(CATableView* table, con
             temImage->setVisible(true);
             temImage->setFrame(CADipRect(0,5,_size.width,_size.height-180));
             temImage->setImage(CAImage::create("image/HelloWorld.png"));
-            temImage->setUrl(m_ImageMsg[row].m_imageUrl[1]);
+            //temImage->setUrl(m_ImageMsg[row].m_imageUrl[1]);
         }
         CommonUrlImageView* temImage1 = dynamic_cast<CommonUrlImageView*>(cell->getSubviewByTag(201));
         CommonUrlImageView* temImage2 = dynamic_cast<CommonUrlImageView*>(cell->getSubviewByTag(202));
@@ -378,7 +400,7 @@ CATableViewCell* CDNewsImageController::tableCellAtIndex(CATableView* table, con
             temImage->setVisible(true);
             temImage->setFrame(CADipRect(0,5,_size.width/2-1,_size.height-180));
             temImage->setImage(CAImage::create("image/HelloWorld.png"));
-            temImage->setUrl(m_ImageMsg[row].m_imageUrl[1]);
+            //temImage->setUrl(m_ImageMsg[row].m_imageUrl[1]);
         }
         CommonUrlImageView* temImage1 = dynamic_cast<CommonUrlImageView*>(cell->getSubviewByTag(201));
         if (temImage1)
@@ -386,7 +408,7 @@ CATableViewCell* CDNewsImageController::tableCellAtIndex(CATableView* table, con
             temImage1->setVisible(true);
             temImage1->setFrame(CADipRect(_size.width/2+1,5,_size.width/2,_size.height-180));
             temImage1->setImage(CAImage::create("image/HelloWorld.png"));
-            temImage1->setUrl(m_ImageMsg[row].m_imageUrl[2]);
+            //temImage1->setUrl(m_ImageMsg[row].m_imageUrl[2]);
         }
 
         CommonUrlImageView* temImage2 = dynamic_cast<CommonUrlImageView*>(cell->getSubviewByTag(202));
@@ -402,7 +424,7 @@ CATableViewCell* CDNewsImageController::tableCellAtIndex(CATableView* table, con
             temImage->setVisible(true);
             temImage->setFrame(CADipRect(0,5,_size.width/2-1,_size.height-180));
             temImage->setImage(CAImage::create("image/HelloWorld.png"));
-            temImage->setUrl(m_ImageMsg[row].m_imageUrl[1]);
+            //temImage->setUrl(m_ImageMsg[row].m_imageUrl[1]);
         }
         CommonUrlImageView* temImage1 = dynamic_cast<CommonUrlImageView*>(cell->getSubviewByTag(201));
         if (temImage1)
@@ -410,7 +432,7 @@ CATableViewCell* CDNewsImageController::tableCellAtIndex(CATableView* table, con
             temImage1->setVisible(true);
             temImage1->setFrame(CADipRect(_size.width/2+1,5,_size.width/2,(_size.height-180)/2-1));
             temImage1->setImage(CAImage::create("image/HelloWorld.png"));
-            temImage1->setUrl(m_ImageMsg[row].m_imageUrl[2]);
+            //temImage1->setUrl(m_ImageMsg[row].m_imageUrl[2]);
         }
         
         CommonUrlImageView* temImage2 = dynamic_cast<CommonUrlImageView*>(cell->getSubviewByTag(202));
@@ -419,7 +441,7 @@ CATableViewCell* CDNewsImageController::tableCellAtIndex(CATableView* table, con
             temImage2->setVisible(true);
             temImage2->setFrame(CADipRect(_size.width/2+1,5+(_size.height-180)/2+2,_size.width/2,(_size.height-180)/2));
             temImage2->setImage(CAImage::create("image/HelloWorld.png"));
-            temImage2->setUrl(m_ImageMsg[row].m_imageUrl[3]);
+            //temImage2->setUrl(m_ImageMsg[row].m_imageUrl[3]);
         }
         CommonUrlImageView* temImage3 = dynamic_cast<CommonUrlImageView*>(cell->getSubviewByTag(203));;
         temImage3->setVisible(false);
@@ -433,7 +455,7 @@ CATableViewCell* CDNewsImageController::tableCellAtIndex(CATableView* table, con
             temImage->setVisible(true);
             temImage->setFrame(CADipRect(0,5,_size.width/2-1,(_size.height-180)/2-1));
             temImage->setImage(CAImage::create("image/HelloWorld.png"));
-            temImage->setUrl(m_ImageMsg[row].m_imageUrl[1]);
+            //temImage->setUrl(m_ImageMsg[row].m_imageUrl[1]);
         }
         CommonUrlImageView* temImage1 = dynamic_cast<CommonUrlImageView*>(cell->getSubviewByTag(201));
         if (temImage1)
@@ -441,7 +463,7 @@ CATableViewCell* CDNewsImageController::tableCellAtIndex(CATableView* table, con
             temImage1->setVisible(true);
             temImage1->setFrame(CADipRect(_size.width/2+1,5,_size.width/2,(_size.height-180)/2-1));
             temImage1->setImage(CAImage::create("image/HelloWorld.png"));
-            temImage1->setUrl(m_ImageMsg[row].m_imageUrl[2]);
+            //temImage1->setUrl(m_ImageMsg[row].m_imageUrl[2]);
         }
         
         CommonUrlImageView* temImage2 = dynamic_cast<CommonUrlImageView*>(cell->getSubviewByTag(202));
@@ -450,7 +472,7 @@ CATableViewCell* CDNewsImageController::tableCellAtIndex(CATableView* table, con
             temImage2->setVisible(true);
             temImage2->setFrame(CADipRect(0,5+(_size.height-180)/2+2,_size.width/2-1,(_size.height-180)/2));
             temImage2->setImage(CAImage::create("image/HelloWorld.png"));
-            temImage2->setUrl(m_ImageMsg[row].m_imageUrl[3]);
+            //temImage2->setUrl(m_ImageMsg[row].m_imageUrl[3]);
         }
         
         CommonUrlImageView* temImage3 = dynamic_cast<CommonUrlImageView*>(cell->getSubviewByTag(203));
@@ -459,7 +481,7 @@ CATableViewCell* CDNewsImageController::tableCellAtIndex(CATableView* table, con
             temImage3->setVisible(true);
             temImage3->setFrame(CADipRect(_size.width/2+1,5+(_size.height-180)/2+2,_size.width/2,(_size.height-180)/2));
             temImage3->setImage(CAImage::create("image/HelloWorld.png"));
-            temImage3->setUrl(m_ImageMsg[row].m_imageUrl[4]);
+            //temImage3->setUrl(m_ImageMsg[row].m_imageUrl[4]);
         }
     }
     return cell;

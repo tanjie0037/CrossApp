@@ -169,6 +169,7 @@ void CALabel::updateImage()
 											   m_bItalics,
 											   m_bUnderLine);
 
+    this->setImage(image);
 	CC_RETURN_IF(image == NULL);
 
     m_cLabelSize = size;
@@ -180,8 +181,6 @@ void CALabel::updateImage()
     float width = m_bFitFlag ? image->getContentSize().width : MIN(this->getBounds().size.width, image->getContentSize().width);
     
     rect.size.width = width;
-    
-    this->setImage(image);
 
     switch (m_nVerticalTextAlignmet)
     {
@@ -203,12 +202,23 @@ void CALabel::updateImage()
 
     if (m_bFitFlag)
     {
-        this->setImageRect(rect, false, size);
+        if (!size.equals(m_obContentSize))
+        {
+            if (m_bFrame)
+            {
+                CCRect rect = this->getFrame();
+                rect.size = size;
+                this->setFrame(rect);
+            }
+            else
+            {
+                CCRect rect = this->getCenter();
+                rect.size = size;
+                this->setCenter(rect);
+            }
+        }
     }
-    else
-    {
-        this->setImageRect(rect);
-    }
+    this->setImageRect(rect);
 }
 
 void CALabel::updateImageRect()
@@ -219,11 +229,13 @@ void CALabel::updateImageRect()
     y1 = m_obContentSize.height - m_obRect.size.height - y1;
     y1 = y1 - pTextHeight;
     x2 = x1 + m_obRect.size.width - 1;
+    x2 = MAX(x1, x2);
     y2 = y1 + m_obRect.size.height - 1;
-    m_sQuad.bl.vertices = vertex3(x1, y1, 0);
-    m_sQuad.br.vertices = vertex3(x2, y1, 0);
-    m_sQuad.tl.vertices = vertex3(x1, y2, 0);
-    m_sQuad.tr.vertices = vertex3(x2, y2, 0);
+    y2 = MAX(y1, y2);
+    m_sQuad.bl.vertices = vertex3(x1, y1, m_fVertexZ);
+    m_sQuad.br.vertices = vertex3(x2, y1, m_fVertexZ);
+    m_sQuad.tl.vertices = vertex3(x1, y2, m_fVertexZ);
+    m_sQuad.tr.vertices = vertex3(x2, y2, m_fVertexZ);
 }
 
 void CALabel::copySelectText()

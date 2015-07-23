@@ -61,17 +61,17 @@ public:
         return true;
     }
     
-	//If the sender doesn't want to insert the text, return true;
-    virtual bool onTextFieldInsertText(CATextField * sender, const char * text, int nLen)
+    //If the sender doesn't want to insert the text, return true;
+    virtual bool onTextFieldInsertText(CATextField * sender, const char * insText, int nLen, int nPosition)
     {
         CC_UNUSED_PARAM(sender);
-        CC_UNUSED_PARAM(text);
+        CC_UNUSED_PARAM(insText);
         CC_UNUSED_PARAM(nLen);
         return false;
     }
     
     //If the sender doesn't want to delete the delText, return true;
-    virtual bool onTextFieldDeleteBackward(CATextField * sender, const char * delText, int nLen)
+    virtual bool onTextFieldDeleteBackward(CATextField * sender, const char * delText, int nLen, int nPosition)
     {
         CC_UNUSED_PARAM(sender);
         CC_UNUSED_PARAM(delText);
@@ -83,6 +83,25 @@ public:
     
     
     virtual bool keyBoardCallBack(CATextField *sender) {return true;}
+    
+    
+    //If the sender doesn't want to insert the text, return true;
+    CC_DEPRECATED_ATTRIBUTE virtual bool onTextFieldInsertText(CATextField * sender, const char * insText, int nLen)
+    {
+        CC_UNUSED_PARAM(sender);
+        CC_UNUSED_PARAM(insText);
+        CC_UNUSED_PARAM(nLen);
+        return false;
+    }
+    
+    //If the sender doesn't want to delete the delText, return true;
+    CC_DEPRECATED_ATTRIBUTE virtual bool onTextFieldDeleteBackward(CATextField * sender, const char * delText, int nLen)
+    {
+        CC_UNUSED_PARAM(sender);
+        CC_UNUSED_PARAM(delText);
+        CC_UNUSED_PARAM(nLen);
+        return false;
+    }
 };
 
 
@@ -166,6 +185,7 @@ protected:
     void initMarkSprite();
     void showCursorMark();
     void hideCursorMark();
+    void setCursorPosition();
     
     void analyzeString(const char * text, int len);
 	void calculateSelChars(const CCPoint& point, int& l, int& r, int& p);
