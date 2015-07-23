@@ -21,8 +21,8 @@ USING_NS_CC;
 
 static const int NX_FREE = 0;
 static const int NX_READY = 1;
-static const std::string K_NATIVEX_PLACEMENT_OFFER = "Store Open Offerwall";
-static const std::string K_NATIVEX_PLACEMENT_VIDEO = "Game Launch Video";
+string AdHelper::K_NATIVEX_PLACEMENT_OFFER = "Store Open Offerwall";
+string AdHelper::K_NATIVEX_PLACEMENT_VIDEO = "Game Launch Video";
 static std::map<std::string, int> _nativeXStep;
 
 #pragma mark MySupersonicDelegate
@@ -134,8 +134,8 @@ static std::map<std::string, int> _nativeXStep;
 - (void)nativeXSDKDidCreateSession {
     CCLOG("nativeXSDKDidCreateSession");
     
-    [[NativeXSDK sharedInstance] fetchAdWithCustomPlacement:nsstr(K_NATIVEX_PLACEMENT_OFFER.c_str()) delegate:self];
-    [[NativeXSDK sharedInstance] fetchAdWithCustomPlacement:nsstr(K_NATIVEX_PLACEMENT_VIDEO.c_str()) delegate:self];
+    [[NativeXSDK sharedInstance] fetchAdWithCustomPlacement:nsstr(AdHelper::K_NATIVEX_PLACEMENT_OFFER.c_str()) delegate:self];
+    [[NativeXSDK sharedInstance] fetchAdWithCustomPlacement:nsstr(AdHelper::K_NATIVEX_PLACEMENT_VIDEO.c_str()) delegate:self];
 }
 
 /** Called when there is an error trying to initialize the Offer Wall.
@@ -171,25 +171,25 @@ static std::map<std::string, int> _nativeXStep;
 {
     CCLOG("nativeXAdView:didLoadWithPlacement, placement:%s", utf8cstr(placement));
     
-    NSString *kOffer = nsstr(K_NATIVEX_PLACEMENT_OFFER.c_str());
-    NSString *kVideo = nsstr(K_NATIVEX_PLACEMENT_VIDEO.c_str());
+    NSString *kOffer = nsstr(AdHelper::K_NATIVEX_PLACEMENT_OFFER.c_str());
+    NSString *kVideo = nsstr(AdHelper::K_NATIVEX_PLACEMENT_VIDEO.c_str());
     
     if ([placement isEqual:kOffer]) {
-        if (_nativeXStep[K_NATIVEX_PLACEMENT_OFFER] == NX_READY) {
-            _nativeXStep[K_NATIVEX_PLACEMENT_OFFER] = NX_FREE;
+        if (_nativeXStep[AdHelper::K_NATIVEX_PLACEMENT_OFFER] == NX_READY) {
+            _nativeXStep[AdHelper::K_NATIVEX_PLACEMENT_OFFER] = NX_FREE;
             [[NativeXSDK sharedInstance] showReadyAdWithCustomPlacement:kOffer];
             
         } else {
-            _nativeXStep[K_NATIVEX_PLACEMENT_OFFER] = NX_READY;
+            _nativeXStep[AdHelper::K_NATIVEX_PLACEMENT_OFFER] = NX_READY;
         }
         
     } else if ([placement isEqual:kVideo]) {
-        if (_nativeXStep[K_NATIVEX_PLACEMENT_VIDEO] == NX_READY) {
-            _nativeXStep[K_NATIVEX_PLACEMENT_VIDEO] = NX_FREE;
+        if (_nativeXStep[AdHelper::K_NATIVEX_PLACEMENT_VIDEO] == NX_READY) {
+            _nativeXStep[AdHelper::K_NATIVEX_PLACEMENT_VIDEO] = NX_FREE;
             [[NativeXSDK sharedInstance] showReadyAdWithCustomPlacement:kVideo];
             
         } else {
-            _nativeXStep[K_NATIVEX_PLACEMENT_VIDEO] = NX_READY;
+            _nativeXStep[AdHelper::K_NATIVEX_PLACEMENT_VIDEO] = NX_READY;
         }
         
     } else {

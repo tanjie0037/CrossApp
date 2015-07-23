@@ -33,6 +33,9 @@ public:
         return map;
     }
     
+    static std::string K_NATIVEX_PLACEMENT_OFFER;
+    static std::string K_NATIVEX_PLACEMENT_VIDEO;
+    
 public:
     static void initAd(AdType type, const std::string &uId, const std::string &appkey, const std::string &token);
     static void callOfferwall(AdType type);

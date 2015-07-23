@@ -21,7 +21,7 @@ void ZPTNativeHelper::getDeviceInfo(CSJsonDictionary& dic)
     [device autorelease];
     NSDictionary *infoDictionary = [[NSBundle mainBundle] infoDictionary];
     
-//    dic.insertItem("name", [device.name UTF8String]);
+    dic.insertItem("name", [device.name UTF8String]);
     dic.insertItem("model", [device.model UTF8String]);
 //    dic.insertItem("localizedModel", [device.localizedModel UTF8String]);
     dic.insertItem("systemName", [device.systemName UTF8String]);

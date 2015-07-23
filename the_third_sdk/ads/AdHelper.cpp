@@ -17,6 +17,8 @@
 USING_NS_CC;
 
 std::map<std::string, AdHelper::AdType> AdHelper::AD_TYPE = AdHelper::createMap();
+string AdHelper::K_NATIVEX_PLACEMENT_OFFER = "Store Open Offerwall";
+string AdHelper::K_NATIVEX_PLACEMENT_VIDEO = "Game Launch Video";
 
 void AdHelper::initAd(AdType type, const std::string &uId, const std::string &appkey, const std::string &token) {
     JniMethodInfo mi;
