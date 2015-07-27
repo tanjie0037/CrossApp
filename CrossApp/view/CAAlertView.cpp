@@ -193,6 +193,7 @@ void CAAlertView::setLabel(CALabel*& pLabel, const char* szTitle, const char* fo
 		pLabel->setVerticalTextAlignmet(CAVerticalTextAlignmentTop);
 		pLabel->setFontName(fontName);
 		pLabel->setFontSize(_px(ALERT_VIEW_MESG_FONT));
+        pLabel->setWordWrap(true);
 	}
 	pLabel->setText(szTitle);
 	pLabel->setColor(col);
