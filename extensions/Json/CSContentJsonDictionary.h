@@ -26,7 +26,7 @@ typedef enum _DicItemType
 }DicItemType;
 
 
-class CSJsonDictionary
+class CSJsonDictionary : public CAObject
 {
 public:
     CSJsonDictionary();
@@ -34,6 +34,7 @@ public:
     ~CSJsonDictionary();
 
 public:
+    static CSJsonDictionary *create(const char *pszDescription);
     void    initWithDescription(const char *pszDescription);
 	void	initWithValue(CSJson::Value& value);
 

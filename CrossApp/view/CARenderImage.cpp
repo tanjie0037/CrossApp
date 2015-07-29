@@ -38,12 +38,12 @@ CARenderImage::CARenderImage()
     // Listen this event to save render Image before come to background.
     // Then it can be restored after coming to foreground on Android.
     CANotificationCenter::sharedNotificationCenter()->addObserver(this,
-                                                                  callfuncO_selector(CARenderImage::listenToBackground),
+                                                                  callfuncOD_selector(CARenderImage::listenToBackground),
                                                                   EVENT_COME_TO_BACKGROUND,
                                                                   NULL);
     
     CANotificationCenter::sharedNotificationCenter()->addObserver(this,
-                                                                  callfuncO_selector(CARenderImage::listenToForeground),
+                                                                  callfuncOD_selector(CARenderImage::listenToForeground),
                                                                   EVENT_COME_TO_FOREGROUND, // this is misspelt
                                                                   NULL);
 #endif

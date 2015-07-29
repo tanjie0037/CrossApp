@@ -44,6 +44,18 @@ CSJsonDictionary::~CSJsonDictionary()
 	m_cValue.clear();
 }
 
+CSJsonDictionary *create(const char *pszDescription)
+{
+    if (pszDescription == NULL || strlen(pszDescription) == 0) {
+        return NULL;
+    }
+    
+    CSJsonDictionary *ret = new CSJsonDictionary();
+    ret->initWithDescription(pszDescription);
+    ret->autorelease();
+    
+    return ret;
+}
 
 void CSJsonDictionary::initWithDescription(const char *pszDescription)
 {

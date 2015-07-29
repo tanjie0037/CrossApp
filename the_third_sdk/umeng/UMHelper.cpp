@@ -18,10 +18,12 @@ USING_NS_CC;
 USING_NS_CC_EXT;
 using namespace CSJson;
 
+static const char *UmengHelperPath = "com.zpt.libumeng.UmengHelper";
+
 void UMHelper::startWithAppkey(const char* appkey, const char* channel)
 {
     JniMethodInfo mi;
-    if (!JniHelper::getStaticMethodInfo(mi, "com.zpt.utils.UmengHelper", "startWithAppkey", "(Ljava/lang/String;Ljava/lang/String;)V")) {
+    if (!JniHelper::getStaticMethodInfo(mi, UmengHelperPath, "startWithAppkey", "(Ljava/lang/String;Ljava/lang/String;)V")) {
         assert(0);
         return;
     }
@@ -36,7 +38,7 @@ void UMHelper::startWithAppkey(const char* appkey, const char* channel)
 void UMHelper::onPageStart(const char* ViewID)
 {
     JniMethodInfo mi;
-    if (!JniHelper::getStaticMethodInfo(mi, "com.zpt.utils.UmengHelper", "onPageStart", "(Ljava/lang/String;)V")) {
+    if (!JniHelper::getStaticMethodInfo(mi, UmengHelperPath, "onPageStart", "(Ljava/lang/String;)V")) {
         assert(0);
         return;
     }
@@ -50,7 +52,7 @@ void UMHelper::onPageStart(const char* ViewID)
 void UMHelper::onPageEnd(const char* ViewID)
 {
     JniMethodInfo mi;
-    if (!JniHelper::getStaticMethodInfo(mi, "com.zpt.utils.UmengHelper", "onPageEnd", "(Ljava/lang/String;)V")) {
+    if (!JniHelper::getStaticMethodInfo(mi, UmengHelperPath, "onPageEnd", "(Ljava/lang/String;)V")) {
         assert(0);
         return;
     }
@@ -64,7 +66,7 @@ void UMHelper::onPageEnd(const char* ViewID)
 void UMHelper::onEventBegin(const char* eventId)
 {
     JniMethodInfo mi;
-    if (!JniHelper::getStaticMethodInfo(mi, "com.zpt.utils.UmengHelper", "onEventBegin", "(Ljava/lang/String;)V")) {
+    if (!JniHelper::getStaticMethodInfo(mi, UmengHelperPath, "onEventBegin", "(Ljava/lang/String;)V")) {
         assert(0);
         return;
     }
@@ -78,7 +80,7 @@ void UMHelper::onEventBegin(const char* eventId)
 void UMHelper::onEventBeginValue(const char* eventId, const char* value)
 {
     JniMethodInfo mi;
-    if (!JniHelper::getStaticMethodInfo(mi, "com.zpt.utils.UmengHelper", "onEventBeginValue", "(Ljava/lang/String;Ljava/lang/String;)V")) {
+    if (!JniHelper::getStaticMethodInfo(mi, UmengHelperPath, "onEventBeginValue", "(Ljava/lang/String;Ljava/lang/String;)V")) {
         assert(0);
         return;
     }
@@ -93,7 +95,7 @@ void UMHelper::onEventBeginValue(const char* eventId, const char* value)
 void UMHelper::onEventEnd(const char* eventId)
 {
     JniMethodInfo mi;
-    if (!JniHelper::getStaticMethodInfo(mi, "com.zpt.utils.UmengHelper", "onEventEnd", "(Ljava/lang/String;)V")) {
+    if (!JniHelper::getStaticMethodInfo(mi, UmengHelperPath, "onEventEnd", "(Ljava/lang/String;)V")) {
         assert(0);
         return;
     }
@@ -107,7 +109,7 @@ void UMHelper::onEventEnd(const char* eventId)
 void UMHelper::onEventEndValue(const char* eventId, const char* value)
 {
     JniMethodInfo mi;
-    if (!JniHelper::getStaticMethodInfo(mi, "com.zpt.utils.UmengHelper", "onEventEndValue", "(Ljava/lang/String;Ljava/lang/String;)V")) {
+    if (!JniHelper::getStaticMethodInfo(mi, UmengHelperPath, "onEventEndValue", "(Ljava/lang/String;Ljava/lang/String;)V")) {
         assert(0);
         return;
     }
@@ -122,7 +124,7 @@ void UMHelper::onEventEndValue(const char* eventId, const char* value)
 void UMHelper::onEvent(const char* eventId)
 {
     JniMethodInfo mi;
-    if (!JniHelper::getStaticMethodInfo(mi, "com.zpt.utils.UmengHelper", "onEvent", "(Ljava/lang/String;)V")) {
+    if (!JniHelper::getStaticMethodInfo(mi, UmengHelperPath, "onEvent", "(Ljava/lang/String;)V")) {
         assert(0);
         return;
     }
@@ -136,7 +138,7 @@ void UMHelper::onEvent(const char* eventId)
 void UMHelper::onEventValue(const char* eventId, const char* value)
 {
     JniMethodInfo mi;
-    if (!JniHelper::getStaticMethodInfo(mi, "com.zpt.utils.UmengHelper", "onEventValue", "(Ljava/lang/String;)V")) {
+    if (!JniHelper::getStaticMethodInfo(mi, UmengHelperPath, "onEventValue", "(Ljava/lang/String;)V")) {
         assert(0);
         return;
     }
@@ -150,7 +152,7 @@ void UMHelper::onEventValue(const char* eventId, const char* value)
 void UMHelper::onEventMap(const char* eventId, CSJsonDictionary& dic)
 {
     JniMethodInfo mi;
-    if (!JniHelper::getStaticMethodInfo(mi, "com.zpt.utils.UmengHelper", "onEventMap", "(Ljava/lang/String;Ljava/lang/String;)V")) {
+    if (!JniHelper::getStaticMethodInfo(mi, UmengHelperPath, "onEventMap", "(Ljava/lang/String;Ljava/lang/String;)V")) {
         assert(0);
         return;
     }
@@ -165,7 +167,7 @@ void UMHelper::onEventMap(const char* eventId, CSJsonDictionary& dic)
 void UMHelper::onEventMapValue(const char* eventId, CSJsonDictionary& dic, int value)
 {
     JniMethodInfo mi;
-    if (!JniHelper::getStaticMethodInfo(mi, "com.zpt.utils.UmengHelper", "onEventMapValue", "(Ljava/lang/String;Ljava/lang/String;I)V")) {
+    if (!JniHelper::getStaticMethodInfo(mi, UmengHelperPath, "onEventMapValue", "(Ljava/lang/String;Ljava/lang/String;I)V")) {
         assert(0);
         return;
     }
@@ -180,7 +182,7 @@ void UMHelper::onEventMapValue(const char* eventId, CSJsonDictionary& dic, int v
 std::string UMHelper::getOnlineParam(const char* key)
 {
     JniMethodInfo mi;
-    if (!JniHelper::getStaticMethodInfo(mi, "com.zpt.utils.UmengHelper", "getOnlineParam", "(Ljava/lang/String;)Ljava/lang/String;")) {
+    if (!JniHelper::getStaticMethodInfo(mi, UmengHelperPath, "getOnlineParam", "(Ljava/lang/String;)Ljava/lang/String;")) {
         assert(0);
         return "";
     }
@@ -198,7 +200,7 @@ std::string UMHelper::getOnlineParam(const char* key)
 void UMHelper::showFeedback(const char* uId)
 {
     JniMethodInfo mi;
-    if (!JniHelper::getStaticMethodInfo(mi, "com.zpt.utils.UmengHelper", "showFeedback", "(Ljava/lang/String;)V")) {
+    if (!JniHelper::getStaticMethodInfo(mi, UmengHelperPath, "showFeedback", "(Ljava/lang/String;)V")) {
         assert(0);
         return;
     }

@@ -15,6 +15,9 @@ import android.view.Display;
 import android.view.WindowManager;
 
 public class Cocos2dxHelper {
+	// 要与native保持一致
+	public static final String kOnlineParamUpdated = "kNoti_online_param";
+	public static final String kNotiRemoteNotiRecived = "kNoti_remote_noti_recived";
 	// ===========================================================
 	// Constants
 	// ===========================================================
@@ -75,7 +78,7 @@ public class Cocos2dxHelper {
 
 	private static native void nativeSetEditTextDialogResult(final byte[] pBytes);
 	
-	private static native void nativePostNotification(String noti);
+	private static native void nativePostNotification(String noti, String info);
 
 	public static String getCocos2dxPackageName() {
 		return Cocos2dxHelper.sPackageName;
@@ -257,11 +260,30 @@ public class Cocos2dxHelper {
     
     public static void postNotification(final String noti)
     {
+    	if (Cocos2dxHelper.sCocos2dxHelperListener == null) {
+    		return;
+    	}
+    	
     	Cocos2dxHelper.sCocos2dxHelperListener.runOnGLThread(new Runnable() {
 			
 			@Override
 			public void run() {
-				Cocos2dxHelper.nativePostNotification(noti);
+				Cocos2dxHelper.nativePostNotification(noti, null);
+			}
+		});
+    }
+    
+    public static void postNotification(final String noti, final String info)
+    {
+    	if (Cocos2dxHelper.sCocos2dxHelperListener == null) {
+    		return;
+    	}
+    	
+    	Cocos2dxHelper.sCocos2dxHelperListener.runOnGLThread(new Runnable() {
+			
+			@Override
+			public void run() {
+				Cocos2dxHelper.nativePostNotification(noti, info);
 			}
 		});
     }

@@ -45,8 +45,9 @@ extern "C" {
         }
     }
 
-    JNIEXPORT void JNICALL Java_org_CrossApp_lib_Cocos2dxHelper_nativePostNotification(JNIEnv*  env, jobject thiz, jstring noti) {
-        CANotificationCenter::sharedNotificationCenter()->postNotification(JniHelper::jstring2string(noti).c_str());
+    JNIEXPORT void JNICALL Java_org_CrossApp_lib_Cocos2dxHelper_nativePostNotification(JNIEnv*  env, jobject thiz, jstring noti, jstring info) {
+        CANotificationCenter::sharedNotificationCenter()->postNotification(JniHelper::jstring2string(noti).c_str(), NULL,
+            CCString::create(JniHelper::jstring2string(info)));
     }
 }
 

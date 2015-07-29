@@ -92,6 +92,8 @@ typedef void (CAObject::*SEL_CallFuncO)(CAObject*);
 typedef void (CAObject::*SEL_MenuHandler)(CAObject*);
 typedef void (CAObject::*SEL_EventHandler)(CAEvent*);
 typedef int (CAObject::*SEL_Compare)(CAObject*);
+// add by jie.tan
+typedef void (CAObject::*SEL_CallFuncOD)(CAObject*, void*);
 
 #define schedule_selector(_SELECTOR) (SEL_SCHEDULE)(&_SELECTOR)
 #define callfunc_selector(_SELECTOR) (SEL_CallFunc)(&_SELECTOR)
@@ -101,6 +103,9 @@ typedef int (CAObject::*SEL_Compare)(CAObject*);
 #define menu_selector(_SELECTOR) (SEL_MenuHandler)(&_SELECTOR)
 #define event_selector(_SELECTOR) (SEL_EventHandler)(&_SELECTOR)
 #define compare_selector(_SELECTOR) (SEL_Compare)(&_SELECTOR)
+
+// add by jie.tan
+#define callfuncOD_selector(_SELECTOR) (SEL_CallFuncOD)(&_SELECTOR)
 
 NS_CC_END
 
