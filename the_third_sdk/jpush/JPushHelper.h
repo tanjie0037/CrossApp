@@ -17,7 +17,11 @@
 class JPushHelper
 {
 public:
-   static void initJPush(const std::string &uId, const std::set<std::string>& tags);
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_IOS)
+    static bool requestedNotiIOS();
+#endif
+    static void initJPush(const std::string &uId, const std::set<std::string>& tags);
+    static void initIOS();
 };
 
 #endif /* defined(__AppGift__JPushHelper__) */

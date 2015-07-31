@@ -104,6 +104,23 @@ static NSDictionary* dictionaryWithJsonString(NSString *jsonString) {
     return dic;
 }
 
+/*
+    NSDictionary to jsonString
+ */
+static NSString *dict2jsonString(NSDictionary *object) {
+    NSString *jsonString = nil;
+    NSError *error;
+    NSData *jsonData = [NSJSONSerialization dataWithJSONObject:object
+                                                       options:NSJSONWritingPrettyPrinted // Pass 0 if you don't care about the readability of the generated string
+                                                         error:&error];
+    if (! jsonData) {
+        NSLog(@"Got an error: %@", error);
+    } else {
+        jsonString = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
+    }
+    return jsonString;
+}
+
 #elif (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
 
 #include <android/log.h>

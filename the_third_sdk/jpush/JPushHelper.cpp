@@ -48,4 +48,6 @@ void JPushHelper::initJPush(const std::string &uId, const std::set<std::string>&
     mi.env->DeleteLocalRef(mi.classID);
 }
 
+void JPushHelper::initIOS(){}
+
 #endif

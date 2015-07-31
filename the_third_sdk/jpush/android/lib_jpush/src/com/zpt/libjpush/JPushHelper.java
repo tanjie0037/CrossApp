@@ -1,12 +1,8 @@
 package com.zpt.libjpush;
 
 import java.util.HashSet;
-import java.util.Set;
-
 import com.zpt.utils.ZPTLog;
-
 import android.app.Activity;
-import android.content.Context;
 import cn.jpush.android.api.JPushInterface;
 
 public class JPushHelper {
