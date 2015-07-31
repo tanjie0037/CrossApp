@@ -431,9 +431,9 @@ void CAAlertView::show()
 	}
     
     this->setAlpha(0);
-    m_pBackView->setScale(0.7f);
+    m_pBackView->setScale(0.5f);
     CAViewAnimation::beginAnimations("", NULL);
-    CAViewAnimation::setAnimationDuration(0.1f);
+    CAViewAnimation::setAnimationDuration(0.2f);
     CAViewAnimation::setAnimationCurve(CAViewAnimationCurveEaseOut);
     this->setAlpha(1.0f);
     m_pBackView->setScale(1.0f);
@@ -445,11 +445,11 @@ void CAAlertView::hide()
     s_vAlertViewCaches.eraseObject(this);
 
     CAViewAnimation::beginAnimations("", NULL);
-    CAViewAnimation::setAnimationDuration(0.1f);
+    CAViewAnimation::setAnimationDuration(0.2f);
     CAViewAnimation::setAnimationCurve(CAViewAnimationCurveEaseIn);
     CAViewAnimation::setAnimationDidStopSelector(this, CAViewAnimation0_selector(CAAlertView::removeFromSuperview));
     this->setAlpha(0.0f);
-    m_pBackView->setScale(0.7f);
+    m_pBackView->setScale(0.5f);
     CAViewAnimation::commitAnimations();
 }
 
