@@ -43,7 +43,7 @@ void JPushHelper::initJPush(const std::string &uId, const std::set<std::string>&
         return;
     }
     
-    jstring juId = mi.env->NewStringUTF(uId.c_str());
+    jstring juId = mi.env->NewStringUTF(str_replace(uId.c_str(), "-", ""));
     mi.env->CallStaticObjectMethod(mi.classID, mi.methodID, juId, javaSet);
     mi.env->DeleteLocalRef(mi.classID);
 }

@@ -14,6 +14,10 @@
 #import <Foundation/Foundation.h>
 #import "AppController.h"
 #import <AdSupport/ASIdentifierManager.h>
+#import "SSKeychain.h"
+#include "AGConst.h"
+
+std::string ZPTNativeHelper::_appName = APP_ID;
 
 void ZPTNativeHelper::getDeviceInfo(CSJsonDictionary& dic)
 {
@@ -85,9 +89,22 @@ void ZPTNativeHelper::sendMail(const string &target, const string &title, CSJson
     [[UIApplication sharedApplication] openURL: [NSURL URLWithString:email]];
 }
 
-string ZPTNativeHelper::getDeviceId()
+string ZPTNativeHelper::getDeviceId(bool simple)
 {
-    return string(utf8cstr([[[ASIdentifierManager sharedManager] advertisingIdentifier] UUIDString]));
+    NSString *deviceId = [SSKeychain passwordForService:nsstr(ZPTNativeHelper::_appName.c_str()) account:@"DeviceId"];
+    
+    if (!deviceId || [[deviceId stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]] length] == 0) {
+        deviceId  = [[[ASIdentifierManager sharedManager] advertisingIdentifier] UUIDString];
+        [SSKeychain setPassword:deviceId forService:nsstr(ZPTNativeHelper::_appName.c_str()) account:@"DeviceId"];
+    }
+    
+    string cDeviceId = string(utf8cstr(deviceId));
+    
+    if (!simple && ZPTNativeHelper::_appName != "") {
+        cDeviceId = ZPTNativeHelper::_appName + "|" + cDeviceId;
+    }
+    
+    return cDeviceId;
 }
 
 string ZPTNativeHelper::getStatusKey()

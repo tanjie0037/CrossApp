@@ -21,13 +21,15 @@ public:
     static void getPrivateInfo(CSJsonDictionary& dic);
     static void openUrl(const char* url);
     static void sendMail(const string &target, const string &title, CSJsonDictionary& extra, const string &format);
-    static string getDeviceId();
+    static string getDeviceId(bool simple = false);
     static string getAppVersion(bool replaceDot = false);
     static int getAppBuild();
     static string getStatusKey();
     static string getLanguage();
     static string getCountyCode();
     static void closeApp();
+    
+    static std::string _appName;
 };
 
 #endif /* defined(__AppGift__ZPTNativeHelper__) */

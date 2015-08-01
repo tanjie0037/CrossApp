@@ -13,6 +13,9 @@
 #include "platform/android/jni/JniHelper.h"
 #include <jni.h>
 #include "SDKCommon.h"
+#include "AGConst.h"
+
+std::string ZPTNativeHelper::_appName = APP_ID;
 
 void ZPTNativeHelper::getDeviceInfo(CSJsonDictionary& dic)
 {
@@ -58,7 +61,7 @@ void ZPTNativeHelper::sendMail(const string &target, const string &title, CSJson
     mi.env->DeleteLocalRef(mi.classID);
 }
 
-string ZPTNativeHelper::getDeviceId()
+string ZPTNativeHelper::getDeviceId(bool simple)
 {
     JniMethodInfo mi;
     if (!JniHelper::getStaticMethodInfo(mi, "com.zpt.utils.ZPTNativeHelper", "getDeviceId", "()Ljava/lang/String;")) {
@@ -69,6 +72,10 @@ string ZPTNativeHelper::getDeviceId()
     jstring returnString = (jstring) mi.env->CallStaticObjectMethod(mi.classID, mi.methodID);
     string deviceId = string(mi.env->GetStringUTFChars(returnString, NULL));
     mi.env->DeleteLocalRef(mi.classID);
+    
+    if (!simple && ZPTNativeHelper::_appName != "") {
+        deviceId = ZPTNativeHelper::_appName + "|" + deviceId;
+    }
                              
     return deviceId;
 }
