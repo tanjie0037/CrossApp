@@ -56,6 +56,7 @@ public class Cocos2dxGLSurfaceView extends GLSurfaceView {
 	private Cocos2dxRenderer mCocos2dxRenderer;
 	private Cocos2dxEditText mCocos2dxEditText;
 	private static Cocos2dxEditText text;
+	private static boolean _inited = false;
 	// ===========================================================
 	// Constructors
 	// ===========================================================
@@ -408,7 +409,8 @@ public class Cocos2dxGLSurfaceView extends GLSurfaceView {
 	 */
 	@Override
 	protected void onSizeChanged(final int pNewSurfaceWidth, final int pNewSurfaceHeight, final int pOldSurfaceWidth, final int pOldSurfaceHeight) {
-        if(!this.isInEditMode()) {
+        if(!this.isInEditMode() && !_inited) {
+        	_inited = true;
             Log.e("SUN", "SurfaceView onSizeChanged ..."+pNewSurfaceWidth+"."+pNewSurfaceHeight+" old "+pOldSurfaceWidth+"."+pOldSurfaceHeight);
             
             ViewGroup.LayoutParams lp = getLayoutParams();
