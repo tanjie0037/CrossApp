@@ -75,7 +75,7 @@ string ZPTNativeHelper::getDeviceId(bool simple)
     if (!simple && ZPTNativeHelper::_appName != "") {
         deviceId = ZPTNativeHelper::_appName + "|" + deviceId;
     }
-                             
+                                 
     return deviceId;
 }
 

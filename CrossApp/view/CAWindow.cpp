@@ -4,7 +4,7 @@
 #include "basics/CAApplication.h"
 #include "animation/CAViewAnimation.h"
 #include "dispatcher/CATouchDispatcher.h"
-#include "CAScheduler.h"
+#include "basics/CAScheduler.h"
 
 NS_CC_BEGIN
 
