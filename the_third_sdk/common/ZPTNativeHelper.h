@@ -28,7 +28,11 @@ public:
     static string getLanguage();
     static string getCountyCode();
     static void closeApp();
-    
+    static void init(const std::string &appName) {
+        ZPTNativeHelper::_appName = appName;
+    }
+
+private:
     static std::string _appName;
 };
 

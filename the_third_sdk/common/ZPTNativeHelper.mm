@@ -15,9 +15,8 @@
 #import "AppController.h"
 #import <AdSupport/ASIdentifierManager.h>
 #import "SSKeychain.h"
-#include "AGConst.h"
 
-std::string ZPTNativeHelper::_appName = APP_ID;
+std::string ZPTNativeHelper::_appName = "";
 
 void ZPTNativeHelper::getDeviceInfo(CSJsonDictionary& dic)
 {

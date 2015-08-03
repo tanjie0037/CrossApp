@@ -13,9 +13,8 @@
 #include "platform/android/jni/JniHelper.h"
 #include <jni.h>
 #include "SDKCommon.h"
-#include "AGConst.h"
 
-std::string ZPTNativeHelper::_appName = APP_ID;
+std::string ZPTNativeHelper::_appName = "";
 
 void ZPTNativeHelper::getDeviceInfo(CSJsonDictionary& dic)
 {
