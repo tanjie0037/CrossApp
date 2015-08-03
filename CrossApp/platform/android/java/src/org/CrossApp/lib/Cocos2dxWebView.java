@@ -11,6 +11,7 @@ import android.graphics.Bitmap;
 import android.net.http.SslError;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.KeyEvent;
 import android.webkit.SslErrorHandler;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
@@ -123,5 +124,15 @@ public class Cocos2dxWebView extends WebView {
         layoutParams.width = width;
         layoutParams.height = height;
         this.setLayoutParams(layoutParams);
+    }
+    
+    @Override
+	public boolean onKeyDown(final int pKeyCode, final KeyEvent pKeyEvent) {
+    	switch (pKeyCode) {
+			case KeyEvent.KEYCODE_BACK:
+				return true;
+			default:
+				return super.onKeyDown(pKeyCode, pKeyEvent);
+    	}
     }
 }
