@@ -4,6 +4,7 @@
 #include "basics/CAApplication.h"
 #include "animation/CAViewAnimation.h"
 #include "dispatcher/CATouchDispatcher.h"
+#include "CAScheduler.h"
 
 NS_CC_BEGIN
 
@@ -12,12 +13,23 @@ CAWindow::CAWindow()
 ,m_pModalViewController(NULL)
 {
     this->setDisplayRange(false);
+    
+    CAScheduler::schedule(schedule_selector(CAWindow::update), this, 0.01f);
 }
 
 CAWindow::~CAWindow()
 {
     CC_SAFE_RELEASE_NULL(m_pRootViewController);
     CC_SAFE_RELEASE_NULL(m_pModalViewController);
+    
+    CAScheduler::unschedule(schedule_selector(CAWindow::update), this);
+    
+    if (!_alertDeque.empty()) {
+        for (deque<CAAlertView *>::iterator it = _alertDeque.begin(); it != _alertDeque.end(); it++) {
+            (*it)->release();
+        }
+    }
+
 }
 
 bool CAWindow::init()
@@ -151,6 +163,26 @@ void CAWindow::dismissEnd()
     m_pModalViewController->removeViewFromSuperview();
     CC_SAFE_RELEASE_NULL(m_pModalViewController);
     CAApplication::getApplication()->getTouchDispatcher()->setDispatchEventsTrue();
+}
+
+void CAWindow::alert(CAAlertView *alert) {
+    if (!alert) {
+        return;
+    }
+    
+    alert->retain();
+    _alertDeque.push_back(alert);
+}
+
+void CAWindow::update(float dt) {
+    CAView::update(dt);
+    
+    if (!_alertDeque.empty()) {
+        CAAlertView* alert = _alertDeque.front();
+        alert->_show();
+        alert->release();
+        _alertDeque.pop_front();
+    }
 }
 
 NS_CC_END

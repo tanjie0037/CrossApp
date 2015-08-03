@@ -32,7 +32,8 @@ public:
     
     void dismissModalViewController(bool animated);
     
-    virtual void alert(CAAlertView *alert) {}
+    virtual void update(float dt);
+    void alert(CAAlertView *alert);
     
 protected:
 
@@ -45,6 +46,8 @@ protected:
     CC_PROPERTY(CAViewController*, m_pRootViewController, RootViewController);
     
     CC_SYNTHESIZE_READONLY(CAViewController*, m_pModalViewController, ModalViewController);
+    
+    std::deque<CAAlertView *> _alertDeque;
 };
 
 NS_CC_END
