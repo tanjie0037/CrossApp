@@ -419,6 +419,11 @@ void CAAlertView::onClickButton(CAControl* btn, CCPoint point)
 
 void CAAlertView::show()
 {
+    CAApplication::getApplication()->getRootWindow()->alert(this);
+}
+
+void CAAlertView::_show()
+{
 	if (getSuperview() != NULL)
 		return;
 

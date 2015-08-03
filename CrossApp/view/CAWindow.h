@@ -5,6 +5,7 @@
 
 #include "CAView.h"
 #include "controller/CAViewController.h"
+#include "CAAlertView.h"
 NS_CC_BEGIN
 
 enum
@@ -30,6 +31,8 @@ public:
     void presentModalViewController(CAViewController* controller, bool animated);
     
     void dismissModalViewController(bool animated);
+    
+    virtual void alert(CAAlertView *alert) {}
     
 protected:
 
