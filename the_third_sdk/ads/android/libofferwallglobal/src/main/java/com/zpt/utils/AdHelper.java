@@ -1,6 +1,8 @@
 package com.zpt.utils;
 
 import java.util.HashMap;
+import java.util.Hashtable;
+
 import org.CrossApp.lib.Cocos2dxActivity;
 import com.nativex.monetization.MonetizationManager;
 import com.nativex.monetization.communication.RedeemRewardData;
@@ -22,16 +24,14 @@ import net.adxmi.android.os.OffersManager;
 import net.adxmi.android.video.VideoAdListener;
 import net.adxmi.android.video.VideoAdManager;
 import net.adxmi.android.video.VideoAdRequestListener;
-import com.zpt.utils.RR;
-import com.zpt.utils.ZPTLog;
 
-//import com.tapjoy.TJActionRequest;
-//import com.tapjoy.TJConnectListener;
-//import com.tapjoy.TJError;
-//import com.tapjoy.TJPlacement;
-//import com.tapjoy.TJPlacementListener;
-//import com.tapjoy.Tapjoy;
-//import com.tapjoy.TapjoyConnectFlag;
+import com.tapjoy.TJActionRequest;
+import com.tapjoy.TJConnectListener;
+import com.tapjoy.TJError;
+import com.tapjoy.TJPlacement;
+import com.tapjoy.TJPlacementListener;
+import com.tapjoy.Tapjoy;
+import com.tapjoy.TapjoyConnectFlag;
 
 class MyNativeXListener implements OnAdEventV2, RewardListener, SessionListener {
 	@Override
@@ -115,21 +115,21 @@ class MyNativeXListener implements OnAdEventV2, RewardListener, SessionListener 
 			ZPTLog.v("Placement: " + placement);
 
 			if (placement.equals(AdHelper.K_NATIVEX_PLACEMENT_OFFER)) {
-				if (AdHelper._nativeXStep.get(AdHelper.K_NATIVEX_PLACEMENT_OFFER) == AdHelper.NX_READY) {
-					AdHelper._nativeXStep.put(AdHelper.K_NATIVEX_PLACEMENT_OFFER, AdHelper.NX_FREE);
+				if (AdHelper._AdStep.get(AdHelper.K_NATIVEX_PLACEMENT_OFFER) == AdHelper.AD_READY) {
+					AdHelper._AdStep.put(AdHelper.K_NATIVEX_PLACEMENT_OFFER, AdHelper.AD_FREE);
 					MonetizationManager.showReadyAd(Cocos2dxActivity.getContext(), placement, this);
 
 				} else {
-					AdHelper._nativeXStep.put(AdHelper.K_NATIVEX_PLACEMENT_OFFER, AdHelper.NX_READY);
+					AdHelper._AdStep.put(AdHelper.K_NATIVEX_PLACEMENT_OFFER, AdHelper.AD_READY);
 				}
 
 			} else if (placement.equals(AdHelper.K_NATIVEX_PLACEMENT_VIDEO)) {
-				if (AdHelper._nativeXStep.get(AdHelper.K_NATIVEX_PLACEMENT_VIDEO) == AdHelper.NX_READY) {
-					AdHelper._nativeXStep.put(AdHelper.K_NATIVEX_PLACEMENT_VIDEO, AdHelper.NX_FREE);
+				if (AdHelper._AdStep.get(AdHelper.K_NATIVEX_PLACEMENT_VIDEO) == AdHelper.AD_READY) {
+					AdHelper._AdStep.put(AdHelper.K_NATIVEX_PLACEMENT_VIDEO, AdHelper.AD_FREE);
 					MonetizationManager.showReadyAd(Cocos2dxActivity.getContext(), placement, this);
 
 				} else {
-					AdHelper._nativeXStep.put(AdHelper.K_NATIVEX_PLACEMENT_VIDEO, AdHelper.NX_READY);
+					AdHelper._AdStep.put(AdHelper.K_NATIVEX_PLACEMENT_VIDEO, AdHelper.AD_READY);
 				}
 
 			} else {
@@ -197,21 +197,69 @@ class MySupersonicListener implements OfferwallListener {
 	}
 }
 
+class MyTJPlacementListener implements TJPlacementListener {
+	@Override
+	public void onRequestSuccess(TJPlacement tjPlacement) {
+		ZPTLog.v("onRequestSuccess:" + tjPlacement.getName());
+	}
+
+	@Override
+	public void onRequestFailure(TJPlacement tjPlacement, TJError tjError) {
+
+	}
+
+	@Override
+	public void onContentReady(TJPlacement tjPlacement) {
+		ZPTLog.v("onContentReady:" + tjPlacement.getName());
+
+		if (tjPlacement.getName().equals(AdHelper.K_TAPJOY_PLACEMENT_OFFER)) {
+			if (AdHelper._AdStep.get(AdHelper.K_TAPJOY_PLACEMENT_OFFER).equals(AdHelper.AD_READY)) {
+				AdHelper._AdStep.put(AdHelper.K_TAPJOY_PLACEMENT_OFFER, AdHelper.AD_FREE);
+				tjPlacement.showContent();
+			}
+		}
+	}
+
+	@Override
+	public void onContentShow(TJPlacement tjPlacement) {
+
+	}
+
+	@Override
+	public void onContentDismiss(TJPlacement tjPlacement) {
+
+	}
+
+	@Override
+	public void onPurchaseRequest(TJPlacement tjPlacement, TJActionRequest tjActionRequest, String s) {
+
+	}
+
+	@Override
+	public void onRewardRequest(TJPlacement tjPlacement, TJActionRequest tjActionRequest, String s, int i) {
+
+	}
+}
+
 public class AdHelper {
-	public static final int NX_FREE = 0;
-	public static final int NX_READY = 1;
+	public static final int AD_FREE = 0;
+	public static final int AD_READY = 1;
 	public static final String K_NATIVEX_PLACEMENT_OFFER = "Store Open Offerwall";
 	public static final String K_NATIVEX_PLACEMENT_VIDEO = "Game Launch Video";
+	public static final String K_TAPJOY_PLACEMENT_OFFER = "offerwall_unit";
+	public static final String K_TAPJOY_PLACEMENT_VIDEO = "video_unit";
 
-	public static HashMap<String, Integer> _nativeXStep = new HashMap<String, Integer>();
+	public static HashMap<String, Integer> _AdStep = new HashMap<String, Integer>();
 
 	private static final int OFFERWALL_REQUEST_CODE = 879510; // fyber
 	
-//	static TJPlacement p;
+	private static TJPlacement _TJPlacementOfferwall;
+	private static TJPlacement _TJPlacementVideo;
 
-	private static Supersonic mMediationAgent = null;
-	private static MySupersonicListener mySupersonicListener = new MySupersonicListener();
-	private static MyNativeXListener myNativeXListener = new MyNativeXListener();
+	private static Supersonic _mMediationAgent = null;
+	private static MySupersonicListener _mySupersonicListener = new MySupersonicListener();
+	private static MyNativeXListener _myNativeXListener = new MyNativeXListener();
+	private static MyTJPlacementListener _myTJPlacementListener = new MyTJPlacementListener();
 
 	class AdType {
 		public static final int AdFyber = 0;
@@ -234,17 +282,17 @@ public class AdHelper {
 					SponsorPay.start(appkey, uId, token, activity);
 					break;
 				case AdType.AdSupersonic:
-					mMediationAgent = SupersonicFactory.getInstance();
-					mMediationAgent.setOfferwallListener(mySupersonicListener);
-					mMediationAgent.initOfferwall(activity, appkey, uId);
-					mMediationAgent.initRewardedVideo(activity, appkey, uId);
+					_mMediationAgent = SupersonicFactory.getInstance();
+					_mMediationAgent.setOfferwallListener(_mySupersonicListener);
+					_mMediationAgent.initOfferwall(activity, appkey, uId);
+					_mMediationAgent.initRewardedVideo(activity, appkey, uId);
 					break;
 				case AdType.AdNativeX:
-					_nativeXStep.put(K_NATIVEX_PLACEMENT_OFFER, NX_FREE);
-					_nativeXStep.put(K_NATIVEX_PLACEMENT_VIDEO, NX_FREE);
+					_AdStep.put(K_NATIVEX_PLACEMENT_OFFER, AD_FREE);
+					_AdStep.put(K_NATIVEX_PLACEMENT_VIDEO, AD_FREE);
 
 					MonetizationManager.enableLogging(RR.debug());
-					MonetizationManager.createSession(context, appkey, uId, myNativeXListener);
+					MonetizationManager.createSession(context, appkey, uId, _myNativeXListener);
 					break;
 				case AdType.AdAdxmi:
 					AdManager.getInstance(context).setEnableDebugLog(RR.debug());
@@ -270,72 +318,33 @@ public class AdHelper {
 					});
 					break;
 				case AdType.AdTapjoy:
-//					Hashtable<String, Object> connectFlags = new Hashtable<String, Object>();
-//					connectFlags.put(TapjoyConnectFlag.ENABLE_LOGGING, RR.debug() ? "true" : "false");
-//					connectFlags.put(TapjoyConnectFlag.STORE_NAME, "Google Play");
-//					connectFlags.put(TapjoyConnectFlag.USER_ID, uId);
-//					
-//					Tapjoy.setDebugEnabled(RR.debug());
-//					
-//					Tapjoy.connect(context, appkey, connectFlags, new TJConnectListener() {
-//						
-//						@Override
-//						public void onConnectSuccess() {
-////							TJPlacementListener placementListener = this;
-//							
-//							p = new TJPlacement(context, "app_launch", new TJPlacementListener() {
-//								
-//								@Override
-//								public void onRewardRequest(TJPlacement arg0, TJActionRequest arg1, String arg2, int arg3) {
-//									// TODO Auto-generated method stub
-//									
-//								}
-//								
-//								@Override
-//								public void onRequestSuccess(TJPlacement arg0) {
-//									// TODO Auto-generated method stub
-//									
-//								}
-//								
-//								@Override
-//								public void onRequestFailure(TJPlacement arg0, TJError arg1) {
-//									// TODO Auto-generated method stub
-//									
-//								}
-//								
-//								@Override
-//								public void onPurchaseRequest(TJPlacement arg0, TJActionRequest arg1, String arg2) {
-//									// TODO Auto-generated method stub
-//									
-//								}
-//								
-//								@Override
-//								public void onContentShow(TJPlacement arg0) {
-//									// TODO Auto-generated method stub
-//									
-//								}
-//								
-//								@Override
-//								public void onContentReady(TJPlacement arg0) {
-//									// TODO Auto-generated method stub
-//									p.showContent();
-//								}
-//								
-//								@Override
-//								public void onContentDismiss(TJPlacement arg0) {
-//									// TODO Auto-generated method stub
-//									
-//								}
-//							});
-//							
-//							p.requestContent();
-//						}
-//						
-//						@Override
-//						public void onConnectFailure() {
-//							
-//						}
-//					});
+					Hashtable<String, Object> connectFlags = new Hashtable<String, Object>();
+					connectFlags.put(TapjoyConnectFlag.ENABLE_LOGGING, RR.debug() ? "true" : "false");
+					connectFlags.put(TapjoyConnectFlag.STORE_NAME, "Google Play");
+					connectFlags.put(TapjoyConnectFlag.USER_ID, uId);
+
+					AdHelper._AdStep.put(AdHelper.K_TAPJOY_PLACEMENT_OFFER, AdHelper.AD_FREE);
+					AdHelper._AdStep.put(AdHelper.K_TAPJOY_PLACEMENT_VIDEO, AdHelper.AD_FREE);
+
+					Tapjoy.setDebugEnabled(RR.debug());
+
+					Tapjoy.connect(context, appkey, connectFlags, new TJConnectListener() {
+
+						@Override
+						public void onConnectSuccess() {
+
+							_TJPlacementOfferwall = new TJPlacement(context, K_TAPJOY_PLACEMENT_OFFER, _myTJPlacementListener);
+							_TJPlacementOfferwall.requestContent();
+
+							_TJPlacementVideo = new TJPlacement(context, "video_unit", _myTJPlacementListener);
+							_TJPlacementVideo.requestContent();
+						}
+
+						@Override
+						public void onConnectFailure() {
+
+						}
+					});
 					
 					break;
 				default:
@@ -360,34 +369,39 @@ public class AdHelper {
 							OFFERWALL_REQUEST_CODE);
 					break;
 				case AdType.AdSupersonic:
-					if (mMediationAgent != null && mMediationAgent.isOfferwallAvailable()) {
-						mMediationAgent.showOfferwall();
+					if (_mMediationAgent != null && _mMediationAgent.isOfferwallAvailable()) {
+						_mMediationAgent.showOfferwall();
 					}
 					break;
 				case AdType.AdNativeX:
-					_nativeXStep.put(K_NATIVEX_PLACEMENT_OFFER, NX_READY);
+					_AdStep.put(K_NATIVEX_PLACEMENT_OFFER, AD_READY);
 
 					if (MonetizationManager.isAdReady(K_NATIVEX_PLACEMENT_OFFER)) {
-						_nativeXStep.put(K_NATIVEX_PLACEMENT_OFFER, NX_FREE);
+						_AdStep.put(K_NATIVEX_PLACEMENT_OFFER, AD_FREE);
 						MonetizationManager.showAd(Cocos2dxActivity.getContext(), K_NATIVEX_PLACEMENT_OFFER,
-								myNativeXListener);
+								_myNativeXListener);
 
 					} else {
 						MonetizationManager.fetchAd(Cocos2dxActivity.getContext(), K_NATIVEX_PLACEMENT_OFFER,
-								myNativeXListener);
+								_myNativeXListener);
 					}
 					break;
 				case AdType.AdAdxmi:
 					OffersManager.getInstance(context).showOffersWall();
 					break;
 				case AdType.AdTapjoy:
-//					p.showContent();
-//					if(p.isContentReady()) {
-//					    p.showContent();
-//					}
-//					else {
-//					    //handle situation where there is no content to show, or it has not yet downloaded.
-//					}
+					if (_TJPlacementOfferwall != null) {
+						if(_TJPlacementOfferwall.isContentReady()) {
+							_TJPlacementOfferwall.showContent();
+						} else {
+							ZPTLog.v("_TJPlacementOfferwall show: " + _TJPlacementOfferwall.isContentAvailable());
+							AdHelper._AdStep.put(AdHelper.K_TAPJOY_PLACEMENT_OFFER, AdHelper.AD_READY);
+							_TJPlacementOfferwall.requestContent();
+						}
+					} else {
+						ZPTLog.v("_TJPlacementOfferwall is null");
+					}
+
 					break;
 				default:
 					assert(false);
@@ -408,21 +422,21 @@ public class AdHelper {
 				case AdType.AdFyber:
 					break;
 				case AdType.AdSupersonic:
-					if (mMediationAgent != null && mMediationAgent.isRewardedVideoAvailable()) {
-						mMediationAgent.showRewardedVideo();
+					if (_mMediationAgent != null && _mMediationAgent.isRewardedVideoAvailable()) {
+						_mMediationAgent.showRewardedVideo();
 					}
 					break;
 				case AdType.AdNativeX:
-					_nativeXStep.put(K_NATIVEX_PLACEMENT_VIDEO, NX_READY);
+					_AdStep.put(K_NATIVEX_PLACEMENT_VIDEO, AD_READY);
 
 					if (MonetizationManager.isAdReady(K_NATIVEX_PLACEMENT_VIDEO)) {
-						_nativeXStep.put(K_NATIVEX_PLACEMENT_VIDEO, NX_FREE);
+						_AdStep.put(K_NATIVEX_PLACEMENT_VIDEO, AD_FREE);
 						MonetizationManager.showAd(Cocos2dxActivity.getContext(), K_NATIVEX_PLACEMENT_VIDEO,
-								myNativeXListener);
+								_myNativeXListener);
 
 					} else {
 						MonetizationManager.fetchAd(Cocos2dxActivity.getContext(), K_NATIVEX_PLACEMENT_VIDEO,
-								myNativeXListener);
+								_myNativeXListener);
 					}
 					break;
 				case AdType.AdAdxmi:
@@ -450,6 +464,8 @@ public class AdHelper {
 						}
 					});
 					break;
+					case AdType.AdTapjoy:
+						break;
 				default:
 					assert(false);
 					break;
@@ -460,21 +476,21 @@ public class AdHelper {
 
 	public static void onResume(Activity ctx) {
 
-		if (mMediationAgent != null) {
+		if (_mMediationAgent != null) {
 
-			mMediationAgent.onResume(ctx);
-//			Tapjoy.onActivityStart(ctx);
+			_mMediationAgent.onResume(ctx);
+			Tapjoy.onActivityStart(ctx);
 		}
 	}
 
 	public static void onPause(Activity ctx) {
 
-		if (mMediationAgent != null) {
-			mMediationAgent.onPause(ctx);
+		if (_mMediationAgent != null) {
+			_mMediationAgent.onPause(ctx);
 		}
 	}
 	
 	public static void onStop(Activity ctx) {
-//		Tapjoy.onActivityStop(ctx);
+		Tapjoy.onActivityStop(ctx);
 	}
 }
