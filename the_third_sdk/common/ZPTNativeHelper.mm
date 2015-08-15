@@ -65,7 +65,6 @@ void ZPTNativeHelper::openUrl(const char* url)
     [[UIApplication sharedApplication] openURL: [NSURL URLWithString:nsstr(url)]];
 }
 
-
 void ZPTNativeHelper::sendMail(const string &target, const string &title, CSJsonDictionary& extra, const string &format)
 {
     NSMutableString *mailUrl = [[[NSMutableString alloc]init]autorelease];

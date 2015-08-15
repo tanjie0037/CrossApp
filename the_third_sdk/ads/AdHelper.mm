@@ -15,6 +15,8 @@
 #import "NativeXSDK.h"
 //#import "SponsorPaySDK.h"
 #import "Supersonic/Supersonic.h"
+#import <AdscendMedia/AdscendMedia.h>
+
 #include "SDKCommon.h"
 
 USING_NS_CC;
@@ -233,8 +235,26 @@ static std::map<std::string, int> _nativeXStep;
 
 @end
 
+#pragma mark ADOffersViewControllerDelegate
+@interface MyADOffersViewControllerDelegate : NSObject<ADOffersViewControllerDelegate> {}
+@property (nonatomic, strong) ADOffersViewController* controller;
+@end
+
+@implementation MyADOffersViewControllerDelegate
+- (void)onCloseOffersVCPressed
+{
+    if (self.controller) {
+        [self.controller dismissViewControllerAnimated:YES completion:^(void){
+            [self.controller release];
+            self.controller = nil;
+        }];
+    }
+}
+@end
+
 static MySupersonicDelegate *_mySupersonicDelegate = [[MySupersonicDelegate alloc] init];
 static MyNaviteXDeleagte *_myNaviteXDeleagte = [[MyNaviteXDeleagte alloc] init];
+static MyADOffersViewControllerDelegate *_myADOffersViewControllerDelegate = [[MyADOffersViewControllerDelegate alloc] init];
 
 #pragma mark AdHelper
 
@@ -245,6 +265,11 @@ static MyNaviteXDeleagte *_myNaviteXDeleagte = [[MyNaviteXDeleagte alloc] init];
 //AdTapjoy = 4
 
 std::map<std::string, AdHelper::AdType> AdHelper::AD_TYPE = AdHelper::createMap();
+
+ADOffersViewController* _offersVC = nil;
+string _uId;
+string _appkey;
+string _token;
 
 void AdHelper::initAd(AdType type, const std::string &uId, const std::string &appkey, const std::string &token)
 {
@@ -275,6 +300,11 @@ void AdHelper::initAd(AdType type, const std::string &uId, const std::string &ap
             [[NativeXSDK sharedInstance] setDelegate:_myNaviteXDeleagte];
             [[NativeXSDK sharedInstance] createSessionWithAppId:nsstr(appkey.c_str())
                                              andPublisherUserId:nsstr(uId.c_str())];
+            break;
+        case AdAdscend:
+            _uId = uId;
+            _appkey = appkey;
+            _token = token;
             break;
         default:
             break;
@@ -307,6 +337,14 @@ void AdHelper::callOfferwall(AdHelper::AdType type)
             }
         
             break;
+        case AdAdxmi:
+            break;
+        case AdAdscend: {
+            _offersVC = [ADOffersViewController newOffersWallForPublisherId:nsstr(_appkey.c_str()) adwallId:nsstr(_token.c_str()) subId1:nsstr(_uId.c_str()) delegate:_myADOffersViewControllerDelegate];
+            _myADOffersViewControllerDelegate.controller = _offersVC;
+            [(UIViewController*)[AppController getRootView] presentViewController:_offersVC animated:YES completion:nil];
+            break;
+        }
         default:
             break;
     }

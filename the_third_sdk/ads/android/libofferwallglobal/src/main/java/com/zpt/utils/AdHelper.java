@@ -4,6 +4,8 @@ import java.util.HashMap;
 import java.util.Hashtable;
 
 import org.CrossApp.lib.Cocos2dxActivity;
+
+import com.adscendmedia.sdk.ui.OffersActivity;
 import com.nativex.monetization.MonetizationManager;
 import com.nativex.monetization.communication.RedeemRewardData;
 import com.nativex.monetization.enums.AdEvent;
@@ -19,6 +21,8 @@ import com.supersonic.mediationsdk.sdk.Supersonic;
 import com.supersonic.mediationsdk.sdk.SupersonicFactory;
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
+
 import net.adxmi.android.AdManager;
 import net.adxmi.android.os.OffersManager;
 import net.adxmi.android.video.VideoAdListener;
@@ -32,6 +36,7 @@ import com.tapjoy.TJPlacement;
 import com.tapjoy.TJPlacementListener;
 import com.tapjoy.Tapjoy;
 import com.tapjoy.TapjoyConnectFlag;
+import com.zpt.libadscend.AdscendWrapper;
 
 class MyNativeXListener implements OnAdEventV2, RewardListener, SessionListener {
 	@Override
@@ -267,6 +272,7 @@ public class AdHelper {
 		public static final int AdNativeX = 2;
 		public static final int AdAdxmi = 3;
 		public static final int AdTapjoy = 4;
+		public static final int AdAdscend = 5;
 	};
 
 	static void initAd(final int type, final String uId, final String appkey, final String token) {
@@ -345,7 +351,9 @@ public class AdHelper {
 
 						}
 					});
-					
+					break;
+				case AdType.AdAdscend:
+					AdscendWrapper.init(context, appkey, token, uId);
 					break;
 				default:
 					assert(false);
@@ -401,7 +409,9 @@ public class AdHelper {
 					} else {
 						ZPTLog.v("_TJPlacementOfferwall is null");
 					}
-
+					break;
+				case AdType.AdAdscend:
+					AdscendWrapper.showOfferwall();
 					break;
 				default:
 					assert(false);

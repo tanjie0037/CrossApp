@@ -18,7 +18,8 @@ public:
         AdSupersonic = 1,
         AdNativeX = 2,
         AdAdxmi = 3,
-        AdTapjoy = 4
+        AdTapjoy = 4,
+        AdAdscend = 5
     };
     
     static std::map<std::string, AdType> AD_TYPE;
