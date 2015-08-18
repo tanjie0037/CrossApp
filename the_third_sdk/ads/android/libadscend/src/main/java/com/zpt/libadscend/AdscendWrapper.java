@@ -16,7 +16,7 @@ public class AdscendWrapper {
     private static String _adwallId = "";
     private static String _userId = "";
 
-    public static void init(Context ctx, String publisherId, String adwallId, String userId) {
+    public static void init(Context ctx, String userId, String publisherId, String adwallId) {
         _ctx = ctx;
         _publisherId = publisherId;
         _adwallId = adwallId;

@@ -21,13 +21,4 @@ android {
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile 'com.android.support:appcompat-v7:22.2.1'
-    compile project(':java')
-    compile project(':libzptutils')
-    compile project(':libadxmi')
-    compile project(':libfyber')
-    compile project(':libnativex')
-    compile project(':libsupersonic')
-    compile project(':libtapjoy')
-    compile project(':libadscend')
-    compile project(':libsuperrewards')
 }

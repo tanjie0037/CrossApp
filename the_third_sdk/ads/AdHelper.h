@@ -19,7 +19,8 @@ public:
         AdNativeX = 2,
         AdAdxmi = 3,
         AdTapjoy = 4,
-        AdAdscend = 5
+        AdAdscend = 5,
+        AdSuperrewards = 6
     };
     
     static std::map<std::string, AdType> AD_TYPE;
@@ -31,6 +32,8 @@ public:
         map["nativeX"] = AdNativeX;
         map["adxmi"] = AdAdxmi;
         map["tapjoy"] = AdTapjoy;
+        map["adscend"] = AdAdscend;
+        map["superrewards"] = AdSuperrewards;
         return map;
     }
     

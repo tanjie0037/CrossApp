@@ -37,6 +37,7 @@ import com.tapjoy.TJPlacementListener;
 import com.tapjoy.Tapjoy;
 import com.tapjoy.TapjoyConnectFlag;
 import com.zpt.libadscend.AdscendWrapper;
+import com.zpt.libsuperrewards.SuperrewardsWrapper;
 
 class MyNativeXListener implements OnAdEventV2, RewardListener, SessionListener {
 	@Override
@@ -273,6 +274,7 @@ public class AdHelper {
 		public static final int AdAdxmi = 3;
 		public static final int AdTapjoy = 4;
 		public static final int AdAdscend = 5;
+		public static final int AdSuperrewards = 6;
 	};
 
 	static void initAd(final int type, final String uId, final String appkey, final String token) {
@@ -353,7 +355,10 @@ public class AdHelper {
 					});
 					break;
 				case AdType.AdAdscend:
-					AdscendWrapper.init(context, appkey, token, uId);
+					AdscendWrapper.init(context, uId, appkey, token);
+					break;
+				case AdType.AdSuperrewards:
+					SuperrewardsWrapper.init(activity, uId, appkey);
 					break;
 				default:
 					assert(false);
@@ -412,6 +417,9 @@ public class AdHelper {
 					break;
 				case AdType.AdAdscend:
 					AdscendWrapper.showOfferwall();
+					break;
+				case AdType.AdSuperrewards:
+					SuperrewardsWrapper.showOfferwall();
 					break;
 				default:
 					assert(false);
