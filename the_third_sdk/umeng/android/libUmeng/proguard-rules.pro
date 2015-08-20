@@ -29,3 +29,10 @@
     public static final int *;
 }
 
+-keep class com.umeng.** {
+    *;
+}
+
+-keep class com.zpt.libumeng.UmengHelper {
+    public *;
+}

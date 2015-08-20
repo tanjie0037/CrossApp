@@ -18,10 +18,15 @@
 
 -keep public class com.google.gson
 -keep class Gson**
--keep classmembers class Gson** {
+-keepclassmembers class Gson** {
     *;
 }
--keep attributes Signature, *Annotation*
+-keepattributes Signature, *Annotation*
 -keep class com.nativex.** {
     *;
 }
+
+-keep public class **.R$*{ *; }
+
+-keep public class **.BuildConfig$*{ *; }
+
