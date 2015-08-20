@@ -10,12 +10,18 @@
 
 namespace CADevice
 {
-    void openCamera(CAMediaDelegate* target,bool allowEdit)
+    
+    const char* getAppVersion()
+    {
+        return "";
+    }
+    
+    void openCamera(CAMediaDelegate* target)
     {
         
     }
     
-    void openAlbum(CAMediaDelegate* target,bool allowEdit)
+    void openAlbum(CAMediaDelegate* target)
     {
         
     }

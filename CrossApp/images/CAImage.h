@@ -136,7 +136,9 @@ public:
     
     const char* description(void);
     
-    void releaseData(void *data);
+    void releaseData();
+    
+    void releaseData(unsigned char ** data);
     
     void drawAtPoint(const CCPoint& point);
     
@@ -203,7 +205,7 @@ public:
     
     CC_SYNTHESIZE_READONLY(unsigned char*, m_pData, Data);
     
-    CC_SYNTHESIZE_READONLY(unsigned long, m_nDataLenght, DataLenght);
+    CC_SYNTHESIZE_READONLY(unsigned long, m_uDataLenght, DataLenght);
     
     void premultipliedImageData();
     

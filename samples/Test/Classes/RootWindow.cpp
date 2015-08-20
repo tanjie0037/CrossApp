@@ -62,6 +62,7 @@ bool RootWindow::init()
     
     m_pRootDrawerController = drawer;
     CAApplication::getApplication()->setNotificationView(NULL);
+
     return true;
 }
 
@@ -103,7 +104,7 @@ void RootWindow::initUIView()
         
     }
     while (0);
-
+    
     if (m_pRootDrawerController)
     {
         m_pRootDrawerController->hideLeftViewController(true);

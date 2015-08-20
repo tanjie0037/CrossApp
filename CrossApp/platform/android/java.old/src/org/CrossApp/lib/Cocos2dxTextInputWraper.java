@@ -43,7 +43,6 @@ public class Cocos2dxTextInputWraper implements TextWatcher, OnEditorActionListe
 		final TextView textField = this.mCocos2dxGLSurfaceView.getCocos2dxEditText();
 		final InputMethodManager imm = (InputMethodManager) textField.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
 		return imm.isFullscreenMode();
-				//isFullscreenMode();
 	}
 
 	public void setOriginText(final String pOriginText) {
@@ -101,10 +100,6 @@ public class Cocos2dxTextInputWraper implements TextWatcher, OnEditorActionListe
 	@Override
 	public boolean onEditorAction(final TextView pTextView, final int pActionID, final KeyEvent pKeyEvent) 
 	{
-		
-		
-		
-		
 		if (pActionID == EditorInfo.IME_ACTION_DONE) 
 		{
 			this.mCocos2dxGLSurfaceView.queueEvent(new Runnable() {
@@ -115,6 +110,7 @@ public class Cocos2dxTextInputWraper implements TextWatcher, OnEditorActionListe
 			});
             return true;
 		}
+
 		if (pActionID == EditorInfo.IME_ACTION_SEARCH)
         {
 			this.mCocos2dxGLSurfaceView.queueEvent(new Runnable() {
@@ -125,6 +121,7 @@ public class Cocos2dxTextInputWraper implements TextWatcher, OnEditorActionListe
 			});
             return true;
 		}
+
 		if (pActionID == EditorInfo.IME_ACTION_SEND)
 		{
 			this.mCocos2dxGLSurfaceView.queueEvent(new Runnable() {
@@ -141,10 +138,11 @@ public class Cocos2dxTextInputWraper implements TextWatcher, OnEditorActionListe
             return false;
         }
         
-        if(pKeyEvent.getAction() == KeyEvent.ACTION_DOWN)
+        if(pKeyEvent != null && pKeyEvent.getAction() == KeyEvent.ACTION_DOWN)
         {
-            return false;
+            return true;
         }
+        
         if (pActionID == EditorInfo.IME_ACTION_UNSPECIFIED)
         {
         	this.mCocos2dxGLSurfaceView.queueEvent(new Runnable() {
@@ -157,11 +155,5 @@ public class Cocos2dxTextInputWraper implements TextWatcher, OnEditorActionListe
         }
 		return true;
 	}
-	// ===========================================================
-	// Methods
-	// ===========================================================
 
-	// ===========================================================
-	// Inner and Anonymous Classes
-	// ===========================================================
 }

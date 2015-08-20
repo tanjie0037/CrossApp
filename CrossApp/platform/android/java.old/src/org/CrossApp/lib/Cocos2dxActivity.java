@@ -105,6 +105,13 @@ public abstract class Cocos2dxActivity extends Activity implements Cocos2dxHelpe
 		 {
 			 mWebViewHelper = new Cocos2dxWebViewHelper(frame);
 		 }
+		 if (savedInstanceState != null && savedInstanceState.containsKey("WEBVIEW"))
+		 {
+			 mWebViewHelper = new Cocos2dxWebViewHelper(frame);
+			 String[] strs = savedInstanceState.getStringArray("WEBVIEW");
+			 mWebViewHelper.setAllWebviews(strs);
+			 savedInstanceState.clear();
+		 }
 		 IntentFilter intentFilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
 
 	     BatteryReceiver batteryReceiver = new BatteryReceiver();
@@ -120,6 +127,13 @@ public abstract class Cocos2dxActivity extends Activity implements Cocos2dxHelpe
 //		unregisterReceiver(BluetoothReciever) ; 
 //		unregisterReceiver(BTDiscoveryReceiver) ; 
 //	}
+	@Override
+	protected void onSaveInstanceState(Bundle outState) {
+		
+		outState.putStringArray("WEBVIEW", mWebViewHelper.getAllWebviews());
+		super.onSaveInstanceState(outState);
+	}
+
 
 	
 	class BatteryReceiver extends BroadcastReceiver{
@@ -541,17 +555,18 @@ public abstract class Cocos2dxActivity extends Activity implements Cocos2dxHelpe
 
             @Override
             public void onGlobalLayout() {
+            	
                 // TODO Auto-generated method stub
                 Rect r = new Rect();
                 rootview.getWindowVisibleDisplayFrame(r);
-
-                Rect frame = new Rect();
-                rootview.getWindowVisibleDisplayFrame(frame);
-                int statusBarHeight = frame.top;
+                System.out.println(r.toString());
 
                 int screenHeight = rootview.getRootView().getHeight();
-                keyboardheight =screenHeight- (r.bottom - (r.top-statusBarHeight));
+                keyboardheight =screenHeight- r.bottom;
                 System.out.println(keyboardheight);
+                
+                frame.getViewTreeObserver().removeGlobalOnLayoutListener(this);
+
                 cocos2dxActivity.mGLSurfaceView.queueEvent(new Runnable()
                 {
 					@Override
@@ -560,15 +575,15 @@ public abstract class Cocos2dxActivity extends Activity implements Cocos2dxHelpe
 		        		{
 		        			KeyBoardHeightReturn(keyboardheight);
 		        			mCocos2dxRenderer.handleOpenKeyPad();
+		        			System.out.println("handleOpenKeyPad");
 		        		}
 		                else
 		                {
 		                	mCocos2dxRenderer.handleCloseKeyPad();
+		                	System.out.println("handleCloseKeyPad");
 						}
 					}
 				});
-                
-                //boolean visible = heightDiff > screenHeight / 3;
             }
         });
 

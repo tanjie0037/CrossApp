@@ -33,7 +33,7 @@ CAListView::CAListView()
 
 CAListView::~CAListView()
 {
-    m_vpUsedListCells.clear();
+	m_mpFreedListCells.clear();
 	CC_SAFE_RELEASE_NULL(m_pListHeaderView);
 	CC_SAFE_RELEASE_NULL(m_pListFooterView);
     m_pListViewDataSource = NULL;
@@ -337,10 +337,7 @@ void CAListView::reloadViewSizeData()
     float width = winRect.size.width;
     float height = winRect.size.height;
     
-    m_nIndexs = 0;
-    m_rIndexRects.clear();
-    m_rLineRects.clear();
-    m_rHeaderRect = m_rFooterRect = CCRectZero;
+	clearData();
     
     int iStartPosition = 0;
     if (m_nListHeaderHeight > 0)
@@ -392,6 +389,39 @@ void CAListView::reloadViewSizeData()
     }
 }
 
+void CAListView::clearData()
+{
+	std::map<unsigned int, CAView*>::iterator it = m_pUsedLines.begin();
+	for (; it != m_pUsedLines.end(); ++it)
+	{
+		CAView* view = it->second;
+		CC_CONTINUE_IF(view == NULL);
+		m_pFreedLines.pushBack(view);
+		view->removeFromSuperview();
+	}
+	m_pUsedLines.clear();
+
+	m_mpUsedListCells.clear();
+
+	for (int i = 0; i < m_vpUsedListCells.size(); i++)
+	{
+		CAListViewCell* cell = m_vpUsedListCells.at(i);
+		CC_CONTINUE_IF(cell == NULL);
+		m_mpFreedListCells[cell->getReuseIdentifier()].pushBack(cell);
+		cell->removeFromSuperview();
+		cell->resetListViewCell();
+	}
+	m_vpUsedListCells.clear();
+
+	m_pSelectedListCells.clear();
+	
+	m_nIndexs = 0;
+	m_rIndexRects.clear();
+	m_rLineRects.clear();
+	m_rHeaderRect = m_rFooterRect = CCRectZero;
+	m_pHighlightedListCells = NULL;
+}
+
 void CAListView::reloadData()
 {
     if (m_pListViewDataSource == NULL)
@@ -399,13 +429,7 @@ void CAListView::reloadData()
     
     this->reloadViewSizeData();
     
-    this->removeAllSubviews();
-    
-    m_pUsedLines.clear();
-    m_vpUsedListCells.clear();
-    m_mpUsedListCells.clear();
-    m_mpFreedListCells.clear();
-    m_pSelectedListCells.clear();
+	this->removeAllSubviews();
     
     CCRect winRect = this->getBounds();
     winRect.origin = this->getContentOffset();
@@ -418,39 +442,14 @@ void CAListView::reloadData()
             addSubview(m_pListHeaderView);
         }
     }
-    
+	
     unsigned int cellCount = m_pListViewDataSource->numberOfIndex(this);
     for (unsigned i = 0; i < cellCount; i++)
     {
-        if (m_nIndexs > 0)
-        {
-            std::pair<std::map<unsigned int, CAListViewCell*>::iterator, bool> itrResult =
-            m_mpUsedListCells.insert(std::make_pair(i, (CAListViewCell*)NULL));
-            
-            CC_CONTINUE_IF(!winRect.intersectsRect(m_rIndexRects[i]));
-            
-            CAListViewCell* cell = m_pListViewDataSource->listViewCellAtIndex(this, m_rIndexRects[i].size, i);
-            if (cell)
-            {
-                cell->m_nIndex = i;
-                cell->setFrame(m_rIndexRects[i]);
-                addSubview(cell);
-                itrResult.first->second = cell;
-                m_vpUsedListCells.pushBack(cell);
-                
-                if (m_pListViewDataSource)
-                {
-                    m_pListViewDataSource->listViewWillDisplayCellAtIndex(this, cell, i);
-                }
-            }
-        }
-        
-        if (m_nSeparatorViewHeight > 0)
-        {
-            CAView* view = CAView::createWithFrame(m_rLineRects[i], m_obSeparatorColor);
-            addSubview(view);
-            m_pUsedLines[i] = view;
-        }
+		if (m_nIndexs > 0)
+		{
+			m_mpUsedListCells.insert(std::make_pair(i, (CAListViewCell*)NULL));
+		}
     }
     
     if (m_nListFooterHeight > 0)
@@ -461,6 +460,7 @@ void CAListView::reloadData()
             addSubview(m_pListFooterView);
         }
     }
+	loadCollectionCell();
     this->layoutPullToRefreshView();
     this->startDeaccelerateScroll();
 }
@@ -486,19 +486,18 @@ void CAListView::recoveryCollectionCell()
 
 		CCRect cellRect = cell->getFrame();
 		CC_CONTINUE_IF(rect.intersectsRect(cellRect));
-
+		
 		m_mpFreedListCells[cell->getReuseIdentifier()].pushBack(cell);
 		cell->removeFromSuperview();
 		cell->resetListViewCell();
 		itr->second = NULL;
         m_vpUsedListCells.eraseObject(cell);
-        
+		
         CAView* line = m_pUsedLines[itr->first];
         CC_CONTINUE_IF(line == NULL);
         m_pFreedLines.pushBack(line);
         line->removeFromSuperview();
         m_pUsedLines[itr->first] = NULL;
-        
 	}
 }
 
@@ -547,7 +546,7 @@ void CAListView::loadCollectionCell()
         }
         m_pUsedLines[index] = view;
         this->insertSubview(view, 1);
-        view->setFrame(lineRect);
+		view->setFrame(lineRect);
 	}
 }
 
@@ -572,7 +571,7 @@ float CAListView::maxSpeedCache(float dt)
 
 float CAListView::decelerationRatio(float dt)
 {
-    return 2.0f * dt;
+    return 1.8f * dt;
 }
 
 CAListViewCell* CAListView::dequeueReusableCellWithIdentifier(const char* reuseIdentifier)

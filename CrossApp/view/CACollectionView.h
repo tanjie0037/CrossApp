@@ -105,6 +105,7 @@ public:
 
 	virtual bool init();
 
+	void clearData();
 	void reloadData();
 
 	CACollectionViewCell* dequeueReusableCellWithIdentifier(const char* reuseIdentifier);
@@ -258,6 +259,7 @@ private:
 
 class CC_DLL CACollectionViewCell : public CAControl
 {
+	friend class CAAutoCollectionView;
 public:
     
 	CACollectionViewCell();
