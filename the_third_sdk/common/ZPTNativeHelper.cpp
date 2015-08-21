@@ -16,10 +16,12 @@
 
 std::string ZPTNativeHelper::_appName = "";
 
+static const char *ZPTNativeHelperPath = "com/zpt/utils/ZPTNativeHelper";
+
 void ZPTNativeHelper::getDeviceInfo(CSJsonDictionary& dic)
 {
     JniMethodInfo mi;
-    if (!JniHelper::getStaticMethodInfo(mi, "com.zpt.utils.ZPTNativeHelper", "getDeviceInfo", "()Ljava/lang/String;")) {
+    if (!JniHelper::getStaticMethodInfo(mi, ZPTNativeHelperPath, "getDeviceInfo", "()Ljava/lang/String;")) {
         assert(0);
         return;
     }
@@ -33,7 +35,7 @@ void ZPTNativeHelper::getDeviceInfo(CSJsonDictionary& dic)
 void ZPTNativeHelper::openUrl(const char* url)
 {
     JniMethodInfo mi;
-    if (!JniHelper::getStaticMethodInfo(mi, "com.zpt.utils.ZPTNativeHelper", "openUrl", "(Ljava/lang/String;)V")) {
+    if (!JniHelper::getStaticMethodInfo(mi, ZPTNativeHelperPath, "openUrl", "(Ljava/lang/String;)V")) {
         assert(0);
         return;
     }
@@ -47,7 +49,7 @@ void ZPTNativeHelper::openUrl(const char* url)
 void ZPTNativeHelper::sendMail(const string &target, const string &title, CSJsonDictionary &extra, const string &format)
 {
     JniMethodInfo mi;
-    if (!JniHelper::getStaticMethodInfo(mi, "com.zpt.utils.ZPTNativeHelper", "sendMail", "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V")) {
+    if (!JniHelper::getStaticMethodInfo(mi, ZPTNativeHelperPath, "sendMail", "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V")) {
         assert(0);
         return;
     }
@@ -63,7 +65,7 @@ void ZPTNativeHelper::sendMail(const string &target, const string &title, CSJson
 string ZPTNativeHelper::getDeviceId(bool simple)
 {
     JniMethodInfo mi;
-    if (!JniHelper::getStaticMethodInfo(mi, "com.zpt.utils.ZPTNativeHelper", "getDeviceId", "()Ljava/lang/String;")) {
+    if (!JniHelper::getStaticMethodInfo(mi, ZPTNativeHelperPath, "getDeviceId", "()Ljava/lang/String;")) {
         assert(0);
         return "";
     }
@@ -82,7 +84,7 @@ string ZPTNativeHelper::getDeviceId(bool simple)
 string ZPTNativeHelper::getAppVersion(bool replaceDot)
 {
     JniMethodInfo mi;
-    if (!JniHelper::getStaticMethodInfo(mi, "com.zpt.utils.ZPTNativeHelper", "getAppVersion", "()Ljava/lang/String;")) {
+    if (!JniHelper::getStaticMethodInfo(mi, ZPTNativeHelperPath, "getAppVersion", "()Ljava/lang/String;")) {
         assert(0);
         return "";
     }
@@ -103,12 +105,12 @@ string ZPTNativeHelper::getAppVersion(bool replaceDot)
 int ZPTNativeHelper::getAppBuild()
 {
     JniMethodInfo mi;
-    if (!JniHelper::getStaticMethodInfo(mi, "com.zpt.utils.ZPTNativeHelper", "getAppBuild", "()I")) {
+    if (!JniHelper::getStaticMethodInfo(mi, ZPTNativeHelperPath, "getAppBuild", "()I")) {
         assert(0);
         return 0;
     }
     
-    int appbuild = (int)(mi.env->CallStaticObjectMethod(mi.classID, mi.methodID));
+    int appbuild = (int)(mi.env->CallStaticIntMethod(mi.classID, mi.methodID));
     return appbuild;
 }
 
@@ -120,7 +122,7 @@ string ZPTNativeHelper::getStatusKey()
 string ZPTNativeHelper::getLanguage()
 {
     JniMethodInfo mi;
-    if (!JniHelper::getStaticMethodInfo(mi, "com.zpt.utils.ZPTNativeHelper", "getLanguage", "()Ljava/lang/String;")) {
+    if (!JniHelper::getStaticMethodInfo(mi, ZPTNativeHelperPath, "getLanguage", "()Ljava/lang/String;")) {
         assert(0);
         return "";
     }
@@ -135,7 +137,7 @@ string ZPTNativeHelper::getLanguage()
 string ZPTNativeHelper::getCountyCode()
 {
     JniMethodInfo mi;
-    if (!JniHelper::getStaticMethodInfo(mi, "com.zpt.utils.ZPTNativeHelper", "getCountyCode", "()Ljava/lang/String;")) {
+    if (!JniHelper::getStaticMethodInfo(mi, ZPTNativeHelperPath, "getCountyCode", "()Ljava/lang/String;")) {
         assert(0);
         return "";
     }
@@ -152,7 +154,7 @@ string ZPTNativeHelper::getCountyCode()
 void ZPTNativeHelper::getPrivateInfo(CSJsonDictionary& dic)
 {
     JniMethodInfo mi;
-    if (!JniHelper::getStaticMethodInfo(mi, "com.zpt.utils.ZPTNativeHelper", "getPhoneInfo", "()Ljava/lang/String;")) {
+    if (!JniHelper::getStaticMethodInfo(mi, ZPTNativeHelperPath, "getPhoneInfo", "()Ljava/lang/String;")) {
         assert(0);
         return;
     }
@@ -166,12 +168,12 @@ void ZPTNativeHelper::getPrivateInfo(CSJsonDictionary& dic)
 void ZPTNativeHelper::closeApp()
 {
     JniMethodInfo mi;
-    if (!JniHelper::getStaticMethodInfo(mi, "org.CrossApp.lib.Cocos2dxHelper", "terminateProcess", "()V")) {
+    if (!JniHelper::getStaticMethodInfo(mi, "org/CrossApp/lib/Cocos2dxHelper", "terminateProcess", "()V")) {
         assert(0);
         return;
     }
     
-    mi.env->CallStaticObjectMethod(mi.classID, mi.methodID);
+    mi.env->CallStaticVoidMethod(mi.classID, mi.methodID);
     mi.env->DeleteLocalRef(mi.classID);
 }
 

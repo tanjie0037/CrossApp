@@ -15,7 +15,7 @@
 #include <string>
 #include "SDKCommon.h"
 
-static const char *JPushHelperPath = "com.zpt.libjpush.JPushHelper";
+static const char *JPushHelperPath = "com/zpt/libjpush/JPushHelper";
 
 void JPushHelper::initJPush(const std::string &uId, const std::set<std::string>& tags) {
     JniMethodInfo mi;
@@ -35,7 +35,7 @@ void JPushHelper::initJPush(const std::string &uId, const std::set<std::string>&
     
     for (std::set<std::string>::iterator it = tags.begin(); it != tags.end(); it++) {
         std::string tag = *it;
-        mi.env->CallObjectMethod(javaSet, mi.methodID, mi.env->NewStringUTF(tag.c_str()));
+        mi.env->CallBooleanMethod(javaSet, mi.methodID, mi.env->NewStringUTF(tag.c_str()));
     }
     
     if (!JniHelper::getStaticMethodInfo(mi, JPushHelperPath, "initUser", "(Ljava/lang/String;Ljava/util/HashSet;)V")) {
@@ -44,7 +44,7 @@ void JPushHelper::initJPush(const std::string &uId, const std::set<std::string>&
     }
     
     jstring juId = mi.env->NewStringUTF(str_replace(uId.c_str(), "-", ""));
-    mi.env->CallStaticObjectMethod(mi.classID, mi.methodID, juId, javaSet);
+    mi.env->CallStaticVoidMethod(mi.classID, mi.methodID, juId, javaSet);
     mi.env->DeleteLocalRef(mi.classID);
 }
 

@@ -18,7 +18,7 @@ USING_NS_CC;
 USING_NS_CC_EXT;
 using namespace CSJson;
 
-static const char *UmengHelperPath = "com.zpt.libumeng.UmengHelper";
+static const char *UmengHelperPath = "com/zpt/libumeng/UmengHelper";
 
 void UMHelper::startWithAppkey(const char* appkey, const char* channel)
 {

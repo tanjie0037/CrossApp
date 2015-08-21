@@ -20,9 +20,11 @@ std::map<std::string, AdHelper::AdType> AdHelper::AD_TYPE = AdHelper::createMap(
 string AdHelper::K_NATIVEX_PLACEMENT_OFFER = "Store Open Offerwall";
 string AdHelper::K_NATIVEX_PLACEMENT_VIDEO = "Game Launch Video";
 
+static const char *AdHelperPath = "com/zpt/utils/AdHelper";
+
 void AdHelper::initAd(AdType type, const std::string &uId, const std::string &appkey, const std::string &token) {
     JniMethodInfo mi;
-    if (!JniHelper::getStaticMethodInfo(mi, "com.zpt.utils.AdHelper", "initAd", "(ILjava/lang/String;Ljava/lang/String;Ljava/lang/String;)V")) {
+    if (!JniHelper::getStaticMethodInfo(mi, AdHelperPath, "initAd", "(ILjava/lang/String;Ljava/lang/String;Ljava/lang/String;)V")) {
         assert(0);
         return;
     }
@@ -37,7 +39,7 @@ void AdHelper::initAd(AdType type, const std::string &uId, const std::string &ap
 
 void AdHelper::callOfferwall(AdType type) {
     JniMethodInfo mi;
-    if (!JniHelper::getStaticMethodInfo(mi, "com.zpt.utils.AdHelper", "callOfferwall", "(I)V")) {
+    if (!JniHelper::getStaticMethodInfo(mi, AdHelperPath, "callOfferwall", "(I)V")) {
         assert(0);
         return;
     }
@@ -48,7 +50,7 @@ void AdHelper::callOfferwall(AdType type) {
 
 void AdHelper::playVideo(AdType type) {
     JniMethodInfo mi;
-    if (!JniHelper::getStaticMethodInfo(mi, "com.zpt.utils.AdHelper", "playVideo", "(I)V")) {
+    if (!JniHelper::getStaticMethodInfo(mi, AdHelperPath, "playVideo", "(I)V")) {
         assert(0);
         return;
     }
