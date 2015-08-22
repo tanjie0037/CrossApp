@@ -15,6 +15,7 @@
 #include "SDKCommon.h"
 
 std::string ZPTNativeHelper::_appName = "";
+std::string ZPTNativeHelper::_appUrl = "";
 
 static const char *ZPTNativeHelperPath = "com/zpt/utils/ZPTNativeHelper";
 

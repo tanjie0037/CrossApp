@@ -17,6 +17,7 @@
 #import "SSKeychain.h"
 
 std::string ZPTNativeHelper::_appName = "";
+std::string ZPTNativeHelper::_appUrl = "";
 
 void ZPTNativeHelper::getDeviceInfo(CSJsonDictionary& dic)
 {

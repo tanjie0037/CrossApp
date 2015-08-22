@@ -32,6 +32,7 @@ public:
         ZPTNativeHelper::_appName = appName;
     }
 
+    static std::string _appUrl;
 private:
     static std::string _appName;
 };
