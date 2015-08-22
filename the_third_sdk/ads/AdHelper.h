@@ -29,7 +29,7 @@ public:
         std::map<std::string, AdType> map;
         map["fyber"] = AdFyber;
         map["supersonic"] = AdSupersonic;
-        map["nativeX"] = AdNativeX;
+        map["nativex"] = AdNativeX;
         map["adxmi"] = AdAdxmi;
         map["tapjoy"] = AdTapjoy;
         map["adscend"] = AdAdscend;

@@ -15,6 +15,7 @@ import android.net.Uri;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.SystemClock;
+import android.provider.Settings;
 import android.telephony.TelephonyManager;
 
 public class ZPTNativeHelper {
@@ -71,8 +72,29 @@ public class ZPTNativeHelper {
 	public static String getDeviceId() {
 		final TelephonyManager tm = (TelephonyManager) Cocos2dxActivity.getContext().getBaseContext()
 				.getSystemService(Context.TELEPHONY_SERVICE);
-		ZPTLog.v("DeviceId:" + tm.getDeviceId());
-		return tm.getDeviceId();
+
+		String uId = tm.getDeviceId();
+
+		if (uId == null || uId.equals("")) {
+			uId = Settings.Secure.getString(Cocos2dxActivity.getContext().getContentResolver(), Settings.Secure.ANDROID_ID);
+		}
+
+		if (uId == null || uId.equals("")) {
+			WifiManager wifiManager = (WifiManager) Cocos2dxActivity.getContext().getSystemService(Context.WIFI_SERVICE);
+			WifiInfo wifiInfo = wifiManager.getConnectionInfo();
+
+			if (wifiInfo.getMacAddress() != null) {
+				uId = wifiInfo.getMacAddress();
+			}
+		}
+
+		if (uId == null || uId.equals("")) {
+			assert (false);
+			uId = "";
+		}
+
+		ZPTLog.v("DeviceId:" + uId);
+		return uId;
 	}
 
 	public static String getAppVersion() {
@@ -148,6 +170,7 @@ public class ZPTNativeHelper {
 		WifiInfo wifiInfo = wifiManager.getConnectionInfo();
 
 		if (wifiInfo.getMacAddress() != null) {
+
 			macStr = wifiInfo.getMacAddress();
 		} else {
 			macStr = "Fail";

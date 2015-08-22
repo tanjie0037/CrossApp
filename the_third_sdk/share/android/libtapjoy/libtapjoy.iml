@@ -91,6 +91,8 @@
       <excludeFolder url="file://$MODULE_DIR$/../../../ads/android/libtapjoy/build/intermediates/rs" />
       <excludeFolder url="file://$MODULE_DIR$/../../../ads/android/libtapjoy/build/intermediates/symbols" />
       <excludeFolder url="file://$MODULE_DIR$/../../../ads/android/libtapjoy/build/outputs" />
+      <excludeFolder url="file://$MODULE_DIR$/../../../ads/android/libtapjoy/build/reports" />
+      <excludeFolder url="file://$MODULE_DIR$/../../../ads/android/libtapjoy/build/test-results" />
       <excludeFolder url="file://$MODULE_DIR$/../../../ads/android/libtapjoy/build/tmp" />
     </content>
     <orderEntry type="jdk" jdkName="Android API 22 Platform" jdkType="Android SDK" />
