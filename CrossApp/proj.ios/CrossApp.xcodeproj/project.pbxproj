@@ -3168,6 +3168,7 @@
 					USE_FILE32API,
 					CC_TARGET_OS_IPHONE,
 					"CROSSAPP_DEBUG=1",
+					__FILE_INDEX,
 				);
 				HEADER_SEARCH_PATHS = (
 					"\"$(SRCROOT)/..\"",
@@ -3209,6 +3210,7 @@
 					CROSSAPP_JAVASCRIPT,
 					USE_FILE32API,
 					CC_TARGET_OS_IPHONE,
+					__FILE_INDEX,
 				);
 				HEADER_SEARCH_PATHS = (
 					"\"$(SRCROOT)/..\"",

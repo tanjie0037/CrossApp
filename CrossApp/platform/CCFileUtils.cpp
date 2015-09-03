@@ -9,6 +9,9 @@
 #include "support/zip_support/unzip.h"
 #include <stack>
 #include <algorithm>
+#include <iostream>
+#include <sstream>
+#include <fstream>
 
 #if (CC_TARGET_PLATFORM != CC_PLATFORM_WIN32)
 #include <dirent.h>
@@ -596,21 +599,32 @@ std::string CCFileUtils::getPathForFilename(const std::string& filename, const s
 
 std::string CCFileUtils::fullPathForFilename(const std::string& pszFileName)
 {
-    std::string strFileName = std::string(pszFileName);
+    std::string strFileName;
     if (isAbsolutePath(pszFileName))
     {
         //CCLOG("Return absolute path( %s ) directly.", pszFileName);
         return pszFileName;
     }
+    
+    //jie.tan: 使用__index匹配实际文件名
+#if defined(__FILE_INDEX)
+    strFileName = getIndexMap()[pszFileName];
+    
+    if (strFileName == "") {
+        strFileName = std::string(pszFileName);
+    }
+#endif
+    //jie.tan: 使用__index匹配实际文件名
+    
     // Already Cached ?
-    std::map<std::string, std::string>::iterator cacheIter = m_fullPathCache.find(pszFileName);
+    std::map<std::string, std::string>::iterator cacheIter = m_fullPathCache.find(strFileName);
     if (cacheIter != m_fullPathCache.end())
     {
         //CCLOG("Return full path from cache: %s", cacheIter->second.c_str());
         return cacheIter->second;
     }
     // Get the new file name.
-    std::string newFilename = getNewFilename(pszFileName);
+    std::string newFilename = getNewFilename(strFileName);
     
     string fullpath = "";
     
@@ -629,13 +643,13 @@ std::string CCFileUtils::fullPathForFilename(const std::string& pszFileName)
             if (fullpath.length() > 0)
             {
                 // Using the filename passed in as key.
-                m_fullPathCache.insert(std::pair<std::string, std::string>(pszFileName, fullpath));
+                m_fullPathCache.insert(std::pair<std::string, std::string>(strFileName, fullpath));
                 return fullpath;
             }
         }
     }
     
-    return pszFileName;
+    return strFileName;
 }
 
 const char* CCFileUtils::fullPathFromRelativeFile(const char *pszFilename, const char *pszRelativeFile)
@@ -858,6 +872,173 @@ bool CCFileUtils::createDirectory(const char *path)
 #endif
 }
 
+void SplitString(const std::string& s, std::vector<std::string>& v, const std::string& c)
+{
+    std::string::size_type pos1, pos2;
+    pos2 = s.find(c);
+    pos1 = 0;
+    while(std::string::npos != pos2)
+    {
+        v.push_back(s.substr(pos1, pos2-pos1));
+        
+        pos1 = pos2 + c.size();
+        pos2 = s.find(c, pos1);
+    }
+    if(pos1 != s.length())
+        v.push_back(s.substr(pos1));
+}
+
+//add by jie.tan
+void CCFileUtils::cleanIndex() {
+    _indexVersion = 0;
+    _indexMap.clear();
+}
+
+void CCFileUtils::loadIndex() {
+    do {
+        string data = getFileString((getWritablePath() + "__index").c_str());
+        
+        // 因为插入了一个'\0'
+        if (data.size() < 2) {
+            data = getFileString(getPathForFilename("__index", "", "Res/").c_str());
+        }
+        
+        if (data.length() < 2) {
+            CCLOG("__index not found!");
+            break;
+        }
+        
+        CCLOG("---index:%s", data.c_str());
+        
+        vector<string> v =  vector<string>();
+        
+        SplitString(data, v, "\n");
+        
+        if (v.size() < 2) {
+            assert(0);
+            break;
+        }
+        
+        _indexVersion = atol(v[0].c_str());
+        _indexMap.clear();
+        _fileSizeMap.clear();
+        
+        for (vector<string>::size_type i = 1; i != v.size(); ++i) {
+            vector<string> v_line =  vector<string>();
+            SplitString(v[i], v_line, " ");
+            
+            if (v_line.size() != 3) {
+                assert(0);
+                continue;
+            }
+            
+            _indexMap[v_line[0]] = v_line[1];
+            _fileSizeMap[v_line[1]] = atol(v_line[2].c_str());
+        }
+    } while(0);
+}
+
+unsigned long CCFileUtils::getIndexVersion() {
+#if defined(__FILE_INDEX)
+    if (_indexVersion <= 0) {
+        loadIndex();
+    }
+    
+    if (_indexVersion <= 0) {
+        CCLOG("__index error!");
+        assert(0);
+    }
+#endif
+    
+    return _indexVersion;
+}
+
+std::map<std::string, std::string> & CCFileUtils::getIndexMap() {
+#if defined(__FILE_INDEX)
+    if (_indexMap.empty()) {
+        loadIndex();
+    }
+    
+    if (_indexMap.empty()) {
+        CCLOG("__index error!");
+        assert(0);
+    }
+#endif
+    
+    return _indexMap;
+}
+
+unsigned long CCFileUtils::getFileSize(const std::string &file) {
+#if defined(__FILE_INDEX)
+    if (_fileSizeMap.empty()) {
+        loadIndex();
+    }
+    
+    if (_fileSizeMap.empty()) {
+        CCLOG("__index error!");
+        assert(0);
+    }
+#endif
+    
+    map<string, unsigned long>::iterator it = _fileSizeMap.find(file);
+    
+    if (it != _fileSizeMap.end()) {
+        return it->second;
+    } else {
+        return 0;
+    }
+}
+
+unsigned long CCFileUtils::saveFile(const std::string &path, const std::string &data) {
+    string fullPath = CCFileUtils::sharedFileUtils()->getWritablePath();
+    
+    //check path
+    if (path.find("/") == string::npos) {
+        fullPath += path;
+        
+    } else {
+        // remove '/'
+        fullPath = fullPath.substr(0, fullPath.size() - 1);
+        
+        vector<std::string> v;
+        SplitString(path, v, "/");
+        vector<std::string>::size_type i = 0;
+        
+        while (i < v.size() - 1) {
+            fullPath += "/" + v[i];
+            createDirectory(fullPath.c_str());
+            ++i;
+        }
+    
+        fullPath += "/" + v[i];
+    }
+    
+    CCLOG("---save file fullPath:%s", fullPath.c_str());
+    
+    ofstream file(fullPath.c_str(), ios::out);
+    
+    if (!file) {
+        assert(0);
+        CCLOG("file path not exist!");
+        return 0;
+    }
+    
+    file.write(data.c_str(), data.size());
+    file.close();
+    
+    long nFileLen = 0;
+    ifstream savedFile(fullPath.c_str(), ios::binary);
+    
+    if (savedFile) {
+        savedFile.seekg(0, ios::end);
+        nFileLen = savedFile.tellg();
+        savedFile.close();
+    }
+    
+    return nFileLen;
+}
+
+//add by jie.tan
 
 NS_CC_END
 

@@ -10,7 +10,6 @@
 #define __AppGift__ZPTNativeHelper__
 
 #include <stdio.h>
-#include <map>
 #include "CrossApp.h"
 #include "CrossAppExt.h"
 
@@ -31,10 +30,16 @@ public:
     static void init(const std::string &appName) {
         ZPTNativeHelper::_appName = appName;
     }
-
-    static std::string _appUrl;
+    static void setAppUrl(const std::string &appUrl) {
+        ZPTNativeHelper::_appUrl = appUrl;
+    }
+    static string getAppUrl() {
+        return ZPTNativeHelper::_appUrl;
+    }
+    
 private:
     static std::string _appName;
+    static std::string _appUrl;
 };
 
 #endif /* defined(__AppGift__ZPTNativeHelper__) */

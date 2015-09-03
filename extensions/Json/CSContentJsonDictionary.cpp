@@ -80,6 +80,10 @@ void CSJsonDictionary::insertItem(const char *pszKey, int nValue)
 	m_cValue[pszKey] = nValue;
 }
 
+void CSJsonDictionary::insertItem(const char *pszKey, unsigned long nValue)
+{
+    m_cValue[pszKey] = (Uint64)nValue;
+}
 
 void CSJsonDictionary::insertItem(const char *pszKey, double fValue)
 {

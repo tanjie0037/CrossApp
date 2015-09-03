@@ -39,6 +39,7 @@ public:
 	void	initWithValue(CSJson::Value& value);
 
     void    insertItem(const char *pszKey, int nValue);
+    void    insertItem(const char *pszKey, unsigned long nValue);
     void    insertItem(const char *pszKey, double fValue);
     void    insertItem(const char *pszKey, const char * pszValue);
     void    insertItem(const char *pszKey, CSJsonDictionary * subDictionary);
