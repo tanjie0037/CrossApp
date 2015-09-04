@@ -890,7 +890,7 @@ void SplitString(const std::string& s, std::vector<std::string>& v, const std::s
 
 //add by jie.tan
 void CCFileUtils::cleanIndex() {
-    _indexVersion = 0;
+    _indexVersion = "";
     _indexMap.clear();
 }
 
@@ -919,15 +919,20 @@ void CCFileUtils::loadIndex() {
             break;
         }
         
-        _indexVersion = atol(v[0].c_str());
+        _indexVersion = v[0];
         _indexMap.clear();
         _fileSizeMap.clear();
         
         for (vector<string>::size_type i = 1; i != v.size(); ++i) {
+            if (v[i].length() < 2) {
+                continue;
+            }
+            
             vector<string> v_line =  vector<string>();
             SplitString(v[i], v_line, " ");
             
             if (v_line.size() != 3) {
+                CCLOG("v[%ld]: [%s]", i, v[i].c_str());
                 assert(0);
                 continue;
             }
@@ -938,13 +943,13 @@ void CCFileUtils::loadIndex() {
     } while(0);
 }
 
-unsigned long CCFileUtils::getIndexVersion() {
+string CCFileUtils::getIndexVersion() {
 #if defined(__FILE_INDEX)
-    if (_indexVersion <= 0) {
+    if (_indexVersion == "") {
         loadIndex();
     }
     
-    if (_indexVersion <= 0) {
+    if (_indexVersion == "") {
         CCLOG("__index error!");
         assert(0);
     }

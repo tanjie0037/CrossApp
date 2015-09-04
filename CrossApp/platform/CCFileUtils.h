@@ -296,7 +296,7 @@ public:
     
     //add by jie.tan
     void cleanIndex();
-    unsigned long getIndexVersion();
+    std::string getIndexVersion();
     std::map<std::string, std::string> &getIndexMap();
     unsigned long getFileSize(const std::string &file);
     unsigned long saveFile(const std::string &path, const std::string &data);
@@ -416,7 +416,7 @@ protected:
     
 private:
     //add by jie.tan
-    long _indexVersion;
+    std::string _indexVersion;
     std::map<std::string, std::string> _indexMap;
     std::map<std::string, unsigned long> _fileSizeMap;
     //add by jie.tan
