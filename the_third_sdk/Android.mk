@@ -18,7 +18,8 @@ LOCAL_C_INCLUDES := $(LOCAL_PATH)/share \
 				$(LOCAL_PATH)/ads \
 				$(LOCAL_PATH)/umeng \
 				$(LOCAL_PATH)/common \
-				$(LOCAL_PATH)/jpush
+				$(LOCAL_PATH)/jpush \
+				$(LOCAL_PATH)
 
 LOCAL_EXPORT_C_INCLUDES = $(LOCAL_C_INCLUDES)
 

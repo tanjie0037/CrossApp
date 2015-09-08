@@ -30,6 +30,7 @@ public:
     virtual std::string getWritablePath();
     virtual bool isFileExist(const std::string& strFilePath);
     virtual bool isAbsolutePath(const std::string& strPath);
+    virtual std::string getFullPathForDirectoryAndFilename(const std::string& strDirectory, const std::string& strFilename);
     
     /** This function is android specific. It is used for CCTextureCache::addImageAsync(). 
      Don't use it in your codes.

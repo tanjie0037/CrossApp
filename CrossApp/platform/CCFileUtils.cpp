@@ -895,11 +895,13 @@ void CCFileUtils::cleanIndex() {
 }
 
 void CCFileUtils::loadIndex() {
+    CCLOG("loadIndex!");
+    
     do {
         string data = getFileString((getWritablePath() + "__index").c_str());
         
         // 因为插入了一个'\0'
-        if (data.size() < 2) {
+        if (data.length() < 2) {
             data = getFileString(getPathForFilename("__index", "", "Res/").c_str());
         }
         
@@ -932,7 +934,7 @@ void CCFileUtils::loadIndex() {
             SplitString(v[i], v_line, " ");
             
             if (v_line.size() != 3) {
-                CCLOG("v[%ld]: [%s]", i, v[i].c_str());
+                CCLOG("v[%lu]: [%s]", i, v[i].c_str());
                 assert(0);
                 continue;
             }
