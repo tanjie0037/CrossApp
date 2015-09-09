@@ -106,6 +106,11 @@ string ZPTNativeHelper::getDeviceId(bool simple)
     return cDeviceId;
 }
 
+string ZPTNativeHelper::getIdfa() {
+    NSString *deviceId = [[[ASIdentifierManager sharedManager] advertisingIdentifier] UUIDString];
+    return string(utf8cstr(deviceId));
+}
+
 string ZPTNativeHelper::getStatusKey()
 {
     return "status-v" + ZPTNativeHelper::getAppVersion(true);

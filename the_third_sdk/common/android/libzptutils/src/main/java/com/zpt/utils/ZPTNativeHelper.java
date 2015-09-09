@@ -1,5 +1,6 @@
 package com.zpt.utils;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Locale;
 
@@ -17,6 +18,11 @@ import android.net.wifi.WifiManager;
 import android.os.SystemClock;
 import android.provider.Settings;
 import android.telephony.TelephonyManager;
+
+import com.google.android.gms.ads.identifier.AdvertisingIdClient;
+import com.google.android.gms.auth.GooglePlayServicesAvailabilityException;
+import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
+import com.google.android.gms.common.GooglePlayServicesRepairableException;
 
 public class ZPTNativeHelper {
 
@@ -162,8 +168,9 @@ public class ZPTNativeHelper {
 		String deviceModel = android.os.Build.MODEL; // 手机型号
 		String imei = tm.getDeviceId();
 		String imsi = tm.getSubscriberId();
-		String numer = tm.getLine1Number(); // 手机号码
+		String nubmer = tm.getLine1Number(); // 手机号码
 		String serviceName = tm.getSimOperatorName(); // 运营商
+		String androidId = Settings.Secure.getString(Cocos2dxActivity.getContext().getContentResolver(), Settings.Secure.ANDROID_ID);
 
 		String macStr, time;
 		WifiManager wifiManager = (WifiManager) ctx.getSystemService(Context.WIFI_SERVICE);
@@ -178,30 +185,39 @@ public class ZPTNativeHelper {
 
 		time = SystemClock.elapsedRealtime() / 1000 + "";
 
-		String phoneInfo = "品牌: " + deviceBrand
-				+ "\n" + "型号: " + deviceModel
-				+ "\n" + "版本: Android " + android.os.Build.VERSION.RELEASE
-				+ "\n" + "IMEI: " + imei
-				+ "\n" + "IMSI: " + imsi
-				+ "\n" + "手机号码: " + numer
-				+ "\n" + "运营商: " + serviceName
-				+ "\n" + "mac: " + macStr
-				+ "\n" + "time: " + time;
-		
-		ZPTLog.v("phoneInfo: " + phoneInfo);
-		
+		AdvertisingIdClient.Info adInfo = null;
+		String adid = "";
+
+		try {
+			adInfo = AdvertisingIdClient.getAdvertisingIdInfo(ctx);
+			adid = adInfo.getId();
+
+		} catch (IOException e) {
+			// Unrecoverable error connecting to Google Play services (e.g.,
+			// the old version of the service doesn't support getting AdvertisingId).
+		} catch (GooglePlayServicesNotAvailableException e) {
+			// Google Play services is not available entirely.
+			e.printStackTrace();
+		} catch (GooglePlayServicesRepairableException e) {
+			e.printStackTrace();
+		}
+
 		HashMap<String, String> infoMap = new HashMap<String, String>();
 		infoMap.put("brand", deviceBrand);
 		infoMap.put("model", deviceModel);
 		infoMap.put("system", "Android " + android.os.Build.VERSION.RELEASE);
 		infoMap.put("imei", imei);
 		infoMap.put("imsi", imsi);
-		infoMap.put("numer", numer);
+		infoMap.put("number", nubmer);
 		infoMap.put("service", serviceName);
 		infoMap.put("mac", macStr);
 		infoMap.put("time", time);
-		
+		infoMap.put("adid", adid);
+		infoMap.put("android_id", androidId);
+
 		JSONObject jsonObj = new JSONObject(infoMap);
+
+		ZPTLog.v("info:\n" + jsonObj.toString());
 
 		return jsonObj.toString();
 	}

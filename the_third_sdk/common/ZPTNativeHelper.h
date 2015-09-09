@@ -21,6 +21,9 @@ public:
     static void openUrl(const char* url);
     static void sendMail(const string &target, const string &title, CSJsonDictionary& extra, const string &format);
     static string getDeviceId(bool simple = false);
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_IOS)
+    static string getIdfa();
+#endif
     static string getAppVersion(bool replaceDot = false);
     static int getAppBuild();
     static string getStatusKey();
