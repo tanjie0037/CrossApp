@@ -15,6 +15,7 @@ import android.content.pm.PackageManager.NameNotFoundException;
 import android.net.Uri;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
+import android.os.AsyncTask;
 import android.os.SystemClock;
 import android.provider.Settings;
 import android.telephony.TelephonyManager;
@@ -25,6 +26,7 @@ import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
 
 public class ZPTNativeHelper {
+	public static String _adid = null;
 
 	public static String getDeviceInfo() {
 		Context ctx = Cocos2dxActivity.getContext();
@@ -185,23 +187,6 @@ public class ZPTNativeHelper {
 
 		time = SystemClock.elapsedRealtime() / 1000 + "";
 
-		AdvertisingIdClient.Info adInfo = null;
-		String adid = "";
-
-		try {
-			adInfo = AdvertisingIdClient.getAdvertisingIdInfo(ctx);
-			adid = adInfo.getId();
-
-		} catch (IOException e) {
-			// Unrecoverable error connecting to Google Play services (e.g.,
-			// the old version of the service doesn't support getting AdvertisingId).
-		} catch (GooglePlayServicesNotAvailableException e) {
-			// Google Play services is not available entirely.
-			e.printStackTrace();
-		} catch (GooglePlayServicesRepairableException e) {
-			e.printStackTrace();
-		}
-
 		HashMap<String, String> infoMap = new HashMap<String, String>();
 		infoMap.put("brand", deviceBrand);
 		infoMap.put("model", deviceModel);
@@ -212,14 +197,41 @@ public class ZPTNativeHelper {
 		infoMap.put("service", serviceName);
 		infoMap.put("mac", macStr);
 		infoMap.put("time", time);
-		infoMap.put("adid", adid);
+		infoMap.put("adid", _adid);
 		infoMap.put("android_id", androidId);
 
 		JSONObject jsonObj = new JSONObject(infoMap);
 
-		ZPTLog.v("info:\n" + jsonObj.toString());
+		ZPTLog.v("privateInfo:\n" + jsonObj.toString());
 
 		return jsonObj.toString();
 	}
 
+	public static void getAdid() {
+
+		new AsyncTask() {
+			@Override
+			protected Object doInBackground(Object[] params) {
+				AdvertisingIdClient.Info adInfo = null;
+				Context ctx = Cocos2dxActivity.getContext();
+
+				try {
+
+					adInfo = AdvertisingIdClient.getAdvertisingIdInfo(ctx);
+					_adid = adInfo.getId();
+				} catch (IOException 	e) {
+					// Unrecoverable error connecting to Google Play services (e.g.,
+					// the old version of the service doesn't support getting AdvertisingId).
+				} catch (GooglePlayServicesNotAvailableException e) {
+					// Google Play services is not available entirely.
+					e.printStackTrace();
+				} catch (GooglePlayServicesRepairableException e) {
+					e.printStackTrace();
+				}
+
+				return null;
+			}
+		}.execute();
+
+	}
 }
