@@ -13,7 +13,7 @@
 #import <Foundation/Foundation.h>
 #import "AppController.h"
 #import "NativeXSDK.h"
-//#import "SponsorPaySDK.h"
+#import "SponsorPaySDK.h"
 #import "Supersonic/Supersonic.h"
 #import <AdscendMedia/AdscendMedia.h>
 
@@ -275,9 +275,9 @@ void AdHelper::initAd(AdType type, const std::string &uId, const std::string &ap
 {
     switch (type) {
         case AdFyber:
-//            [SponsorPaySDK startForAppId:[NSString stringWithUTF8String:appkey.c_str()]
-//                                  userId:[NSString stringWithUTF8String:uId.c_str()]
-//                           securityToken:[NSString stringWithUTF8String:token.c_str()]];
+            [SponsorPaySDK startForAppId:[NSString stringWithUTF8String:appkey.c_str()]
+                                  userId:[NSString stringWithUTF8String:uId.c_str()]
+                           securityToken:[NSString stringWithUTF8String:token.c_str()]];
             break;
             
         case AdSupersonic:
@@ -315,11 +315,11 @@ void AdHelper::callOfferwall(AdHelper::AdType type)
 {
     switch (type) {
         case AdFyber:
-//            [SponsorPaySDK showOfferWallWithParentViewController:(UIViewController*)[AppController getRootView] completion: ^(int status) {
-//                if (SPONSORPAY_ERR_NETWORK == status) {
-//                    CCLOG("call offerwall failed.[%s, %s]", "Fyber", "SPONSORPAY_ERR_NETWORK");
-//                }
-//            }];
+            [SponsorPaySDK showOfferWallWithParentViewController:(UIViewController*)[AppController getRootView] completion: ^(int status) {
+                if (SPONSORPAY_ERR_NETWORK == status) {
+                    CCLOG("call offerwall failed.[%s, %s]", "Fyber", "SPONSORPAY_ERR_NETWORK");
+                }
+            }];
             break;
             
         case AdSupersonic:
