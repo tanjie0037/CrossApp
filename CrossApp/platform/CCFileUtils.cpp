@@ -898,19 +898,40 @@ void CCFileUtils::loadIndex() {
     CCLOG("loadIndex!");
     
     do {
-        string data = getFileString((getWritablePath() + "__index").c_str());
+        string dataOut = getFileString((getWritablePath() + "__index").c_str());
+        string dataIn = getFileString(getPathForFilename("__index", "", "Res/").c_str());
+        string data;
         
         // 因为插入了一个'\0'
-        if (data.length() < 2) {
-            data = getFileString(getPathForFilename("__index", "", "Res/").c_str());
+        if (dataOut.length() < 2 && dataIn.length() < 2) {
+            CCAssert(0, "no index found.");
+            return;
+        }
+            
+        if (dataOut.length() < 2) {
+            data = dataIn;
+            
+        } else {
+            // 选择index build高的那个为准
+            string buildStrIn, buildStrOut;
+            
+            size_t firstEnter = dataIn.find("\n");
+            buildStrIn = dataIn.substr(firstEnter + 1, dataIn.find("\n", firstEnter + 1) - firstEnter - 1);
+            
+            firstEnter = dataOut.find("\n");
+            buildStrOut = dataOut.substr(firstEnter + 1, dataOut.find("\n", firstEnter + 1) - firstEnter - 1);
+            
+            CCLog("compare index, out:[%s], in:[%s]", buildStrOut.c_str(), buildStrIn.c_str());
+            
+            long buildIn = atol(buildStrIn.c_str());
+            long buildOut = atol(buildStrOut.c_str());
+            
+            data = buildIn > buildOut ? dataIn : dataOut;
         }
         
-        if (data.length() < 2) {
-            CCLOG("__index not found!");
-            break;
-        }
+        data.find("\n");
         
-        CCLOG("---index:%s", data.c_str());
+        CCLOG("---index:------------\n%s\n------------", data.c_str());
         
         vector<string> v =  vector<string>();
         
@@ -925,7 +946,7 @@ void CCFileUtils::loadIndex() {
         _indexMap.clear();
         _fileSizeMap.clear();
         
-        for (vector<string>::size_type i = 1; i != v.size(); ++i) {
+        for (vector<string>::size_type i = 2; i != v.size(); ++i) {
             if (v[i].length() < 2) {
                 continue;
             }
