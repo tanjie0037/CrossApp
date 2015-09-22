@@ -599,7 +599,7 @@ std::string CCFileUtils::getPathForFilename(const std::string& filename, const s
 
 std::string CCFileUtils::fullPathForFilename(const std::string& pszFileName)
 {
-    std::string strFileName;
+    std::string strFileName = pszFileName;
     if (isAbsolutePath(pszFileName))
     {
         //CCLOG("Return absolute path( %s ) directly.", pszFileName);
