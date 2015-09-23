@@ -38,3 +38,26 @@
 -(id)proxyForJson;
 
 @end
+
+#pragma mark NativeXRewardDelegate protocol definition
+
+@protocol NativeXRewardDelegate <NSObject>
+
+@required
+
+/** Called when the currency redemption is unsuccessfull.
+ *
+ * @param   error
+ *          reason why redeem currency call failed
+ */
+- (void)rewardDidRedeemWithError:(NSError *)error;
+
+
+/** Called when the rewards redemption is successful.
+ *
+ * @param rewardInfo
+ *        an object containing the list of reciepts, as well as some helper methods
+ */
+- (void)rewardDidRedeemWithRewardInfo:(NativeXRewardInfo*)rewardInfo;
+
+@end

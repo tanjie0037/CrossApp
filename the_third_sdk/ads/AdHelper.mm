@@ -13,7 +13,7 @@
 #import <Foundation/Foundation.h>
 #import "AppController.h"
 #import "NativeXSDK.h"
-#import "SponsorPaySDK.h"
+#import "FyberSDK.h"
 #import "Supersonic/Supersonic.h"
 //#import <AdscendMedia/AdscendMedia.h>
 
@@ -274,12 +274,12 @@ string _token;
 void AdHelper::initAd(AdType type, const std::string &uId, const std::string &appkey, const std::string &token)
 {
     switch (type) {
-        case AdFyber:
-            [SponsorPaySDK startForAppId:[NSString stringWithUTF8String:appkey.c_str()]
-                                  userId:[NSString stringWithUTF8String:uId.c_str()]
-                           securityToken:[NSString stringWithUTF8String:token.c_str()]];
+        case AdFyber:{
+            FYBSDKOptions *options = [FYBSDKOptions optionsWithAppId:nsstr(appkey.c_str()) userId:nsstr(uId.c_str()) securityToken:nsstr(token.c_str())];
+            [FyberSDK startWithOptions:options];
             break;
-            
+        }
+
         case AdSupersonic:
             //uId: 1 to 64 characters
             [Supersonic sharedInstance];
@@ -314,13 +314,29 @@ void AdHelper::initAd(AdType type, const std::string &uId, const std::string &ap
 void AdHelper::callOfferwall(AdHelper::AdType type)
 {
     switch (type) {
-        case AdFyber:
-            [SponsorPaySDK showOfferWallWithParentViewController:(UIViewController*)[AppController getRootView] completion: ^(int status) {
-                if (SPONSORPAY_ERR_NETWORK == status) {
-                    CCLOG("call offerwall failed.[%s, %s]", "Fyber", "SPONSORPAY_ERR_NETWORK");
-                }
-            }];
+        case AdFyber: {
+            // Create an instance of the FYBOfferWallViewController
+            FYBOfferWallViewController *offerWallViewController = [[FYBOfferWallViewController alloc] init];
+            
+            // Show a close button while the Offer Wall is loading
+            offerWallViewController.showCloseButtonOnLoad = YES;
+            
+            // Dismiss the Offer Wall when the user leaves your application
+            offerWallViewController.shouldDismissOnRedirect = YES;
+            
+            // Show the Offer Wall
+            [offerWallViewController presentFromViewController:(UIViewController*)[AppController getRootView] animated:YES completion:^{
+                
+                // Code executed when the Offer Wall is presented
+                NSLog(@"Offer was presented");
+                
+            } dismiss:^(NSError *error){
+                
+                // Code executed when the Offer Wall is dismissed
+                NSLog(@"Offer is dismissed: %@", error);
+            }];   
             break;
+        }
             
         case AdSupersonic:
             [[Supersonic sharedInstance] showOW];

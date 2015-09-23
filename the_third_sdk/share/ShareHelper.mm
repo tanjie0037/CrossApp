@@ -14,10 +14,13 @@
 #import <ShareSDK/ShareSDK.h>
 #import <AGCommon/CMRegexKitLite.h>
 #import <FacebookConnection/ISSFacebookApp.h>
-//#import "WXApi.h"
-//#import "WeiboApi.h"
-//#import <TencentOpenAPI/QQApiInterface.h>
-//#import <TencentOpenAPI/TencentOAuth.h>
+
+#ifdef __IN_CHINA__
+#import "WXApi.h"
+#import "WeiboApi.h"
+#import <TencentOpenAPI/QQApiInterface.h>
+#import <TencentOpenAPI/TencentOAuth.h>
+#endif
 
 #include "SDKCommon.h"
 
@@ -346,15 +349,17 @@ void ShareHelper::initIOS()
     //开启Facebook网页授权开关(optional). todo: fb审核需要关闭
     id<ISSFacebookApp> facebookApp =(id<ISSFacebookApp>)[ShareSDK getClientWithType:ShareTypeFacebook];
     [facebookApp setIsAllowWebAuthorize:YES];
+
+#ifdef __IN_CHINA__
+    //导入微信类型
+    [ShareSDK importWeChatClass:[WXApi class]];
     
-//    //导入微信类型
-//    [ShareSDK importWeChatClass:[WXApi class]];
-//    
-//    //导入腾讯微博类型
-//    [ShareSDK importTencentWeiboClass:[WeiboApi class]];
-//    
-//    //导入QQ类型
-//    [ShareSDK importQQClass:[QQApiInterface class] tencentOAuthCls:[TencentOAuth class]];
+    //导入腾讯微博类型
+    [ShareSDK importTencentWeiboClass:[WeiboApi class]];
+    
+    //导入QQ类型
+    [ShareSDK importQQClass:[QQApiInterface class] tencentOAuthCls:[TencentOAuth class]];
+#endif
 }
 
 #endif

@@ -58,9 +58,10 @@ typedef enum {
 
 @property (nonatomic, strong) id<NativeXSDKDelegate> delegate;
 @property (nonatomic, strong) UIViewController *presenterViewController;
-@property (nonatomic, assign) BOOL shouldOutputDebugLog;
 
 #pragma mark - Monetization API
+
+- (void) setShouldOutputDebugLog:(BOOL)enable;
 
 /** 
  * Provides access to the NativeXSDK shared object.
@@ -119,6 +120,12 @@ typedef enum {
  */
 - (void)redeemRewards;
 
+/**
+ * Stateless only!!  Call to fetch and return reward balances for user
+ * @param rewardDelegate (required)
+ *        the NativeXRewardDelegate that should be called when rewards are given
+ */
+- (void)redeemStatelessRewards:(id<NativeXRewardDelegate>)rewardDelegate;
 
 #pragma mark - NativeX Ad Methods
 
@@ -139,6 +146,26 @@ typedef enum {
  *          A string that describes the interaction point of an ad within your game
  */
 - (BOOL)isAdReadyWithCustomPlacement:(NSString*)customPlacement;
+
+/**
+ * Checks to see if there is a Stateless ad of this placement ready to show.
+ *
+ * @param   placement (required)
+ *          A pre-defined set of game interaction points
+ * @param   aDelegate (required)
+ *          Delegate
+ */
+- (BOOL) isStatelessAdReadyWithPlacement:(NativeXAdPlacement)placement delegate:(id<NativeXAdViewDelegate>)aDelegate;
+
+/**
+ * Checks to see if there is a Stateless ad of this placement ready to show.
+ *
+ * @param   customPlacement (required)
+ *          A string that describes the interaction point of an ad within your game
+ * @param   aDelegate (required)
+ *          Delegate
+ */
+- (BOOL) isStatelessAdReadyWithCustomPlacement:(NSString*)customPlacement delegate:(id<NativeXAdViewDelegate>)aDelegate;
 
 /**
  * Show a multi-format ad with a NativeX placement from key window,
@@ -377,6 +404,8 @@ typedef enum {
  *  @return NSString representation of NativeX placement
  */
 - (NSString *)convertAdPlacementToString:(NativeXAdPlacement)placement;
+
+- (void)resetSession;
 
 #pragma mark - In App Purchase Tracking (IAPT) methods
 /**
