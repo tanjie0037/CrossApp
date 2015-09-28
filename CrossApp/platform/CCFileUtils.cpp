@@ -450,6 +450,7 @@ void CCFileUtils::purgeFileUtils()
 
 CCFileUtils::CCFileUtils()
 : m_pFilenameLookupDict(NULL)
+, _indexBuild(0)
 {
 }
 
@@ -943,6 +944,7 @@ void CCFileUtils::loadIndex() {
         }
         
         _indexVersion = v[0];
+        _indexBuild = atol(v[1].c_str());
         _indexMap.clear();
         _fileSizeMap.clear();
         
@@ -979,6 +981,21 @@ string CCFileUtils::getIndexVersion() {
 #endif
     
     return _indexVersion;
+}
+
+unsigned int CCFileUtils::getIndexBuild() {
+#if defined(__FILE_INDEX)
+    if (_indexBuild == 0) {
+        loadIndex();
+    }
+    
+    if (_indexBuild == 0) {
+        CCLOG("__index error!");
+        assert(0);
+    }
+#endif
+    
+    return _indexBuild;
 }
 
 std::map<std::string, std::string> & CCFileUtils::getIndexMap() {
