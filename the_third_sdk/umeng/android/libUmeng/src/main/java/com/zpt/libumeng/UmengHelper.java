@@ -46,7 +46,7 @@ public class UmengHelper {
 		new Thread(new Runnable() {
 			public void run() {
 				try {
-					Thread.sleep(1000);
+					Thread.sleep(3000);
 					Cocos2dxHelper.postNotification(Cocos2dxHelper.kOnlineParamUpdated);
 				} catch (InterruptedException e) {
 					// TODO Auto-generated catch block

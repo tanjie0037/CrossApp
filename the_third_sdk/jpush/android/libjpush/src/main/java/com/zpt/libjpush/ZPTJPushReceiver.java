@@ -7,8 +7,10 @@ import org.json.JSONObject;
 import com.zpt.utils.ZPTLog;
 
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import cn.jpush.android.api.JPushInterface;
 
@@ -29,6 +31,8 @@ public class ZPTJPushReceiver extends BroadcastReceiver {
 	public void onReceive(Context context, Intent intent) {
 		Bundle bundle = intent.getExtras();
 		String bundleStr = toNativeMessage(context, bundle);
+
+		ZPTLog.d("bundle:" + bundle.toString());
 
 		ZPTLog.v("[MyReceiver] onReceive - " + intent.getAction() + ", info: " + bundleStr);
 
@@ -56,17 +60,31 @@ public class ZPTJPushReceiver extends BroadcastReceiver {
 		} else if (JPushInterface.ACTION_NOTIFICATION_OPENED.equals(intent.getAction())) {
 			ZPTLog.v("[MyReceiver] 用户点击打开了通知");
 
-			// 打开自定义的Activity
-			if (_cls == null) {
-				assert(false);
-				return;
-			}
+			try {
+				JSONObject obj = new JSONObject(bundleStr);
+				// 打开url的直接跳转
+				if (obj != null &&
+						obj.getString("msg_type") != null && obj.getString("msg_type").equals("message") &&
+						obj.getString("url") != null && !obj.getString("url").equals("")) {
 
-			Intent i = new Intent(context, _cls);
-			i.putExtras(bundle);
-//			i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-			i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
-			context.startActivity(i);
+					Intent intentUrl = new Intent(Intent.ACTION_VIEW, Uri.parse(obj.getString("url")));
+					intentUrl = Intent.createChooser(intentUrl, "Open With");
+					intentUrl.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+					context.startActivity(intentUrl);
+
+				} else {
+					ComponentName componetName = new ComponentName(
+							"com.zpt.appgift",
+							"com.zpt.appgift.AppGift");
+					Intent startIntent= new Intent();
+					startIntent.putExtra("JPushMsg", bundleStr);
+					startIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+					startIntent.setComponent(componetName);
+					context.startActivity(startIntent);
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 
 		} else if (JPushInterface.ACTION_RICHPUSH_CALLBACK.equals(intent.getAction())) {
 			ZPTLog.v("[MyReceiver] 用户收到到RICH PUSH CALLBACK: " + bundle.getString(JPushInterface.EXTRA_EXTRA));
@@ -85,36 +103,34 @@ public class ZPTJPushReceiver extends BroadcastReceiver {
 	// send msg to MainActivity
 	private String toNativeMessage(Context context, Bundle bundle) {
 		String infoStr = "";
-		
-		if (_cls != null) {
-			String extras = bundle.getString(JPushInterface.EXTRA_EXTRA);
-			JSONObject extraJson;
 
-			try {
-				if (extras == null) {
-					extraJson = new JSONObject();
-				} else {
-					extraJson = new JSONObject(extras);					
-				}
+		String extras = bundle.getString(JPushInterface.EXTRA_EXTRA);
+		JSONObject extraJson;
 
-				for (String key : bundle.keySet()) {
-				    if (key.equals(JPushInterface.EXTRA_EXTRA)) {
-				    	continue;
-				    } else if (key.equals(JPushInterface.EXTRA_NOTIFICATION_ID)) {
-				    	extraJson.put(key, bundle.getInt(key));
-					} else if (key.equals(JPushInterface.EXTRA_CONNECTION_CHANGE)) {
-						extraJson.put(key, bundle.getBoolean(key));
-					} else {
-						extraJson.put(key, bundle.getString(key));
-					}
-				}
-				
-				infoStr = extraJson.toString();
-				
-			} catch (JSONException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+		try {
+			if (extras == null || extras.equals("")) {
+				extraJson = new JSONObject();
+			} else {
+				extraJson = new JSONObject(extras);
 			}
+
+			for (String key : bundle.keySet()) {
+				if (key.equals(JPushInterface.EXTRA_EXTRA)) {
+					continue;
+				} else if (key.equals(JPushInterface.EXTRA_NOTIFICATION_ID)) {
+					extraJson.put(key, bundle.getInt(key));
+				} else if (key.equals(JPushInterface.EXTRA_CONNECTION_CHANGE)) {
+					extraJson.put(key, bundle.getBoolean(key));
+				} else {
+					extraJson.put(key, bundle.getString(key));
+				}
+			}
+
+			infoStr = extraJson.toString();
+
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 		
 		return infoStr;
