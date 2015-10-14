@@ -10,6 +10,7 @@
 #define AppGift_AdHelper_h
 
 #include "CrossApp.h"
+#include "CrossAppExt.h"
 
 class AdHelper {
 public:
@@ -39,9 +40,11 @@ public:
     
     static std::string K_NATIVEX_PLACEMENT_OFFER;
     static std::string K_NATIVEX_PLACEMENT_VIDEO;
+    static CSJson::Value _configCache;
     
 public:
     static void initAd(AdType type, const std::string &uId, const std::string &appkey, const std::string &token);
+    static void initAdOnce(const CSJson::Value &params);
     static void callOfferwall(AdType type);
     static void playVideo(AdType type);
 };

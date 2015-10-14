@@ -169,7 +169,7 @@ void ZPTNativeHelper::getPrivateInfo(CSJsonDictionary& dic)
 void ZPTNativeHelper::closeApp()
 {
     JniMethodInfo mi;
-    if (!JniHelper::getStaticMethodInfo(mi, "org/CrossApp/lib/Cocos2dxHelper", "terminateProcess", "()V")) {
+    if (!JniHelper::getStaticMethodInfo(mi, ZPTNativeHelperPath, "closeApp", "()V")) {
         assert(0);
         return;
     }

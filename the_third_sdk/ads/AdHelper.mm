@@ -271,6 +271,8 @@ string _uId;
 string _appkey;
 string _token;
 
+void AdHelper::initAdOnce(const CSJson::Value &params) {}
+
 void AdHelper::initAd(AdType type, const std::string &uId, const std::string &appkey, const std::string &token)
 {
     switch (type) {

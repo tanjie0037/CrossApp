@@ -2,11 +2,15 @@ package com.zpt.utils;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 
 import org.CrossApp.lib.Cocos2dxActivity;
+import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.app.ActivityManager;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
@@ -16,6 +20,7 @@ import android.net.Uri;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
+import android.os.Bundle;
 import android.os.SystemClock;
 import android.provider.Settings;
 import android.telephony.TelephonyManager;
@@ -233,5 +238,56 @@ public class ZPTNativeHelper {
 			}
 		}.execute();
 
+	}
+
+	public static void callGoldMine(final String packageName, final String activityName, final String intentName, final String params) {
+		final Cocos2dxActivity ctx = Cocos2dxActivity.getContext();
+
+		ctx.runOnUiThread(new Runnable() {
+			@Override
+			public void run() {
+				ComponentName componetName = new ComponentName(
+						//这个是另外一个应用程序的包名
+						packageName,
+						//这个参数是要启动的Activity
+						activityName);
+				Intent intent = new Intent(intentName);
+				Bundle bundle = new Bundle();
+				bundle.putString("data", params);
+				intent.putExtras(bundle);
+				intent.setComponent(componetName);
+				ctx.startActivity(intent);
+			}
+		});
+	}
+
+	public static void closeApp() {
+		//todo: init  by native
+		String goldminePkg = "com.zero.diaobaole";
+		String activityName = "com.zero.diaobaole.MainActivity";
+		String intentName = "com.diao.diaobaole.OFFERWALL";
+
+		JSONObject data = new JSONObject();
+		try {
+			data.put("function", "exit");
+			callGoldMine(goldminePkg, activityName, intentName, data.toString());
+
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+
+		new AsyncTask() {
+			@Override
+			protected Object doInBackground(Object[] params) {
+				try {
+					Thread.sleep(100);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+
+				android.os.Process.killProcess(android.os.Process.myPid());
+				return null;
+			}
+		}.execute();
 	}
 }
