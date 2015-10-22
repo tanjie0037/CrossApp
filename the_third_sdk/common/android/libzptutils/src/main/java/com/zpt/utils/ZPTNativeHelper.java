@@ -29,6 +29,7 @@ import android.os.Environment;
 import android.os.SystemClock;
 import android.provider.Settings;
 import android.telephony.TelephonyManager;
+import android.widget.Toast;
 
 import com.google.android.gms.ads.identifier.AdvertisingIdClient;
 import com.google.android.gms.auth.GooglePlayServicesAvailabilityException;
@@ -363,6 +364,7 @@ public class ZPTNativeHelper {
 
 		} catch (IOException e) {
 			e.printStackTrace();
+			Toast.makeText(context, "storage isn't reachable, please close other apps using it.", Toast.LENGTH_SHORT).show();
 		}
 
 		return copyIsFinish;
