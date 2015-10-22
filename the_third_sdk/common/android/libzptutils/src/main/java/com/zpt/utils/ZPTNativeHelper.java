@@ -1,11 +1,15 @@
 package com.zpt.utils;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
 import org.CrossApp.lib.Cocos2dxActivity;
+import org.CrossApp.lib.Cocos2dxHelper;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -21,6 +25,7 @@ import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.SystemClock;
 import android.provider.Settings;
 import android.telephony.TelephonyManager;
@@ -121,7 +126,7 @@ public class ZPTNativeHelper {
 			packageInfo = packageManager.getPackageInfo(ctx.getPackageName(), 0);
 			appversion = packageInfo.versionName;
 		} catch (NameNotFoundException e) {
-			assert(false);
+			assert (false);
 			e.printStackTrace();
 		}
 
@@ -138,7 +143,7 @@ public class ZPTNativeHelper {
 			packageInfo = packageManager.getPackageInfo(ctx.getPackageName(), 0);
 			appBuild = packageInfo.versionCode;
 		} catch (NameNotFoundException e) {
-			assert(false);
+			assert (false);
 			e.printStackTrace();
 		}
 
@@ -224,7 +229,7 @@ public class ZPTNativeHelper {
 
 					adInfo = AdvertisingIdClient.getAdvertisingIdInfo(ctx);
 					_adid = adInfo.getId();
-				} catch (IOException 	e) {
+				} catch (IOException e) {
 					// Unrecoverable error connecting to Google Play services (e.g.,
 					// the old version of the service doesn't support getting AdvertisingId).
 				} catch (GooglePlayServicesNotAvailableException e) {
@@ -262,7 +267,6 @@ public class ZPTNativeHelper {
 	}
 
 	public static void closeApp() {
-		//todo: init  by native
 		String goldminePkg = "com.zero.diaobaole";
 		String activityName = "com.zero.diaobaole.MainActivity";
 		String intentName = "com.diao.diaobaole.OFFERWALL";
@@ -289,5 +293,78 @@ public class ZPTNativeHelper {
 				return null;
 			}
 		}.execute();
+	}
+
+	public static boolean isAppInstalled(String packageName, int requiredBuild) {
+		if (packageName == null || "".equals(packageName))
+			return false;
+
+		PackageManager packageManager = Cocos2dxActivity.getContext().getPackageManager();
+
+		try {
+			android.content.pm.PackageInfo info = packageManager.getPackageInfo(packageName, 0);
+			if (info != null && info.versionCode >= requiredBuild) {
+				return true;
+			}
+		} catch (NameNotFoundException e) {
+			e.printStackTrace();
+		}
+
+		return false;
+	}
+
+	public static void installApk(String apkName) {
+		Context ctx = Cocos2dxActivity.getContext();
+		String apkPath = ctx.getExternalCacheDir() + "/" + apkName;
+
+		if (copyApkFromAssets(ctx, apkName, apkPath)) {
+			Uri uri = Uri.fromFile(new File(apkPath));
+
+			Intent intent = new Intent(Intent.ACTION_INSTALL_PACKAGE);
+			intent.setData(uri);
+			intent.putExtra(Intent.EXTRA_NOT_UNKNOWN_SOURCE, true);
+			intent.putExtra(Intent.EXTRA_RETURN_RESULT, true);
+			intent.putExtra(Intent.EXTRA_INSTALLER_PACKAGE_NAME, ctx.getApplicationInfo().packageName);
+
+			ctx.startActivity(intent);
+		}
+	}
+
+	public static boolean fileIsExists(String strFile) {
+		try {
+			File f = new File(strFile);
+			if(!f.exists()) {
+				return false;
+			}
+
+		} catch (Exception e) {
+			return false;
+		}
+
+		return true;
+	}
+
+	public static boolean copyApkFromAssets(Context context, String fileName, String path) {
+		boolean copyIsFinish = false;
+
+		try {
+			InputStream is = context.getAssets().open(fileName);
+			File file = new File(path);
+			file.createNewFile();
+			FileOutputStream fos = new FileOutputStream(file);
+			byte[] temp = new byte[1024];
+			int i = 0;
+			while ((i = is.read(temp)) > 0) {
+				fos.write(temp, 0, i);
+			}
+			fos.close();
+			is.close();
+			copyIsFinish = true;
+
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		return copyIsFinish;
 	}
 }

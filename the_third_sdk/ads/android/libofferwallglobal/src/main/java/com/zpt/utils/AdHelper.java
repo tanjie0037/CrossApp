@@ -352,6 +352,7 @@ public class AdHelper {
 
 							@Override
 							public void onConnectSuccess() {
+								ZPTLog.d("tapjoy onConnectSuccess");
 
 								_TJPlacementOfferwall = new TJPlacement(_activity, K_TAPJOY_PLACEMENT_OFFER, _myTJPlacementListener);
 								_TJPlacementOfferwall.requestContent();
@@ -362,7 +363,7 @@ public class AdHelper {
 
 							@Override
 							public void onConnectFailure() {
-
+								ZPTLog.d("tapjoy onConnectFailure");
 							}
 						});
 						break;

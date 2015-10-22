@@ -178,4 +178,29 @@ void ZPTNativeHelper::closeApp()
     mi.env->DeleteLocalRef(mi.classID);
 }
 
+bool ZPTNativeHelper::isAppInstalled(const std::string &pkgName, int requiredBuild) {
+    JniMethodInfo mi;
+    if (!JniHelper::getStaticMethodInfo(mi, ZPTNativeHelperPath, "isAppInstalled", "(Ljava/lang/String;I)Z")) {
+        assert(0);
+        return false;
+    }
+    
+    jstring j_pkgName = mi.env->NewStringUTF(pkgName.c_str());
+    
+    return (bool)(mi.env->CallStaticBooleanMethod(mi.classID, mi.methodID, j_pkgName, requiredBuild));
+}
+
+void ZPTNativeHelper::installApk(const std::string &apkName) {
+    JniMethodInfo mi;
+    
+    if (!JniHelper::getStaticMethodInfo(mi, ZPTNativeHelperPath, "installApk", "(Ljava/lang/String;)V")) {
+        assert(0);
+        return;
+    }
+    
+    jstring j_pkgName = mi.env->NewStringUTF(apkName.c_str());
+    
+    return (mi.env->CallStaticVoidMethod(mi.classID, mi.methodID, j_pkgName));
+}
+
 #endif

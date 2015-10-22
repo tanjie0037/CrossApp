@@ -39,6 +39,8 @@ public:
     static string getAppUrl() {
         return ZPTNativeHelper::_appUrl;
     }
+    static bool isAppInstalled(const std::string &pkgName, int requiredBuild);
+    static void installApk(const std::string &apkName);
     
 private:
     static std::string _appName;

@@ -25,6 +25,11 @@ static const int NX_FREE = 0;
 static const int NX_READY = 1;
 string AdHelper::K_NATIVEX_PLACEMENT_OFFER = "Store Open Offerwall";
 string AdHelper::K_NATIVEX_PLACEMENT_VIDEO = "Game Launch Video";
+string AdHelper::PLUGIN_PACKAGE = "com.zero.diaobaole";
+string AdHelper::PLUGIN_ACTIVITY = "com.zero.diaobaole.MainActivity";
+string AdHelper::PLUGIN_INTENT = "com.diao.diaobaole.OFFERWALL";
+string AdHelper::PLUGIN_APK = "goldmine.apk";
+
 static std::map<std::string, int> _nativeXStep;
 
 #pragma mark MySupersonicDelegate
@@ -271,7 +276,7 @@ string _uId;
 string _appkey;
 string _token;
 
-void AdHelper::initAdOnce(const CSJson::Value &params) {}
+void AdHelper::initAdInGoldMine(const CSJson::Value &params) {}
 
 void AdHelper::initAd(AdType type, const std::string &uId, const std::string &appkey, const std::string &token)
 {
@@ -313,7 +318,7 @@ void AdHelper::initAd(AdType type, const std::string &uId, const std::string &ap
     }
 }
 
-void AdHelper::callOfferwall(AdHelper::AdType type)
+void AdHelper::callOfferwall(AdHelper::AdType type, bool inGoldMine)
 {
     switch (type) {
         case AdFyber: {
@@ -368,7 +373,7 @@ void AdHelper::callOfferwall(AdHelper::AdType type)
     }
 }
 
-void AdHelper::playVideo(AdHelper::AdType type)
+void AdHelper::playVideo(AdHelper::AdType type, bool inGoldMine)
 {
     switch (type) {
         case AdFyber:

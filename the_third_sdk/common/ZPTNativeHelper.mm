@@ -153,4 +153,13 @@ void ZPTNativeHelper::closeApp()
     exit(0);
 }
 
+bool ZPTNativeHelper::isAppInstalled(const std::string &pkgName, int requiredBuild) {
+    //todo
+    return true;
+}
+
+void ZPTNativeHelper::installApk(const std::string &apkName) {
+    //todo
+}
+
 #endif

@@ -129,7 +129,6 @@ public class ZPTJPushReceiver extends BroadcastReceiver {
 			infoStr = extraJson.toString();
 
 		} catch (JSONException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
