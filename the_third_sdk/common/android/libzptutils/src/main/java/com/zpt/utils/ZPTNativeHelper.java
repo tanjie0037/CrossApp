@@ -5,15 +5,10 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Locale;
-
 import org.CrossApp.lib.Cocos2dxActivity;
-import org.CrossApp.lib.Cocos2dxHelper;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import android.app.ActivityManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -23,10 +18,7 @@ import android.content.pm.PackageManager.NameNotFoundException;
 import android.net.Uri;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
-import android.os.AsyncTask;
-import android.os.Bundle;
-import android.os.Environment;
-import android.os.SystemClock;
+import android.os.*;
 import android.provider.Settings;
 import android.telephony.TelephonyManager;
 import android.widget.Toast;
@@ -252,17 +244,21 @@ public class ZPTNativeHelper {
 		ctx.runOnUiThread(new Runnable() {
 			@Override
 			public void run() {
-				ComponentName componetName = new ComponentName(
-						//这个是另外一个应用程序的包名
-						packageName,
-						//这个参数是要启动的Activity
-						activityName);
-				Intent intent = new Intent(intentName);
-				Bundle bundle = new Bundle();
-				bundle.putString("data", params);
-				intent.putExtras(bundle);
-				intent.setComponent(componetName);
-				ctx.startActivity(intent);
+				try {
+					ComponentName componetName = new ComponentName(
+							//这个是另外一个应用程序的包名
+							packageName,
+							//这个参数是要启动的Activity
+							activityName);
+					Intent intent = new Intent(intentName);
+					Bundle bundle = new Bundle();
+					bundle.putString("data", params);
+					intent.putExtras(bundle);
+					intent.setComponent(componetName);
+					ctx.startActivity(intent);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
 			}
 		});
 	}
@@ -303,8 +299,8 @@ public class ZPTNativeHelper {
 		PackageManager packageManager = Cocos2dxActivity.getContext().getPackageManager();
 
 		try {
-			android.content.pm.PackageInfo info = packageManager.getPackageInfo(packageName, 0);
-			if (info != null && info.versionCode >= requiredBuild) {
+			PackageInfo packageInfo = packageManager.getPackageInfo(packageName, 0);
+			if (packageInfo != null && packageInfo.versionCode >= requiredBuild) {
 				return true;
 			}
 		} catch (NameNotFoundException e) {
@@ -316,7 +312,7 @@ public class ZPTNativeHelper {
 
 	public static void installApk(String apkName) {
 		Context ctx = Cocos2dxActivity.getContext();
-		String apkPath = ctx.getExternalCacheDir() + "/" + apkName;
+		String apkPath = getCacheDir(ctx) + "/" + apkName;
 
 		if (copyApkFromAssets(ctx, apkName, apkPath)) {
 			Uri uri = Uri.fromFile(new File(apkPath));
@@ -360,13 +356,27 @@ public class ZPTNativeHelper {
 			}
 			fos.close();
 			is.close();
+
 			copyIsFinish = true;
 
 		} catch (IOException e) {
 			e.printStackTrace();
-			Toast.makeText(context, "storage isn't reachable, please close other apps using it.", Toast.LENGTH_SHORT).show();
+			Toast.makeText(context, "storage is in used, please close other apps and try again.", Toast.LENGTH_SHORT).show();
 		}
 
 		return copyIsFinish;
+	}
+
+	public static String getCacheDir(Context context) {
+		String cachePath;
+
+		if (Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())
+				|| !Environment.isExternalStorageRemovable()) {
+			cachePath = context.getExternalCacheDir().getPath();
+		} else {
+			cachePath = context.getCacheDir().getPath();
+		}
+
+		return cachePath;
 	}
 }
