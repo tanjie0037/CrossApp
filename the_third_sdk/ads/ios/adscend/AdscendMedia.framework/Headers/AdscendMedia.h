@@ -15,3 +15,4 @@ FOUNDATION_EXPORT double AdscendMediaVersionNumber;
 FOUNDATION_EXPORT const unsigned char AdscendMediaVersionString[];
 
 #import <AdscendMedia/ADOffersViewController.h>
+#import <AdscendMedia/ADRewardedVideoViewController.h>
