@@ -28,7 +28,7 @@ public:
     static int getAppBuild();
     static string getStatusKey();
     static string getLanguage();
-    static string getCountyCode();
+    static string getCountryCode();
     static void closeApp();
     static void init(const std::string &appName) {
         ZPTNativeHelper::_appName = appName;

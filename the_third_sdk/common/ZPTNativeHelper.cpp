@@ -135,10 +135,10 @@ string ZPTNativeHelper::getLanguage()
     return language;
 }
 
-string ZPTNativeHelper::getCountyCode()
+string ZPTNativeHelper::getCountryCode()
 {
     JniMethodInfo mi;
-    if (!JniHelper::getStaticMethodInfo(mi, ZPTNativeHelperPath, "getCountyCode", "()Ljava/lang/String;")) {
+    if (!JniHelper::getStaticMethodInfo(mi, ZPTNativeHelperPath, "getCountryCode", "()Ljava/lang/String;")) {
         assert(0);
         return "";
     }

@@ -137,7 +137,7 @@ string ZPTNativeHelper::getLanguage()
     return ret;
 }
 
-string ZPTNativeHelper::getCountyCode()
+string ZPTNativeHelper::getCountryCode()
 {
     NSString *country = [[NSLocale currentLocale] localeIdentifier];
     return string(utf8cstr(country));

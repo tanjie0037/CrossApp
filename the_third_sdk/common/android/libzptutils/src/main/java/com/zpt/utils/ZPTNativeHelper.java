@@ -159,7 +159,7 @@ public class ZPTNativeHelper {
 		return language;
 	}
 
-	public static String getCountyCode() {
+	public static String getCountryCode() {
 		return Locale.getDefault().toString();
 	}
 
