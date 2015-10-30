@@ -891,6 +891,7 @@ void SplitString(const std::string& s, std::vector<std::string>& v, const std::s
 
 //add by jie.tan
 void CCFileUtils::cleanIndex() {
+    _indexBuild = 0;
     _indexVersion = "";
     _indexMap.clear();
 }
