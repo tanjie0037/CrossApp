@@ -7,30 +7,25 @@ import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 
 public class NotificationHelper extends BroadcastReceiver {
-	public final static String __NOTIFICATION_ACTION = "com.zpt.utils.localnotification";
-	private static Class<?> _cls = null;
-
-	public static void init(Class<?> cls) {
-		_cls = cls;
-	}
-
 	static Activity mContext = null;
 	static int mIconID = 0;
 	static NotificationManager mNotificationManager = null;
 	static String mAlarmAction = null;
 	static boolean mInit = false;
 
-	public static void init(Activity context) {
+	public static void init(Activity context, String action, int icon) {
 		mContext = context;
-		mNotificationManager = (NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
-		setIconID(RR.drawable("icon"));
-		setAlarmAction(__NOTIFICATION_ACTION);
+		setIconID(icon);
+		setAlarmAction(action);
 
+		mNotificationManager = (NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
 		mInit = true;
 	}
 
@@ -49,6 +44,7 @@ public class NotificationHelper extends BroadcastReceiver {
 	public static void cancelLocalNotification(int requestCode) {
 		if (!mInit) {
 			ZPTLog.e("should init first.");
+			assert(false);
 			return;
 		}
 
@@ -93,7 +89,6 @@ public class NotificationHelper extends BroadcastReceiver {
 		} else {
 			alarmManager.set(AlarmManager.RTC_WAKEUP, alertTime, alarmPending);
 		}
-
 	}
 
 	// ///////////// BroadcastReceiver functions
@@ -115,9 +110,10 @@ public class NotificationHelper extends BroadcastReceiver {
 		String alertBody = bundle.getString("alertBody");
 		int requestCode = bundle.getInt("requestCode");
 
-		Intent notifyIntent;
-		notifyIntent = new Intent(context, _cls);
-		notifyIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+		PackageManager pm = context.getPackageManager();
+		String pkgName = context.getPackageName();
+		Intent notifyIntent= pm.getLaunchIntentForPackage(pkgName);
+		notifyIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
 
 		// 创建notification
 		// 点击通知后的动作，启动游戏
@@ -131,12 +127,12 @@ public class NotificationHelper extends BroadcastReceiver {
 					.setContentText(alertBody).setContentIntent(pt).setTicker(alertBody).build();
 		} catch (NoClassDefFoundError e) {
 			e.printStackTrace();
-			// 缓解某些崩溃先用老api
+			// 老api
 			notification = new Notification(icon, alertBody, System.currentTimeMillis());
 			notification.setLatestEventInfo(context, alertTitle, alertBody, pt);
 		} catch (NoSuchMethodError e) {
 			e.printStackTrace();
-			// 缓解某些崩溃先用老api
+			// 老api
 			notification = new Notification(icon, alertBody, System.currentTimeMillis());
 			notification.setLatestEventInfo(context, alertTitle, alertBody, pt);
 		} catch (Exception e) {

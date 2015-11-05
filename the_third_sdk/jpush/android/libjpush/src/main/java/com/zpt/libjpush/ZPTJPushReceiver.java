@@ -10,13 +10,14 @@ import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import cn.jpush.android.api.JPushInterface;
 
 /**
  * 自定义接收器
- * 
+ *
  * 如果不定义这个 Receiver，则： 1) 默认用户会打开主界面 2) 接收不到自定义消息
  */
 public class ZPTJPushReceiver extends BroadcastReceiver {
@@ -63,9 +64,9 @@ public class ZPTJPushReceiver extends BroadcastReceiver {
 			try {
 				JSONObject obj = new JSONObject(bundleStr);
 				// 打开url的直接跳转
-				if (obj != null &&
-						obj.getString("msg_type") != null && obj.getString("msg_type").equals("message") &&
-						obj.getString("url") != null && !obj.getString("url").equals("")) {
+				if (obj != null
+						&& obj.has("msg_type") && obj.getString("msg_type").equals("message")
+						&& obj.has("url") && !obj.getString("url").equals("")) {
 
 					Intent intentUrl = new Intent(Intent.ACTION_VIEW, Uri.parse(obj.getString("url")));
 					intentUrl = Intent.createChooser(intentUrl, "Open With");
@@ -73,13 +74,11 @@ public class ZPTJPushReceiver extends BroadcastReceiver {
 					context.startActivity(intentUrl);
 
 				} else {
-					ComponentName componetName = new ComponentName(
-							"com.zpt.appgift",
-							"com.zpt.appgift.AppGift");
-					Intent startIntent= new Intent();
+					PackageManager pm = context.getPackageManager();
+					String pkgName = context.getPackageName();
+					Intent startIntent= pm.getLaunchIntentForPackage(pkgName);
 					startIntent.putExtra("JPushMsg", bundleStr);
 					startIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
-					startIntent.setComponent(componetName);
 					context.startActivity(startIntent);
 				}
 			} catch (Exception e) {
@@ -131,7 +130,7 @@ public class ZPTJPushReceiver extends BroadcastReceiver {
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}
-		
+
 		return infoStr;
 	}
 }

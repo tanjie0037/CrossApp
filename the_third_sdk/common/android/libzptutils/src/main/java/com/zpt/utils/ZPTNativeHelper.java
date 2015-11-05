@@ -264,6 +264,7 @@ public class ZPTNativeHelper {
 	}
 
 	public static void closeApp() {
+		//// TODO: init these
 		String goldminePkg = "com.zero.diaobaole";
 		String activityName = "com.zero.diaobaole.MainActivity";
 		String intentName = "com.diao.diaobaole.OFFERWALL";
