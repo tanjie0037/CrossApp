@@ -25,6 +25,4 @@
 @property (nonatomic, strong)   NSString *  privateKey;
 @property (nonatomic)           BOOL        debugMode;
 
-@property (nonatomic, strong)   NSString * platform;
-
 @end

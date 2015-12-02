@@ -63,14 +63,19 @@ public class NotificationHelper extends BroadcastReceiver {
 
 	/**
 	 * dict 为notification的一些数据 alertTitle alertBody requestCode timestamp long
-	 * repeat boolean
+	 * alertTime: second
+	 * interval: second
 	 */
-	public static void createLocalNotification(String alertTitle, String alertBody, long alertTime, int requestCode,
-			long repeatInterval) {
+	public static void createLocalNotification(String alertTitle, String alertBody, long alertTime, int requestCode, long repeatInterval) {
 		if (!mInit) {
 			ZPTLog.e("should init first.");
 			return;
 		}
+
+		ZPTLog.d("---", alertTitle + "," + alertBody + "," + alertTime + "," + requestCode + "," + repeatInterval);
+
+		alertTime = alertTime * 1000;
+		repeatInterval = repeatInterval * 1000;
 
 		Intent alarmIntent = new Intent();
 		alarmIntent.setAction(mAlarmAction);
