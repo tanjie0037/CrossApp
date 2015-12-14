@@ -11,6 +11,11 @@
 
 #include <string.h>
 #include <stdlib.h>
+#include <time.h>
+#include <sstream>
+#include <vector>
+
+using namespace std;
 
 static char *str_copy(const char *str) {
     int len = (int)strlen(str) + 1;
@@ -121,6 +126,71 @@ static string decodeURL( const string& s ) {
     return result;
 }
 
+static void split(const string &text, const string &delimit, vector<std::string> &elems) {
+    size_t start = 0;
+    string::size_type pos = text.find(delimit);
+    elems.clear();
 
+    while (string::npos != pos) {
+        elems.push_back(text.substr(start, pos - start));
+        start = pos + delimit.size();
+        pos = text.find(delimit, start);
+    }
+    
+    if (start < text.size() - 1) {
+        elems.push_back(text.substr(start, text.size() - start));
+    }
+}
+
+static void _test_split(const string &str, const string &delimit) {
+    vector<string> elems;
+    
+    split(str, delimit, elems);
+    string result = "[" + str + "]---split:";
+    
+    size_t i = 0;
+    while (i <  elems.size()) {
+        result += "," + elems[i];
+        i++;
+    }
+    
+    CCLOG("%s", result.c_str());
+}
+
+
+static void parseTime(const string &timeStr, int &day, int &hour, int &minute, int &second) {
+    vector<string> elems;
+    split(timeStr, ":", elems);
+    
+    assert(elems.size() == 4);
+    
+    day = atoi(elems[0].c_str());
+    hour = atoi(elems[1].c_str());
+    minute = atoi(elems[2].c_str());
+    second = atoi(elems[3].c_str());
+}
+
+static uint64_t getNotiConfigTime(int day, int hour, int minute, int second, bool isLocalTime) {
+    time_t now = time(0);
+    
+    CCLOG("now:%ld", now);
+    
+    now += day * 24 * 3600;
+    tm *localTimeNow = localtime(&now);
+    
+    localTimeNow->tm_hour = hour;
+    localTimeNow->tm_min = minute;
+    localTimeNow->tm_sec = second;
+    
+    if (!isLocalTime) {
+        now = mktime(localTimeNow) + localTimeNow->tm_gmtoff;
+    } else {
+        now = mktime(localTimeNow);
+    }
+    
+    CCLOG("targetTime:%s", asctime(localtime(&now)));
+    
+    return now;
+}
 
 #endif

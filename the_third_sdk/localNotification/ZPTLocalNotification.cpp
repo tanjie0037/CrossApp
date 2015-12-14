@@ -16,6 +16,13 @@ using namespace CSJson;
 const std::string ZPTLocalNotification::K_SINGLE_NOTI_COUNT = "k_single_noti_count";
 const std::string ZPTLocalNotification::K_SINGLE_NOTI = "k_single_noti";
 const std::string ZPTLocalNotification::K_REPEAT_NOTI = "k_repeat_noti";
+const IntervalType ZPTLocalNotification::IntervalTypeNone = "none";
+const IntervalType ZPTLocalNotification::IntervalTypeSecond = "second";
+const IntervalType ZPTLocalNotification::IntervalTypeMinute = "minute";
+const IntervalType ZPTLocalNotification::IntervalTypeHour = "hour";
+const IntervalType ZPTLocalNotification::IntervalTypeDay = "day";
+const IntervalType ZPTLocalNotification::IntervalTypeWeek = "week";
+
 ZPTLocalNotification *ZPTLocalNotification::_instance = NULL;
 
 ZPTLocalNotification::~ZPTLocalNotification() {
@@ -30,6 +37,8 @@ void ZPTLocalNotification::addNotification(uint32_t alertId, uint64_t alertTime,
     if (alertId == 0) {
         alertId = ++_singleNotiCount;
         interval = IntervalTypeNone;
+    } else {
+        alertId += REPEAT_ID_START;
     }
     
     Value notiConfig;
@@ -49,6 +58,8 @@ void ZPTLocalNotification::addNotification(uint32_t alertId, uint64_t alertTime,
     
     setNoti(alertId, alertTime, alertTitle, alertBody, interval);
     saveData();
+    
+    CCLOG("add noti id:%d, time:%llu, title:%s, interval:%s", alertId, alertTime, alertTitle.c_str(), interval.c_str());
 }
 
 void ZPTLocalNotification::removeNotification(uint32_t alertId) {
@@ -103,7 +114,7 @@ void ZPTLocalNotification::setAll() {
                 noti["alertTime"].asUInt64(),
                 noti["alertTitle"].asString(),
                 noti["alertBody"].asString(),
-                (IntervalType)(noti["interval"].asUInt()));
+                (IntervalType)(noti["interval"].asString()));
     }
 }
 
@@ -128,6 +139,5 @@ void ZPTLocalNotification::saveData() {
     userDefault->setIntegerForKey(K_SINGLE_NOTI_COUNT.c_str(), _singleNotiCount);
     userDefault->setStringForKey(K_SINGLE_NOTI.c_str(), _singleNoti.toStyledString());
     userDefault->setStringForKey(K_REPEAT_NOTI.c_str(), _repeatNoti.toStyledString());
-    
     userDefault->flush();
 }

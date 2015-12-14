@@ -50,10 +50,11 @@ void ZPTLocalNotification_IOS::setNoti(uint32_t alertId, uint64_t alertTime, con
         notification.applicationIconBadgeNumber = 1;
         notification.timeZone = [NSTimeZone defaultTimeZone];
         notification.userInfo = [NSDictionary dictionaryWithObject:[NSString stringWithFormat:@"%d", alertId] forKey:@"alertId"];
+        
+        NSLog(@"fireDate: %@", notification.fireDate);
+        [[UIApplication sharedApplication] scheduleLocalNotification:notification];
+        [notification release];
     }
-    
-    [[UIApplication sharedApplication] scheduleLocalNotification:notification];
-    [notification release];
 }
 
 void ZPTLocalNotification_IOS::cancelNoti(uint32_t alertId) {

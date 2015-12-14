@@ -14,14 +14,17 @@
 #include "CrossApp.h"
 #include "CrossAppExt.h"
 
-enum IntervalType {
-    IntervalTypeNone = 0,
-    IntervalTypeSecond,
-    IntervalTypeMinute,
-    IntervalTypeHour,
-    IntervalTypeDay,
-    IntervalTypeWeek
-};
+#define REPEAT_ID_START 1000000
+
+//enum IntervalType {
+//    IntervalTypeNone = 0,
+//    IntervalTypeSecond,
+//    IntervalTypeMinute,
+//    IntervalTypeHour,
+//    IntervalTypeDay,
+//    IntervalTypeWeek
+//};
+typedef std::string IntervalType;
 
 class ZPTLocalNotification {
 public:
@@ -47,10 +50,15 @@ protected:
     static const std::string K_SINGLE_NOTI_COUNT;
     static const std::string K_SINGLE_NOTI;
     static const std::string K_REPEAT_NOTI;
+    static const IntervalType IntervalTypeNone;
+    static const IntervalType IntervalTypeSecond;
+    static const IntervalType IntervalTypeMinute;
+    static const IntervalType IntervalTypeHour;
+    static const IntervalType IntervalTypeDay;
+    static const IntervalType IntervalTypeWeek;
     
     ZPTLocalNotification()
     {}
-    
     virtual void setNoti(uint32_t alertId, uint64_t alertTime, const std::string &alertTitle, const std::string &alertBody, IntervalType interval) {}
     virtual void cancelNoti(uint32_t alertId) {}
     void loadData();
