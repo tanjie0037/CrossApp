@@ -203,4 +203,8 @@ void ZPTNativeHelper::installApk(const std::string &apkName) {
     return (mi.env->CallStaticVoidMethod(mi.classID, mi.methodID, j_pkgName));
 }
 
+bool ZPTNativeHelper::isVpnConnected() {
+    return false;
+}
+
 #endif

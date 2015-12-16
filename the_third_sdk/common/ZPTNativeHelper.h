@@ -41,6 +41,7 @@ public:
     }
     static bool isAppInstalled(const std::string &pkgName, int requiredBuild);
     static void installApk(const std::string &apkName);
+    static bool isVpnConnected();
     
 private:
     static std::string _appName;

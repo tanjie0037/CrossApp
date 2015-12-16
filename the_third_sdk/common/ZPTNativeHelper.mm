@@ -162,4 +162,17 @@ void ZPTNativeHelper::installApk(const std::string &apkName) {
     //todo
 }
 
+bool ZPTNativeHelper::isVpnConnected() {
+    NSDictionary *dict = CFBridgingRelease(CFNetworkCopySystemProxySettings());
+    NSArray *keys = [dict[@"__SCOPED__"]allKeys];
+    for (NSString *key in keys) {
+        if ([key rangeOfString:@"tap"].location != NSNotFound ||
+            [key rangeOfString:@"tun"].location != NSNotFound ||
+            [key rangeOfString:@"ppp"].location != NSNotFound){
+            return true;
+        }
+    }
+    return false;
+}
+
 #endif
