@@ -608,7 +608,7 @@ std::string CCFileUtils::fullPathForFilename(const std::string& pszFileName)
     }
     
     //jie.tan: 使用__index匹配实际文件名
-#if defined(__FILE_INDEX)
+#if defined(__FILE_INDEX) && (__FILE_INDEX == 1)
     strFileName = getIndexMap()[pszFileName];
     
     if (strFileName == "") {
@@ -970,7 +970,7 @@ void CCFileUtils::loadIndex() {
 }
 
 string CCFileUtils::getIndexVersion() {
-#if defined(__FILE_INDEX)
+#if defined(__FILE_INDEX) && (__FILE_INDEX == 1)
     if (_indexVersion == "") {
         loadIndex();
     }
@@ -985,7 +985,7 @@ string CCFileUtils::getIndexVersion() {
 }
 
 unsigned int CCFileUtils::getIndexBuild() {
-#if defined(__FILE_INDEX)
+#if defined(__FILE_INDEX) && (__FILE_INDEX == 1)
     if (_indexBuild == 0) {
         loadIndex();
     }
@@ -1000,7 +1000,7 @@ unsigned int CCFileUtils::getIndexBuild() {
 }
 
 std::map<std::string, std::string> & CCFileUtils::getIndexMap() {
-#if defined(__FILE_INDEX)
+#if defined(__FILE_INDEX) && (__FILE_INDEX == 1)
     if (_indexMap.empty()) {
         loadIndex();
     }
@@ -1015,7 +1015,7 @@ std::map<std::string, std::string> & CCFileUtils::getIndexMap() {
 }
 
 unsigned long CCFileUtils::getFileSize(const std::string &file) {
-#if defined(__FILE_INDEX)
+#if defined(__FILE_INDEX) && (__FILE_INDEX == 1)
     if (_fileSizeMap.empty()) {
         loadIndex();
     }
