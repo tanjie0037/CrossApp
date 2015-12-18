@@ -12,8 +12,8 @@
 
 #import <Foundation/Foundation.h>
 #import "AppController.h"
-#import "NativeXSDK.h"
-#import "FyberSDK.h"
+//#import "NativeXSDK.h"
+//#import "FyberSDK.h"
 #import "Supersonic/Supersonic.h"
 //#import <AdscendMedia/AdscendMedia.h>
 
@@ -133,113 +133,113 @@ static std::map<std::string, int> _nativeXStep;
 @end
 
 #pragma mark MyNaviteXDeleagte
-@interface MyNaviteXDeleagte : NSObject <NativeXSDKDelegate, NativeXAdViewDelegate> {}
-@end
-
-@implementation MyNaviteXDeleagte
-/** Called when the Offer Wall is successfully initialized. */
-- (void)nativeXSDKDidCreateSession {
-    CCLOG("nativeXSDKDidCreateSession");
-    
-    [[NativeXSDK sharedInstance] fetchAdWithCustomPlacement:nsstr(AdHelper::K_NATIVEX_PLACEMENT_OFFER.c_str()) delegate:self];
-    [[NativeXSDK sharedInstance] fetchAdWithCustomPlacement:nsstr(AdHelper::K_NATIVEX_PLACEMENT_VIDEO.c_str()) delegate:self];
-}
-
-/** Called when there is an error trying to initialize the Offer Wall.
- *
- * @param   error
- *          reason why create session call failed
- */
-- (void)nativeXSDKDidFailToCreateSession: (NSError *) error
-{
-    CCLOG("nativeXSDKDidFailToCreateSession");
-    NSLog(@"error:%@", error);
-}
-
-/** Called when the currency redemption is unsuccessfull.
- *
- * @param   error
- *          reason why redeem currency call failed
- */
-- (void)nativeXSDKDidRedeemWithError:(NSError *)error
-{
-    CCLOG("nativeXSDKDidRedeemWithError");
-    NSLog(@"error:%@", error);
-}
-
-/** Called when adView is loaded and ready to be displayed
- * use this method to override when adView is displayed
- * If this delegate does not exist when caching an ad it will be shown immediately
- *
- * @param adView        the NativeX adView that has been loaded
- * @param placement     NSString representation of placement, used to distinquish which ad is loaded
- */
-- (void)nativeXAdView:(NativeXAdView *)adView didLoadWithPlacement:(NSString *)placement
-{
-    CCLOG("nativeXAdView:didLoadWithPlacement, placement:%s", utf8cstr(placement));
-    
-    NSString *kOffer = nsstr(AdHelper::K_NATIVEX_PLACEMENT_OFFER.c_str());
-    NSString *kVideo = nsstr(AdHelper::K_NATIVEX_PLACEMENT_VIDEO.c_str());
-    
-    if ([placement isEqual:kOffer]) {
-        if (_nativeXStep[AdHelper::K_NATIVEX_PLACEMENT_OFFER] == NX_READY) {
-            _nativeXStep[AdHelper::K_NATIVEX_PLACEMENT_OFFER] = NX_FREE;
-            [[NativeXSDK sharedInstance] showReadyAdWithCustomPlacement:kOffer];
-            
-        } else {
-            _nativeXStep[AdHelper::K_NATIVEX_PLACEMENT_OFFER] = NX_READY;
-        }
-        
-    } else if ([placement isEqual:kVideo]) {
-        if (_nativeXStep[AdHelper::K_NATIVEX_PLACEMENT_VIDEO] == NX_READY) {
-            _nativeXStep[AdHelper::K_NATIVEX_PLACEMENT_VIDEO] = NX_FREE;
-            [[NativeXSDK sharedInstance] showReadyAdWithCustomPlacement:kVideo];
-            
-        } else {
-            _nativeXStep[AdHelper::K_NATIVEX_PLACEMENT_VIDEO] = NX_READY;
-        }
-        
-    } else {
-        NSAssert(NO, @"unknown placement");
-    }
-}
-
-/** called if no ad is available at this time
- *
- * @param adView        the NativeX adView that has NOT been loaded
- */
-- (void)nativeXAdViewNoAdContent:(NativeXAdView *)adView
-{
-    CCLOG("nativeXAdView:nativeXAdViewNoAdContent");
-}
-
-/** Called when error loading an ad (was the SDK initialized correctly?)
- *
- * @param adView        the NativeX adView that has NOT been loaded because of an error
- * @param error         reason why ad failed to load
- */
-- (void)nativeXAdView:(NativeXAdView *)adView didFailWithError:(NSError *)error
-{
-    CCLOG("nativeXAdView:didFailWithError");
-    NSLog(@"error:%@", error);
-}
-
-/** Called when ad content has expired for specific adView
- *
- * @param adView        the NativeX adView that has expired
- */
-- (void)nativeXAdViewDidExpire:(NativeXAdView *)adView
-{
-    CCLOG("nativeXAdView::nativeXAdViewDidExpire");
-}
-
-- (void) nativeXSDKDidRedeemWithRewardInfo:(NativeXRewardInfo *)rewardInfo
-{
-    // do it server side
-}
-
-@end
-
+//@interface MyNaviteXDeleagte : NSObject <NativeXSDKDelegate, NativeXAdViewDelegate> {}
+//@end
+//
+//@implementation MyNaviteXDeleagte
+///** Called when the Offer Wall is successfully initialized. */
+//- (void)nativeXSDKDidCreateSession {
+//    CCLOG("nativeXSDKDidCreateSession");
+//    
+//    [[NativeXSDK sharedInstance] fetchAdWithCustomPlacement:nsstr(AdHelper::K_NATIVEX_PLACEMENT_OFFER.c_str()) delegate:self];
+//    [[NativeXSDK sharedInstance] fetchAdWithCustomPlacement:nsstr(AdHelper::K_NATIVEX_PLACEMENT_VIDEO.c_str()) delegate:self];
+//}
+//
+///** Called when there is an error trying to initialize the Offer Wall.
+// *
+// * @param   error
+// *          reason why create session call failed
+// */
+//- (void)nativeXSDKDidFailToCreateSession: (NSError *) error
+//{
+//    CCLOG("nativeXSDKDidFailToCreateSession");
+//    NSLog(@"error:%@", error);
+//}
+//
+///** Called when the currency redemption is unsuccessfull.
+// *
+// * @param   error
+// *          reason why redeem currency call failed
+// */
+//- (void)nativeXSDKDidRedeemWithError:(NSError *)error
+//{
+//    CCLOG("nativeXSDKDidRedeemWithError");
+//    NSLog(@"error:%@", error);
+//}
+//
+///** Called when adView is loaded and ready to be displayed
+// * use this method to override when adView is displayed
+// * If this delegate does not exist when caching an ad it will be shown immediately
+// *
+// * @param adView        the NativeX adView that has been loaded
+// * @param placement     NSString representation of placement, used to distinquish which ad is loaded
+// */
+//- (void)nativeXAdView:(NativeXAdView *)adView didLoadWithPlacement:(NSString *)placement
+//{
+//    CCLOG("nativeXAdView:didLoadWithPlacement, placement:%s", utf8cstr(placement));
+//    
+//    NSString *kOffer = nsstr(AdHelper::K_NATIVEX_PLACEMENT_OFFER.c_str());
+//    NSString *kVideo = nsstr(AdHelper::K_NATIVEX_PLACEMENT_VIDEO.c_str());
+//    
+//    if ([placement isEqual:kOffer]) {
+//        if (_nativeXStep[AdHelper::K_NATIVEX_PLACEMENT_OFFER] == NX_READY) {
+//            _nativeXStep[AdHelper::K_NATIVEX_PLACEMENT_OFFER] = NX_FREE;
+//            [[NativeXSDK sharedInstance] showReadyAdWithCustomPlacement:kOffer];
+//            
+//        } else {
+//            _nativeXStep[AdHelper::K_NATIVEX_PLACEMENT_OFFER] = NX_READY;
+//        }
+//        
+//    } else if ([placement isEqual:kVideo]) {
+//        if (_nativeXStep[AdHelper::K_NATIVEX_PLACEMENT_VIDEO] == NX_READY) {
+//            _nativeXStep[AdHelper::K_NATIVEX_PLACEMENT_VIDEO] = NX_FREE;
+//            [[NativeXSDK sharedInstance] showReadyAdWithCustomPlacement:kVideo];
+//            
+//        } else {
+//            _nativeXStep[AdHelper::K_NATIVEX_PLACEMENT_VIDEO] = NX_READY;
+//        }
+//        
+//    } else {
+//        NSAssert(NO, @"unknown placement");
+//    }
+//}
+//
+///** called if no ad is available at this time
+// *
+// * @param adView        the NativeX adView that has NOT been loaded
+// */
+//- (void)nativeXAdViewNoAdContent:(NativeXAdView *)adView
+//{
+//    CCLOG("nativeXAdView:nativeXAdViewNoAdContent");
+//}
+//
+///** Called when error loading an ad (was the SDK initialized correctly?)
+// *
+// * @param adView        the NativeX adView that has NOT been loaded because of an error
+// * @param error         reason why ad failed to load
+// */
+//- (void)nativeXAdView:(NativeXAdView *)adView didFailWithError:(NSError *)error
+//{
+//    CCLOG("nativeXAdView:didFailWithError");
+//    NSLog(@"error:%@", error);
+//}
+//
+///** Called when ad content has expired for specific adView
+// *
+// * @param adView        the NativeX adView that has expired
+// */
+//- (void)nativeXAdViewDidExpire:(NativeXAdView *)adView
+//{
+//    CCLOG("nativeXAdView::nativeXAdViewDidExpire");
+//}
+//
+//- (void) nativeXSDKDidRedeemWithRewardInfo:(NativeXRewardInfo *)rewardInfo
+//{
+//    // do it server side
+//}
+//
+//@end
+//
 #pragma mark ADOffersViewControllerDelegate
 //@interface MyADOffersViewControllerDelegate : NSObject<ADOffersViewControllerDelegate> {}
 //@property (nonatomic, strong) ADOffersViewController* controller;
@@ -258,7 +258,7 @@ static std::map<std::string, int> _nativeXStep;
 //@end
 
 static MySupersonicDelegate *_mySupersonicDelegate = [[MySupersonicDelegate alloc] init];
-static MyNaviteXDeleagte *_myNaviteXDeleagte = [[MyNaviteXDeleagte alloc] init];
+//static MyNaviteXDeleagte *_myNaviteXDeleagte = [[MyNaviteXDeleagte alloc] init];
 //static MyADOffersViewControllerDelegate *_myADOffersViewControllerDelegate = [[MyADOffersViewControllerDelegate alloc] init];
 
 #pragma mark AdHelper
@@ -282,8 +282,8 @@ void AdHelper::initAd(AdType type, const std::string &uId, const std::string &ap
 {
     switch (type) {
         case AdFyber:{
-            FYBSDKOptions *options = [FYBSDKOptions optionsWithAppId:nsstr(appkey.c_str()) userId:nsstr(uId.c_str()) securityToken:nsstr(token.c_str())];
-            [FyberSDK startWithOptions:options];
+//            FYBSDKOptions *options = [FYBSDKOptions optionsWithAppId:nsstr(appkey.c_str()) userId:nsstr(uId.c_str()) securityToken:nsstr(token.c_str())];
+//            [FyberSDK startWithOptions:options];
             break;
         }
 
@@ -301,12 +301,12 @@ void AdHelper::initAd(AdType type, const std::string &uId, const std::string &ap
             break;
             
         case AdNativeX:
-            _nativeXStep[K_NATIVEX_PLACEMENT_OFFER] = NX_FREE;
-            _nativeXStep[K_NATIVEX_PLACEMENT_VIDEO] = NX_FREE;
-        
-            [[NativeXSDK sharedInstance] setDelegate:_myNaviteXDeleagte];
-            [[NativeXSDK sharedInstance] createSessionWithAppId:nsstr(appkey.c_str())
-                                             andPublisherUserId:nsstr(uId.c_str())];
+//            _nativeXStep[K_NATIVEX_PLACEMENT_OFFER] = NX_FREE;
+//            _nativeXStep[K_NATIVEX_PLACEMENT_VIDEO] = NX_FREE;
+//        
+//            [[NativeXSDK sharedInstance] setDelegate:_myNaviteXDeleagte];
+//            [[NativeXSDK sharedInstance] createSessionWithAppId:nsstr(appkey.c_str())
+//                                             andPublisherUserId:nsstr(uId.c_str())];
             break;
         case AdAdscend:
             _uId = uId;
@@ -323,25 +323,25 @@ void AdHelper::callOfferwall(AdHelper::AdType type, bool inGoldMine)
     switch (type) {
         case AdFyber: {
             // Create an instance of the FYBOfferWallViewController
-            FYBOfferWallViewController *offerWallViewController = [[FYBOfferWallViewController alloc] init];
+//            FYBOfferWallViewController *offerWallViewController = [[FYBOfferWallViewController alloc] init];
             
             // Show a close button while the Offer Wall is loading
-            offerWallViewController.showCloseButtonOnLoad = YES;
+//            offerWallViewController.showCloseButtonOnLoad = YES;
             
             // Dismiss the Offer Wall when the user leaves your application
-            offerWallViewController.shouldDismissOnRedirect = YES;
+//            offerWallViewController.shouldDismissOnRedirect = YES;
             
             // Show the Offer Wall
-            [offerWallViewController presentFromViewController:(UIViewController*)[AppController getRootView] animated:YES completion:^{
-                
-                // Code executed when the Offer Wall is presented
-                NSLog(@"Offer was presented");
-                
-            } dismiss:^(NSError *error){
-                
-                // Code executed when the Offer Wall is dismissed
-                NSLog(@"Offer is dismissed: %@", error);
-            }];   
+//            [offerWallViewController presentFromViewController:(UIViewController*)[AppController getRootView] animated:YES completion:^{
+//                
+//                // Code executed when the Offer Wall is presented
+//                NSLog(@"Offer was presented");
+//                
+//            } dismiss:^(NSError *error){
+//                
+//                // Code executed when the Offer Wall is dismissed
+//                NSLog(@"Offer is dismissed: %@", error);
+//            }];   
             break;
         }
             
@@ -349,15 +349,15 @@ void AdHelper::callOfferwall(AdHelper::AdType type, bool inGoldMine)
             [[Supersonic sharedInstance] showOW];
             break;
         case AdNativeX:
-            _nativeXStep[K_NATIVEX_PLACEMENT_OFFER] = NX_READY;
-        
-            if ([[NativeXSDK sharedInstance] isAdReadyWithCustomPlacement:nsstr(K_NATIVEX_PLACEMENT_OFFER.c_str())]) {
-                _nativeXStep[K_NATIVEX_PLACEMENT_OFFER] = NX_FREE;
-                [[NativeXSDK sharedInstance] showReadyAdWithCustomPlacement:nsstr(K_NATIVEX_PLACEMENT_OFFER.c_str())];
-                
-            } else {
-                [[NativeXSDK sharedInstance] fetchAdWithCustomPlacement: nsstr(K_NATIVEX_PLACEMENT_OFFER.c_str()) delegate: _myNaviteXDeleagte];
-            }
+//            _nativeXStep[K_NATIVEX_PLACEMENT_OFFER] = NX_READY;
+//        
+//            if ([[NativeXSDK sharedInstance] isAdReadyWithCustomPlacement:nsstr(K_NATIVEX_PLACEMENT_OFFER.c_str())]) {
+//                _nativeXStep[K_NATIVEX_PLACEMENT_OFFER] = NX_FREE;
+//                [[NativeXSDK sharedInstance] showReadyAdWithCustomPlacement:nsstr(K_NATIVEX_PLACEMENT_OFFER.c_str())];
+//                
+//            } else {
+//                [[NativeXSDK sharedInstance] fetchAdWithCustomPlacement: nsstr(K_NATIVEX_PLACEMENT_OFFER.c_str()) delegate: _myNaviteXDeleagte];
+//            }
         
             break;
         case AdAdxmi:
@@ -386,15 +386,15 @@ void AdHelper::playVideo(AdHelper::AdType type, bool inGoldMine)
             }
             break;
         case AdNativeX:
-            _nativeXStep[K_NATIVEX_PLACEMENT_VIDEO] = NX_READY;
-            
-            if ([[NativeXSDK sharedInstance] isAdReadyWithCustomPlacement:nsstr(K_NATIVEX_PLACEMENT_VIDEO.c_str())]) {
-                _nativeXStep[K_NATIVEX_PLACEMENT_VIDEO] = NX_FREE;
-                [[NativeXSDK sharedInstance] showReadyAdWithCustomPlacement:nsstr(K_NATIVEX_PLACEMENT_VIDEO.c_str())];
-                
-            } else {
-                [[NativeXSDK sharedInstance] fetchAdWithCustomPlacement: nsstr(K_NATIVEX_PLACEMENT_VIDEO.c_str()) delegate: _myNaviteXDeleagte];
-            }
+//            _nativeXStep[K_NATIVEX_PLACEMENT_VIDEO] = NX_READY;
+//            
+//            if ([[NativeXSDK sharedInstance] isAdReadyWithCustomPlacement:nsstr(K_NATIVEX_PLACEMENT_VIDEO.c_str())]) {
+//                _nativeXStep[K_NATIVEX_PLACEMENT_VIDEO] = NX_FREE;
+//                [[NativeXSDK sharedInstance] showReadyAdWithCustomPlacement:nsstr(K_NATIVEX_PLACEMENT_VIDEO.c_str())];
+//                
+//            } else {
+//                [[NativeXSDK sharedInstance] fetchAdWithCustomPlacement: nsstr(K_NATIVEX_PLACEMENT_VIDEO.c_str()) delegate: _myNaviteXDeleagte];
+//            }
             break;
         default:
             break;
