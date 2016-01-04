@@ -22,7 +22,6 @@ static const char *UmengHelperPath = "com/zpt/libumeng/UmengHelper";
 
 void UMHelper::startWithAppkey(const char* appkey, const char* channel)
 {
-    appkey = "5561e5e467e58e5f0f008d3d";
     JniMethodInfo mi;
     if (!JniHelper::getStaticMethodInfo(mi, UmengHelperPath, "startWithAppkey", "(Ljava/lang/String;Ljava/lang/String;)V")) {
         assert(0);

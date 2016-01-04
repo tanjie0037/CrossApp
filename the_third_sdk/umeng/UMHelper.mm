@@ -18,9 +18,6 @@
 
 void UMHelper::startWithAppkey(const char* appkey, const char* channel)
 {
-#if defined(TARGET_APP_GIFT_IOS)
-    appkey = "5561e62967e58e3d8d00933b";
-#endif
     NSString *version = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"];
     [MobClick setAppVersion:version];
     [MobClick startWithAppkey:nsstr(appkey) reportPolicy:BATCH channelId:nsstr(channel)];
