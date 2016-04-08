@@ -15,9 +15,6 @@ import android.view.Display;
 import android.view.WindowManager;
 
 public class Cocos2dxHelper {
-	// 要与native保持一致
-	public static final String kOnlineParamUpdated = "kNoti_online_param";
-	public static final String kNotiRemoteNotiRecived = "kNoti_remote_noti_recived";
 	// ===========================================================
 	// Constants
 	// ===========================================================
@@ -36,8 +33,7 @@ public class Cocos2dxHelper {
 	private static String sFileDirectory;
 	private static Context sContext = null;
 	private static Cocos2dxHelperListener sCocos2dxHelperListener;
-	private static Cocos2dxSDL sCocos2dSDL;
-
+    private static Cocos2dxSDL sSDL;
 	// ===========================================================
 	// Constructors
 	// ===========================================================
@@ -56,10 +52,8 @@ public class Cocos2dxHelper {
 		Cocos2dxHelper.sCocos2dMusic = new Cocos2dxMusic(pContext);
 		Cocos2dxHelper.sCocos2dSound = new Cocos2dxSound(pContext);
 		Cocos2dxHelper.sAssetManager = pContext.getAssets();
-		Cocos2dxHelper.sCocos2dSDL = new Cocos2dxSDL(pContext);
-		
+		Cocos2dxHelper.sSDL = new Cocos2dxSDL(pContext);
 		Cocos2dxBitmap.setContext(pContext);
-		Cocos2dxETCLoader.setContext(pContext);
 	}
 
 	// ===========================================================
@@ -77,8 +71,6 @@ public class Cocos2dxHelper {
 	private static native void nativeSetApkPath(final String pApkPath);
 
 	private static native void nativeSetEditTextDialogResult(final byte[] pBytes);
-	
-	private static native void nativePostNotification(String noti, String info);
 
 	public static String getCocos2dxPackageName() {
 		return Cocos2dxHelper.sPackageName;
@@ -258,35 +250,6 @@ public class Cocos2dxHelper {
 		return -1.0f;
     }
     
-    public static void postNotification(final String noti)
-    {
-    	if (Cocos2dxHelper.sCocos2dxHelperListener == null) {
-    		return;
-    	}
-    	
-    	Cocos2dxHelper.sCocos2dxHelperListener.runOnGLThread(new Runnable() {
-			
-			@Override
-			public void run() {
-				Cocos2dxHelper.nativePostNotification(noti, null);
-			}
-		});
-    }
-    
-    public static void postNotification(final String noti, final String info)
-    {
-    	if (Cocos2dxHelper.sCocos2dxHelperListener == null) {
-    		return;
-    	}
-    	
-    	Cocos2dxHelper.sCocos2dxHelperListener.runOnGLThread(new Runnable() {
-			
-			@Override
-			public void run() {
-				Cocos2dxHelper.nativePostNotification(noti, info);
-			}
-		});
-    }
     // ===========================================================
  	// Functions for CCUserDefault
  	// ===========================================================
