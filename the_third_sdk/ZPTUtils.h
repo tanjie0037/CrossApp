@@ -11,6 +11,7 @@
 
 #include <string.h>
 #include <stdlib.h>
+#include <stdio.h>
 #include <time.h>
 #include <sstream>
 #include <vector>
@@ -191,6 +192,21 @@ static uint64_t getNotiConfigTime(int day, int hour, int minute, int second, boo
     CCLOG("targetTime:%s", asctime(localtime(&now)));
     
     return now;
+}
+
+static string getFormatedTime(int second) {    
+    int hour = second/3600;
+    int minute = (second%3600)/60;
+    second = (second%3600)%60;
+    
+    if (hour > 24) {
+        hour = 24;
+    }
+    
+    char szBuf[10] = {0};
+    snprintf(szBuf, 10, "%02d:%02d:%02d", hour, minute, second);
+    
+    return string(szBuf);
 }
 
 #endif
