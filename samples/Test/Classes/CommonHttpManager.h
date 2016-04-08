@@ -4,11 +4,9 @@
 
 #include <iostream>
 #include <CrossApp.h>
-#include <CrossAppExt.h>
 #include <map>
 
-USING_NS_CC;
-USING_NS_CC_EXT;
+
 
 static char Dec2HexChar(short int n)
 {
@@ -265,9 +263,9 @@ public:
     
     static CommonUrlImageView* createWithImage(CAImage* image);
     
-    static CommonUrlImageView* createWithFrame(const CCRect& rect);
+    static CommonUrlImageView* createWithFrame(const DRect& rect);
     
-    static CommonUrlImageView* createWithCenter(const CCRect& rect);
+    static CommonUrlImageView* createWithCenter(const DRect& rect);
     
     void setUrl(const std::string& url);
 

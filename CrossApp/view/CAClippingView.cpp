@@ -5,7 +5,7 @@
 #include "shaders/CAGLProgram.h"
 #include "shaders/CAShaderCache.h"
 #include "basics/CAApplication.h"
-#include "support/CCPointExtension.h"
+#include "support/CAPointExtension.h"
 #include "view/CADrawingPrimitives.h"
 
 NS_CC_BEGIN
@@ -26,6 +26,7 @@ CAClippingView::CAClippingView()
 : m_pStencil(NULL)
 , m_fAlphaThreshold(1.0f)
 , m_bInverted(false)
+, m_bClippingEnabled(true)
 {}
 
 CAClippingView::~CAClippingView()
@@ -116,7 +117,7 @@ void CAClippingView::onExit()
 void CAClippingView::visit()
 {
     // if stencil buffer disabled
-    if (g_sStencilBits < 1)
+    if (!m_bClippingEnabled || g_sStencilBits < 1)
     {
         // draw everything, as if there where no stencil
         CAView::visit();
@@ -227,8 +228,8 @@ void CAClippingView::visit()
     glStencilOp(!m_bInverted ? GL_ZERO : GL_REPLACE, GL_KEEP, GL_KEEP);
     
     // draw a fullscreen solid rectangle to clear the stencil buffer
-    //ccDrawSolidRect(CCPointZero, ccpFromSize([[CAApplication sharedApplication] winSize]), ccc4f(1, 1, 1, 1));
-    ccDrawSolidRect(CCPointZero, ccpFromSize(CAApplication::getApplication()->getWinSize()), ccc4f(1, 1, 1, 1));
+    //ccDrawSolidRect(DPointZero, ccpFromSize([[CAApplication sharedApplication] winSize]), ccc4f(1, 1, 1, 1));
+    ccDrawSolidRect(DPointZero, ccpFromSize(CAApplication::getApplication()->getWinSize()), ccc4f(1, 1, 1, 1));
     
     ///////////////////////////////////
     // DRAW CLIPPING STENCIL
@@ -366,6 +367,15 @@ bool CAClippingView::isInverted() const
 void CAClippingView::setInverted(bool bInverted)
 {
     m_bInverted = bInverted;
+}
+
+bool CAClippingView::isClippingEnabled() const
+{
+    return m_bClippingEnabled;
+}
+void CAClippingView::setClippingEnabled(bool bClippingEnabled)
+{
+    m_bClippingEnabled = bClippingEnabled;
 }
 
 NS_CC_END

@@ -29,8 +29,6 @@ public:
 	virtual bool onShouldStartLoading(CAWebView* pWebView, const std::string &url) { return true; }
 	
 	virtual void onDidFinishLoading(CAWebView* pWebView, const std::string &url) {}
-
-	virtual void onLoadHtmlSource(CAWebView* pWebView, const std::string &htmlSource) {}
 	
 	virtual void onDidFailLoading(CAWebView* pWebView, const std::string &url) {}
 	
@@ -47,9 +45,9 @@ public:
     
     virtual bool init();
     
-	static CAWebView *createWithFrame(const CCRect& rect);
+	static CAWebView *createWithFrame(const DRect& rect);
 
-	static CAWebView *createWithCenter(const CCRect& rect);
+	static CAWebView *createWithCenter(const DRect& rect);
 
     /**
     * Set javascript interface scheme.
@@ -111,7 +109,9 @@ public:
     /**
     * evaluates JavaScript in the context of the currently displayed page
     */
-    void evaluateJS(const std::string &js);
+    std::string evaluateJS(const std::string &js);
+
+	std::string getHTMLSource();
 
     /**
     * Set WebView should support zooming. The default value is false.
@@ -130,7 +130,13 @@ public:
     
 	CC_SYNTHESIZE(CAWebViewDelegate*, m_pWebViewDelegate, WebViewDelegate);
 
-    CC_SYNTHESIZE(bool, m_bShowLoadingImage, ShowLoadingImage);
+	void setActivityView(CAActivityIndicatorView* loadingView);
+	void showLoadingActivity(bool show);
+   
+protected:
+    
+    virtual void setContentSize(const DSize &contentSize);
+    
 private:
     
     CAWebViewImpl *_impl;
@@ -141,9 +147,9 @@ private:
     
     CAActivityIndicatorView* m_pLoadingView;
     
-    CCPoint m_obLastPoint;
+    DPoint m_obLastPoint;
     
-    CCSize m_obLastContentSize;
+    DSize m_obLastContentSize;
     
 	friend class CAWebViewImpl;
     

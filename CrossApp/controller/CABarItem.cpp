@@ -7,14 +7,14 @@
 //
 
 #include "CABarItem.h"
+#include "basics/CAApplication.h"
 
 NS_CC_BEGIN
 
 #pragma CABarItem
 
 CABarItem::CABarItem()
-:m_bTouchEnabled(true)
-,m_pImage(NULL)
+:m_pImage(NULL)
 ,m_sTitle("")
 {
 
@@ -32,6 +32,8 @@ CABarButtonItem::CABarButtonItem()
 :m_pHighlightedImage(NULL)
 ,m_pTarget(NULL)
 ,m_selCallFunc(NULL)
+,m_pCustomView(NULL)
+,m_uItemWidth(80)
 {
 
 }
@@ -53,11 +55,25 @@ CABarButtonItem* CABarButtonItem::create(const std::string& title, CAImage* imag
     return NULL;
 }
 
-bool CABarButtonItem::init(const std::string& title, CAImage *image, CAImage *highlightedImage)
+bool CABarButtonItem::initWithTitle(const std::string& title, CAImage *image, CAImage *highlightedImage)
 {
     this->setTitle(title);
     this->setImage(image);
     this->setHighlightedImage(highlightedImage);
+    return true;
+}
+
+bool CABarButtonItem::initWithImage(CAImage* image, CAImage* highlightedImage)
+{
+    this->setImage(image);
+    this->setHighlightedImage(highlightedImage);
+    return true;
+}
+
+bool CABarButtonItem::initWithCustomView(CAView* customView)
+{
+    CC_SAFE_RETAIN(customView);
+    m_pCustomView = customView;
     return true;
 }
 

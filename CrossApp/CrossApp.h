@@ -60,20 +60,20 @@
 #include "dispatcher/CATouchDispatcher.h"
 #include "dispatcher/CAKeypadDelegate.h"
 #include "dispatcher/CAKeypadDispatcher.h"
-#include "dispatcher/CAIMEDelegate.h"
-#include "dispatcher/CAIMEDispatcher.h"
 #include "dispatcher/CAProtocols.h"
 
 
 // images
 #include "images/CAImage.h"
 #include "images/CAImageCache.h"
+#include "images/CAGif.h"
 
 
 //view
 #include "view/CAView.h"
 #include "view/CAWindow.h"
 #include "view/CAImageView.h"
+#include "view/CAGifView.h"
 #include "view/CAScale9ImageView.h"
 #include "view/CALabel.h"
 #include "view/CABatchView.h"
@@ -84,24 +84,26 @@
 #include "view/CATableView.h"
 #include "view/CAPageView.h"
 #include "view/CACollectionView.h"
+#include "view/CAAutoCollectionView.h"
 #include "view/CAAlertView.h"
 #include "view/CAPickerView.h"
 #include "view/CADatePickerView.h"
 #include "view/CAActivityIndicatorView.h"
 #include "view/CAPullToRefreshView.h"
-#include "view/CATextField.h"
-#include "view/CATextView.h"
 #include "view/CAWebView.h"
 #include "view/CADrawingPrimitives.h"
 #include "view/CADrawView.h"
-#include "view/CAFlashView.h"
 #include "view/CATextEditHelper.h"
+#include "view/CAAutoCollectionView.h"
+#include "view/CAWaterfallView.h"
+
+#include "video/CAVideoPlayerDecoder.h"
+#include "video/CAVideoPlayerRender.h"
+#include "video/CAVideoPlayerView.h"
+#include "video/CAVideoPlayerControlView.h"
 
 // cocoa
-#include "cocoa/CCDictionary.h"
-#include "cocoa/CCArray.h"
 #include "cocoa/CCSet.h"
-#include "cocoa/CCString.h"
 #include "cocoa/CCNS.h"
 #include "cocoa/CACalendar.h"
 
@@ -122,13 +124,22 @@
 #include "support/ccUtils.h"
 #include "support/ccUTF8.h"
 #include "support/CANotificationCenter.h"
-#include "support/CCPointExtension.h"
-#include "support/CCProfiling.h"
+#include "support/CAPointExtension.h"
+#include "support/CAProfiling.h"
 #include "support/user_default/CAUserDefault.h"
 #include "support/CCVertex.h"
 #include "support/tinyxml2/tinyxml2.h"
 #include "support/md5.h"
 #include "support/base64.h"
+#include "support/network/HttpRequest.h"
+#include "support/network/HttpResponse.h"
+#include "support/network/HttpClient.h"
+#include "support/network/DownloadManager.h"
+#include "support/Json/CSContentJsonDictionary.h"
+#include "support/sqlite3/sqlite3.h"
+#include "support/LocalStorage/LocalStorage.h"
+#include "support/device/CADevice.h"
+
 
 // platform
 #include "platform/CCCommon.h"
@@ -139,11 +150,9 @@
 #include "platform/CCPlatformMacros.h"
 #include "platform/CAFreeTypeFont.h"
 #include "platform/CAFTFontCache.h"
-#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID) || (CC_TARGET_PLATFORM == CC_PLATFORM_IOS)
-// video
-#include "video/CAVideoPlayerController.h"
-#endif //(CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID) || (CC_TARGET_PLATFORM == CC_PLATFORM_IOS)
-
+#include "platform/CATextField.h"
+#include "platform/CATextView.h"
+#include "platform/CADensityDpi.h"
 //script_support
 #include "script_support/CCScriptSupport.h"
 #include "script_support/JSViewController.h"

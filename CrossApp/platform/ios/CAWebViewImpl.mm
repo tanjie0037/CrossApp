@@ -2,15 +2,17 @@
 #import <UIKit/UIKit.h>
 #include "CAWebViewImpl.h"
 #include "EAGLView.h"
-#include "platform/CCFileUtils.h"
 #include "basics/CAApplication.h"
-
+#include "platform/CCFileUtils.h"
+#include "platform/CADensityDpi.h"
 
 USING_NS_CC;
 
 #define WebViewWrapper ((UIWebViewWrapper*)m_pWebViewWrapper)
 
-@interface UIWebViewWrapper : NSObject
+@interface UIWebViewWrapper : NSObject<UIWebViewDelegate>
+@property(nonatomic, retain) UIWebView *uiWebView;
+@property(nonatomic, copy) NSString *jsScheme;
 
 @property(nonatomic, readonly, getter=canGoBack) BOOL canGoBack;
 @property(nonatomic, readonly, getter=canGoForward) BOOL canGoForward;
@@ -35,19 +37,13 @@ USING_NS_CC;
 
 - (void)reload;
 
-- (void)evaluateJS:(const std::string &)js;
+- (std::string)evaluateJS:(const std::string &)js;
 
 - (void)goBack;
 
 - (void)goForward;
 
 - (void)setScalesPageToFit:(const bool)scalesPageToFit;
-@end
-
-
-@interface UIWebViewWrapper () <UIWebViewDelegate>
-@property(nonatomic, retain) UIWebView *uiWebView;
-@property(nonatomic, copy) NSString *jsScheme;
 @end
 
 @implementation UIWebViewWrapper
@@ -72,8 +68,12 @@ USING_NS_CC;
 
 - (void)dealloc
 {
-    self.uiWebView.delegate = nil;
+    [self.uiWebView setDelegate:nil];
     [self.uiWebView removeFromSuperview];
+    [self.uiWebView loadHTMLString:@"" baseURL:nil];
+    [self.uiWebView stopLoading];
+    [self.uiWebView release];
+    [[NSURLCache sharedURLCache] removeAllCachedResponses];
     self.jsScheme = nil;
     [super dealloc];
 }
@@ -82,7 +82,7 @@ USING_NS_CC;
 {
     if (!self.uiWebView)
     {
-        self.uiWebView = [[[UIWebView alloc] init] autorelease];
+        self.uiWebView = [[UIWebView alloc] init];
         self.uiWebView.delegate = self;
         self.uiWebView.scalesPageToFit = YES;
     }
@@ -92,6 +92,9 @@ USING_NS_CC;
         [eaglview addSubview:self.uiWebView];
         [eaglview bringSubviewToFront: self.uiWebView];
     }
+
+	NSURLCache *sharedCache = [[[NSURLCache alloc] initWithMemoryCapacity:0 diskCapacity:0 diskPath:nil] autorelease];
+    [NSURLCache setSharedURLCache:sharedCache];
 }
 
 - (void)setVisible:(bool)visible
@@ -101,15 +104,8 @@ USING_NS_CC;
 
 - (UIImage*)getWebViewImage
 {
-    if (UIGraphicsBeginImageContextWithOptions!=NULL)
-    {
-        UIGraphicsBeginImageContextWithOptions(self.uiWebView.frame.size, NO, 0);
-    }
-    else
-    {
-        UIGraphicsBeginImageContext(self.uiWebView.frame.size);
-    }
-    
+    static float scale = [UIScreen mainScreen].scale;
+    UIGraphicsBeginImageContextWithOptions(self.uiWebView.bounds.size, NO, scale);
     [self.uiWebView.layer renderInContext:UIGraphicsGetCurrentContext()];
     return UIGraphicsGetImageFromCurrentImageContext();
 }
@@ -191,10 +187,11 @@ USING_NS_CC;
     [self.uiWebView goForward];
 }
 
-- (void)evaluateJS:(const std::string &)js
+- (std::string)evaluateJS:(const std::string &)js
 {
     if (!self.uiWebView) {[self setupWebView];}
-    [self.uiWebView stringByEvaluatingJavaScriptFromString:@(js.c_str())];
+    NSString* s = [self.uiWebView stringByEvaluatingJavaScriptFromString:@(js.c_str())];
+    return [s UTF8String];
 }
 
 - (void)setScalesPageToFit:(const bool)scalesPageToFit
@@ -222,8 +219,6 @@ USING_NS_CC;
 {
     NSString *url = [[webView.request URL] absoluteString];
     CAWebViewImpl::didFinishLoading(self, [url UTF8String]);
-	NSString* html = [webView stringByEvaluatingJavaScriptFromString:@"document.documentElement.innerHTML"];
-    CAWebViewImpl::onLoadHtmlSource(self,[html UTF8String]);
 }
 
 - (void)webView:(UIWebView *)webView didFailLoadWithError:(NSError *)error
@@ -272,12 +267,6 @@ bool CAWebViewImpl::shouldStartLoading(void* pWebViewWrapper, const std::string 
             if (!webView->m_pWebViewDelegate->onShouldStartLoading(webView, url))
                 return false;
         }
-        if (webView && webView->m_bShowLoadingImage)
-        {
-            it->second->setVisible(false);
-            webView->m_pLoadingView->setVisible(true);
-        }
-
     }
     return true;
 }
@@ -289,28 +278,9 @@ void CAWebViewImpl::didFinishLoading(void* pWebViewWrapper, const std::string &u
     if (it != s_WebViewImpls.end()) {
         
         CAWebView* webView = it->second->m_pWebView;
-        if (webView && webView->m_bShowLoadingImage)
-        {
-            webView->m_pLoadingView->setVisible(false);
-            it->second->setVisible(true);
-        }
-
         if (webView && webView->m_pWebViewDelegate)
         {
             webView->m_pWebViewDelegate->onDidFinishLoading(webView, url);
-        }
-    }
-}
-
-void CAWebViewImpl::onLoadHtmlSource(void* pWebViewWrapper, const std::string &htmlSource)
-{
-    WEB_MAP it=s_WebViewImpls.find((UIWebViewWrapper*)pWebViewWrapper);
-    if (it != s_WebViewImpls.end())
-    {
-        CAWebView* webView = it->second->m_pWebView;
-        if (webView && webView->m_pWebViewDelegate)
-        {
-            webView->m_pWebViewDelegate->onLoadHtmlSource(webView, htmlSource);
         }
     }
 }
@@ -321,12 +291,6 @@ void CAWebViewImpl::didFailLoading(void* pWebViewWrapper, const std::string &url
     if (it != s_WebViewImpls.end())
     {
         CAWebView* webView = it->second->m_pWebView;
-        if (webView && webView->m_bShowLoadingImage)
-        {
-            webView->m_pLoadingView->setVisible(false);
-            it->second->setVisible(true);
-        }
-
         if (webView && webView->m_pWebViewDelegate)
         {
             webView->m_pWebViewDelegate->onDidFailLoading(webView, url);
@@ -400,9 +364,9 @@ void CAWebViewImpl::goForward()
     [WebViewWrapper goForward];
 }
 
-void CAWebViewImpl::evaluateJS(const std::string &js)
+std::string CAWebViewImpl::evaluateJS(const std::string &js)
 {
-    [WebViewWrapper evaluateJS:js];
+    return [WebViewWrapper evaluateJS:js];
 }
 
 void CAWebViewImpl::setScalesPageToFit(const bool scalesPageToFit)
@@ -412,7 +376,12 @@ void CAWebViewImpl::setScalesPageToFit(const bool scalesPageToFit)
 
 void CAWebViewImpl::update(float dt)
 {
-    CCRect cRect = m_pWebView->convertRectToWorldSpace(m_pWebView->getBounds());
+    DRect cRect = m_pWebView->convertRectToWorldSpace(m_pWebView->getBounds());
+    cRect.origin.x = s_dip_to_px(cRect.origin.x);
+    cRect.origin.y = s_dip_to_px(cRect.origin.y);
+    cRect.size.width = s_dip_to_px(cRect.size.width);
+    cRect.size.height = s_dip_to_px(cRect.size.height);
+    
     CGFloat scale = [[UIScreen mainScreen] scale];
     CGFloat x = cRect.origin.x/scale;
     CGFloat y = cRect.origin.y/scale;

@@ -6,8 +6,8 @@
 //  Copyright (c) 2014 http://9miao.com All rights reserved.
 //
 
-#ifndef __CrossAppx__CABarItem__
-#define __CrossAppx__CABarItem__
+#ifndef __CrossApp__CABarItem__
+#define __CrossApp__CABarItem__
 
 #include <iostream>
 
@@ -30,8 +30,6 @@ public:
     CC_SYNTHESIZE_PASS_BY_REF(std::string, m_sTitle, Title);
     
     CC_SYNTHESIZE_RETAIN(CAImage*, m_pImage, Image);
-    
-    CC_SYNTHESIZE_IS(bool, m_bTouchEnabled, TouchEnabled);
 };
 
 class CC_DLL CABarButtonItem
@@ -48,9 +46,22 @@ public:
     
     virtual ~CABarButtonItem();
     
-    bool init(const std::string& title, CAImage* image, CAImage* highlightedImage);
+    bool init(const std::string& title, CAImage* image = NULL, CAImage* highlightedImage = NULL)
+    {
+        return initWithTitle(title, image, highlightedImage);
+    }
+    
+    bool initWithTitle(const std::string& title, CAImage* image = NULL, CAImage* highlightedImage = NULL);
+    
+    bool initWithImage(CAImage* image, CAImage* highlightedImage = NULL);
+    
+    bool initWithCustomView(CAView* customView);
     
     CC_SYNTHESIZE_RETAIN(CAImage*, m_pHighlightedImage, HighlightedImage);
+    
+    CC_SYNTHESIZE(unsigned int, m_uItemWidth, ItemWidth);
+    
+    CC_SYNTHESIZE_READONLY(CAView*, m_pCustomView, CustomView);
     
     void setTarget(CAObject* target, SEL_CAControl callfunc);
     
@@ -63,6 +74,7 @@ protected:
     CAObject* m_pTarget;
     
     SEL_CAControl m_selCallFunc;
+    
 };
 
 class CC_DLL CANavigationBarItem
@@ -117,10 +129,12 @@ public:
     
     CC_SYNTHESIZE_RETAIN(CAImage*, m_pSelectedImage, SelectedImage);
     
+    CC_SYNTHESIZE_PASS_BY_REF(std::string, m_pBadgeValue, BadgeValue);
+    
 };
 
 
 NS_CC_END
 
 
-#endif /* defined(__CrossAppx__CABarItem__) */
+#endif /* defined(__CrossApp__CABarItem__) */

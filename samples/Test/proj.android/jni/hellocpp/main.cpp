@@ -2,6 +2,7 @@
 #include "CrossApp.h"
 #include "ccTypes.h"
 #include "platform/android/jni/JniHelper.h"
+#include "platform/android/CAWebViewImpl.h"
 #include <jni.h>
 #include <android/log.h>
 
@@ -12,7 +13,7 @@ using namespace CrossApp;
 
 extern "C"
 {
-    
+
 jint JNI_OnLoad(JavaVM *vm, void *reserved)
 {
     JniHelper::setJavaVM(vm);
@@ -32,6 +33,7 @@ void Java_org_CrossApp_lib_Cocos2dxRenderer_nativeInit(JNIEnv*  env, jobject thi
     }
     else
     {
+
         ccGLInvalidateStateCache();
         CAShaderCache::sharedShaderCache()->reloadDefaultShaders();
         ccDrawInit();

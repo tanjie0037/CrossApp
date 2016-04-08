@@ -52,9 +52,15 @@ public:
     
     bool isShowLeftViewController();
     
+    virtual bool isReachBoundaryLeft();
+    
+    virtual bool isReachBoundaryRight();
+    
 protected:
     
-    void showBegin();
+    void begin();
+    
+    void showEnded();
     
     void hideEnded();
     
@@ -94,8 +100,10 @@ protected:
     
     int m_fOffX;
     
-    CCRect m_rShowFrame[2];
-    CCRect m_rHideFrame[2];
+    bool m_bAnimation;
+    
+    DRect m_rShowFrame[2];
+    DRect m_rHideFrame[2];
 };
 
 NS_CC_END

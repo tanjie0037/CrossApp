@@ -9,31 +9,8 @@ NS_CC_BEGIN
 
 extern "C"
 {
-
-	char* jstringTostring(JNIEnv* env, jstring jstr)
-	{
-		char* rtn = NULL;
-		jclass clsstring = env->FindClass("java/lang/String");
-		jstring strencode = env->NewStringUTF("utf-8");
-		jmethodID mid = env->GetMethodID(clsstring, "getBytes", "(Ljava/lang/String;)[B");
-		jbyteArray barr = (jbyteArray)env->CallObjectMethod(jstr, mid, strencode);
-		jsize alen = env->GetArrayLength(barr);
-		jbyte* ba = env->GetByteArrayElements(barr, JNI_FALSE);
-		if (alen > 0)
-		{
-			rtn = (char*)malloc(alen + 1);
-			memcpy(rtn, ba, alen);
-			rtn[alen] = 0;
-		}
-		env->ReleaseByteArrayElements(barr, ba, 0);
-		return rtn;
-	}
-
-
-
 	void JAVAsetPasteBoardString(const char* str)
 	{
-
 		JniMethodInfo jmi;
 		if (JniHelper::getStaticMethodInfo(jmi, "org/CrossApp/lib/Cocos2dxActivity", "getContext", "()Lorg/CrossApp/lib/Cocos2dxActivity;"))
 		{
@@ -41,15 +18,18 @@ extern "C"
 			bool isHave = JniHelper::getMethodInfo(jmi, "org/CrossApp/lib/Cocos2dxActivity", "setPasteBoardStr", "(Ljava/lang/String;)V");
 			if (isHave)
 			{
-				jmi.env->CallVoidMethod(obj, jmi.methodID, jmi.env->NewStringUTF(str));
+				jstring strArg = jmi.env->NewStringUTF(str);
+				jmi.env->CallVoidMethod(obj, jmi.methodID, strArg);
+				jmi.env->DeleteLocalRef(strArg);
 			}
-
-
+			jmi.env->DeleteLocalRef(obj);
+			jmi.env->DeleteLocalRef(jmi.classID);
 		}
 	}
 
-	const char* JAVAgetPasteBoardString()
+	std::string JAVAgetPasteBoardString()
 	{
+		std::string cszResult;
 		JniMethodInfo jmi;
 		if (JniHelper::getStaticMethodInfo(jmi, "org/CrossApp/lib/Cocos2dxActivity", "getContext", "()Lorg/CrossApp/lib/Cocos2dxActivity;"))
 		{
@@ -58,19 +38,19 @@ extern "C"
 			if (isHave)
 			{
 				jstring a = (jstring)jmi.env->CallObjectMethod(obj, jmi.methodID);
-				const char *str = jstringTostring(jmi.env, a);
-				return str;
+				cszResult = JniHelper::jstring2string(a);
+				jmi.env->DeleteLocalRef(a);
 			}
+			jmi.env->DeleteLocalRef(obj);
+			jmi.env->DeleteLocalRef(jmi.classID);
 		}
-		return "";
+		return cszResult;
 	}
 }
 
 std::string CAClipboard::getText()
 {
-    const char *str = JAVAgetPasteBoardString();
-    
-    return str ? str : "";
+	return JAVAgetPasteBoardString();
 }
 
 void CAClipboard::setText(const std::string& cszStrText)

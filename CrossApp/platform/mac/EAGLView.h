@@ -45,7 +45,7 @@
  
  Only available for Mac OS X
  */
-@interface EAGLView : NSOpenGLView {
+@interface EAGLView : NSOpenGLView{
 	id<MacEventDelegate> eventDelegate_;
 
 	BOOL isFullScreen_;
@@ -57,6 +57,8 @@
     NSRect          originalWinRect_; // Original size and position
     
     float           frameZoomFactor_;
+    
+    NSString *              markedText_;
 }
 
 @property (nonatomic, readwrite, assign) id<MacEventDelegate> eventDelegate;

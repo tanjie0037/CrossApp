@@ -4,13 +4,12 @@
 #define __CCTEXTURE_CACHE_H__
 
 #include "basics/CAObject.h"
-#include "cocoa/CCDictionary.h"
+#include "basics/CASTLContainer.h"
 #include "CAImage.h"
 #include <string>
 
 
 NS_CC_BEGIN
-
 
 class CC_DLL CAImageCache : public CAObject
 {
@@ -23,8 +22,6 @@ public:
 
     const char* description(void);
 
-    CCDictionary* snapshotTextures();
-
     static CAImageCache * sharedImageCache();
 
     static void purgeSharedImageCache();
@@ -34,8 +31,6 @@ public:
     void addImageAsync(const std::string& path, CAObject *target, SEL_CallFuncO selector);
 
     void addImageFullPathAsync(const std::string& path, CAObject *target, SEL_CallFuncO selector);
-
-    CAImage* addETCImage(const std::string& filename);
 
     CAImage* imageForKey(const std::string& key);
     
@@ -61,8 +56,9 @@ private:
     
 protected:
     
-    CCDictionary* m_pImages;
-    //pthread_mutex_t                *m_pDictLock;
+    CAMap<std::string, CAImage*> m_mImages;
+    //pthread_mutex_t                *m_pDictLock;  恐怕；【】、就没看了；、‘
+
 };
 
 
@@ -120,11 +116,13 @@ public:
    
 protected:
     
+    CC_SYNTHESIZE_READONLY(unsigned long, m_uSerialNumberOfDraws, SerialNumberOfDraws);
+    
     CC_PROPERTY_READONLY(unsigned int, m_uTotalQuads, TotalQuads)
     
     CC_PROPERTY_READONLY(unsigned int, m_uCapacity, Capacity)
     
-    CC_PROPERTY(CAImage *, m_pImage, Image)
+    CC_PROPERTY(CAImage*, m_pImage, Image)
     
     CC_PROPERTY(ccV3F_C4B_T2F_Quad *, m_pQuads, Quads)
     
@@ -148,6 +146,7 @@ protected:
     GLuint              m_pBuffersVBO[2];
     bool                m_bDirty;
 };
+
 
 NS_CC_END
 

@@ -3,7 +3,9 @@
 #include "ccMacros.h"
 #include "CAApplication.h"
 #include "support/data_support/utlist.h"
+#include "support/data_support/ccCArray.h"
 #include "cocoa/CCSet.h"
+
 
 using namespace std;
 
@@ -136,7 +138,7 @@ void CATimer::update(float dt)
                 
                 if (m_pTarget && m_pfnSelector)
                 {
-                    (m_pTarget->*m_pfnSelector)(MIN(m_fElapsed, m_fInterval * 2));
+                    (m_pTarget->*m_pfnSelector)(MIN(m_fElapsed, 0.05f));
                 }
             
                 m_fElapsed = 0;
@@ -152,7 +154,7 @@ void CATimer::update(float dt)
                     
                     if (m_pTarget && m_pfnSelector)
                     {
-                        (m_pTarget->*m_pfnSelector)(MIN(m_fElapsed, m_fInterval * 2));
+						(m_pTarget->*m_pfnSelector)(MIN(m_fElapsed, 0.05f));
                     }
 
                     m_uTimesExecuted += 1;
@@ -165,7 +167,7 @@ void CATimer::update(float dt)
                 {
                     if (m_pTarget && m_pfnSelector)
                     {
-                        (m_pTarget->*m_pfnSelector)(MIN(m_fElapsed, m_fInterval * 2));
+						(m_pTarget->*m_pfnSelector)(MIN(m_fElapsed, 0.05f));
                     }
 
                     m_fElapsed = 0;

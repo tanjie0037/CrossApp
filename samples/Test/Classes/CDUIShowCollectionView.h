@@ -19,7 +19,7 @@ public:
     CDUIShowCollectionView();
     
     virtual ~CDUIShowCollectionView();
-    
+    //CREATE_FUNC(CDUIShowCollectionView);
 protected:
     
     void viewDidLoad();
@@ -32,7 +32,7 @@ public:
     
     virtual void collectionViewDidDeselectCellAtIndexPath(CACollectionView *collectionView, unsigned int section, unsigned int row, unsigned int item);
     
-    virtual CACollectionViewCell* collectionCellAtIndex(CACollectionView *collectionView, const CCSize& cellSize, unsigned int section, unsigned int row, unsigned int item);
+    virtual CACollectionViewCell* collectionCellAtIndex(CACollectionView *collectionView, const DSize& cellSize, unsigned int section, unsigned int row, unsigned int item);
     
     virtual unsigned int numberOfSections(CACollectionView *collectionView);
     
@@ -48,9 +48,9 @@ public:
     
 private:
     
-    CADipSize size;
+    DSize size;
     
-    CACollectionView* p_Conllection;
+    //CACollectionView* p_Conllection;
     
     std::vector<CAColor4B> colorArr;
     

@@ -26,7 +26,7 @@ CARenderImage::CARenderImage()
 , m_pImage(0)
 , m_ePixelFormat(CAImage::PixelFormat_RGBA8888)
 , m_uClearFlags(0)
-, m_sClearColor(ccc4f(0,0,0,0))
+, m_sClearColor(ccc4f(0,0,0,1))
 , m_fClearDepth(0.0f)
 , m_nClearStencil(0)
 , m_bAutoDraw(false)
@@ -34,19 +34,36 @@ CARenderImage::CARenderImage()
 , m_uPixelsHigh(0)
 , m_uName(0)
 {
+#if CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID
+    // Listen this event to save render Image before come to background.
+    // Then it can be restored after coming to foreground on Android.
+    CANotificationCenter::sharedNotificationCenter()->addObserver(this,
+                                                                  callfuncO_selector(CARenderImage::listenToBackground),
+                                                                  EVENT_COME_TO_BACKGROUND,
+                                                                  NULL);
     
+    CANotificationCenter::sharedNotificationCenter()->addObserver(this,
+                                                                  callfuncO_selector(CARenderImage::listenToForeground),
+                                                                  EVENT_COME_TO_FOREGROUND, // this is misspelt
+                                                                  NULL);
+#endif
+
 }
 
 CARenderImage::~CARenderImage()
 {
     CC_SAFE_RELEASE(m_pImageView);
-    CC_SAFE_RELEASE(m_pImage);
     
     glDeleteFramebuffers(1, &m_uFBO);
     if (m_uDepthRenderBufffer)
     {
         glDeleteRenderbuffers(1, &m_uDepthRenderBufffer);
     }
+    
+#if CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID
+    CANotificationCenter::sharedNotificationCenter()->removeObserver(this, EVENT_COME_TO_BACKGROUND);
+    CANotificationCenter::sharedNotificationCenter()->removeObserver(this, EVENT_COME_TO_FOREGROUND);
+#endif
 
 }
 
@@ -57,6 +74,16 @@ void CARenderImage::listenToBackground(CrossApp::CAObject *obj)
 
 void CARenderImage::listenToForeground(CrossApp::CAObject *obj)
 {
+// -- regenerate frame buffer object and attach the texture
+    glGetIntegerv(GL_FRAMEBUFFER_BINDING, &m_nOldFBO);
+    
+    glGenFramebuffers(1, &m_uFBO);
+    glBindFramebuffer(GL_FRAMEBUFFER, m_uFBO);
+    
+    m_pImage->setAliasTexParameters();
+    
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_pImage->getName(), 0);
+    glBindFramebuffer(GL_FRAMEBUFFER, m_nOldFBO);
 
 }
 
@@ -177,18 +204,15 @@ bool CARenderImage::initWithWidthAndHeight(int w, int h, CAImage::PixelFormat eF
         glGetIntegerv(GL_FRAMEBUFFER_BINDING, &m_nOldFBO);
 
         // textures must be power of two squared
-        unsigned int powW = 0;
-        unsigned int powH = 0;
-
-        {
-            powW = (unsigned int)w;
-            powH = (unsigned int)h;
-        }
-
-        data = (unsigned char *)malloc((int)(powW * powH * 4));
+        unsigned int powW = (unsigned int)(w + 1) / 2;
+        powW *= 2;
+        unsigned int powH = (unsigned int)(h + 1) / 2;
+        powH *= 2;
+        
+        data = (unsigned char *)malloc((unsigned long)(powW * powH * 4));
         CC_BREAK_IF(! data);
 
-        memset(data, 0, (int)(powW * powH * 4));
+        memset(data, 0, (unsigned long)(powW * powH * 4));
         m_ePixelFormat = eFormat;
         m_uPixelsWide = powW;
         m_uPixelsHigh = powH;
@@ -234,7 +258,7 @@ bool CARenderImage::initWithWidthAndHeight(int w, int h, CAImage::PixelFormat eF
         glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
         glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
 
-        CAImageView* imageView = CAImageView::createWithFrame(CCRect(0, 0, m_uPixelsWide, m_uPixelsHigh));
+        CAImageView* imageView = CAImageView::createWithFrame(DRect(0, 0, m_uPixelsWide, m_uPixelsHigh));
         ccBlendFunc tBlendFunc = {GL_ONE, GL_ONE_MINUS_SRC_ALPHA };
         imageView->setBlendFunc(tBlendFunc);
         this->addSubview(imageView);
@@ -254,6 +278,55 @@ bool CARenderImage::initWithWidthAndHeight(int w, int h, CAImage::PixelFormat eF
     return bRet;
 }
 
+void CARenderImage::printscreenWithView(CAView* view)
+{
+    this->printscreenWithView(view, DPointZero);
+}
+
+void CARenderImage::printscreenWithView(CAView* view, DPoint offset)
+{
+    this->printscreenWithView(view, offset, CAColor_clear);
+}
+
+void CARenderImage::printscreenWithView(CAView* view, const CAColor4B& backgroundColor)
+{
+    this->printscreenWithView(view, DPointZero, backgroundColor);
+}
+
+void CARenderImage::printscreenWithView(CAView* view, DPoint offset, const CAColor4B& backgroundColor)
+{
+    CC_RETURN_IF(view == NULL);
+    
+    DPoint point = DPointZero;
+    if (view->getSuperview())
+    {
+        point.y += view->getSuperview()->getFrame().size.height;
+    }
+    else
+    {
+        point.y += CAApplication::getApplication()->getWinSize().height;
+    }
+    point.y -= view->getFrame().size.height;
+    point.y += offset.y;
+    point.x -= offset.x;
+    
+    DPoint originalFrameOrigin = view->getFrameOrigin();
+    DPoint originalAnchorPoint = view->getAnchorPoint();
+    float originalRotationX = view->getRotationX();
+    
+    view->setAnchorPoint(DPoint(0.5f, 0.5f));
+    view->setRotationX(originalRotationX + 180);
+    view->setFrameOrigin(point);
+    
+    this->beginWithClear(backgroundColor);
+    view->visit();
+    this->end();
+    
+    view->setRotationX(originalRotationX);
+    view->setAnchorPoint(originalAnchorPoint);
+    view->setFrameOrigin(originalFrameOrigin);
+}
+
 void CARenderImage::begin()
 {
     kmGLMatrixMode(KM_GL_PROJECTION);
@@ -262,7 +335,7 @@ void CARenderImage::begin()
     kmGLPushMatrix();
 
     // Calculate the adjustment ratios based on the old and new projections
-    CCSize size = CAApplication::getApplication()->getWinSize();
+    DSize size = CAApplication::getApplication()->getWinSize();
     float widthRatio = size.width / m_uPixelsWide;
     float heightRatio = size.height / m_uPixelsHigh;
 
@@ -285,62 +358,65 @@ void CARenderImage::begin()
     
 }
 
-void CARenderImage::beginWithClear(float r, float g, float b, float a)
+void CARenderImage::beginWithClear(const CAColor4B& backgroundColor)
 {
-    beginWithClear(r, g, b, a, 0, 0, GL_COLOR_BUFFER_BIT);
+    beginWithClear(backgroundColor, 0, 0, GL_COLOR_BUFFER_BIT);
 }
 
-void CARenderImage::beginWithClear(float r, float g, float b, float a, float depthValue)
+void CARenderImage::beginWithClear(const CAColor4B& backgroundColor, float depthValue)
 {
-    beginWithClear(r, g, b, a, depthValue, 0, GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
+    beginWithClear(backgroundColor, depthValue, 0, GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 }
 
-void CARenderImage::beginWithClear(float r, float g, float b, float a, float depthValue, int stencilValue)
+void CARenderImage::beginWithClear(const CAColor4B& backgroundColor, float depthValue, int stencilValue)
 {
-    beginWithClear(r, g, b, a, depthValue, stencilValue, GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT|GL_STENCIL_BUFFER_BIT);
+    beginWithClear(backgroundColor, depthValue, stencilValue, GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT|GL_STENCIL_BUFFER_BIT);
 }
 
-void CARenderImage::beginWithClear(float r, float g, float b, float a, float depthValue, int stencilValue, GLbitfield flags)
+void CARenderImage::beginWithClear(const CAColor4B& backgroundColor, float depthValue, int stencilValue, GLbitfield flags)
 {
     this->begin();
 
-    // save clear color
-    GLfloat	clearColor[4] = {0.0f};
-    GLfloat depthClearValue = 0.0f;
-    int stencilClearValue = 0;
-    
-    if (flags & GL_COLOR_BUFFER_BIT)
+    if (backgroundColor.a > 0)
     {
-        glGetFloatv(GL_COLOR_CLEAR_VALUE,clearColor);
-        glClearColor(r, g, b, a);
-    }
-    
-    if (flags & GL_DEPTH_BUFFER_BIT)
-    {
-        glGetFloatv(GL_DEPTH_CLEAR_VALUE, &depthClearValue);
-        glClearDepth(depthValue);
-    }
-
-    if (flags & GL_STENCIL_BUFFER_BIT)
-    {
-        glGetIntegerv(GL_STENCIL_CLEAR_VALUE, &stencilClearValue);
-        glClearStencil(stencilValue);
-    }
-    
-    glClear(flags);
-
-    // restore
-    if (flags & GL_COLOR_BUFFER_BIT)
-    {
-        glClearColor(clearColor[0], clearColor[1], clearColor[2], clearColor[3]);
-    }
-    if (flags & GL_DEPTH_BUFFER_BIT)
-    {
-        glClearDepth(depthClearValue);
-    }
-    if (flags & GL_STENCIL_BUFFER_BIT)
-    {
-        glClearStencil(stencilClearValue);
+        // save clear color
+        GLfloat	clearColor[4] = {0.0f};
+        GLfloat depthClearValue = 0.0f;
+        int stencilClearValue = 0;
+        
+        if (flags & GL_COLOR_BUFFER_BIT)
+        {
+            glGetFloatv(GL_COLOR_CLEAR_VALUE, clearColor);
+            glClearColor(backgroundColor.r, backgroundColor.g, backgroundColor.b, backgroundColor.a);
+        }
+        
+        if (flags & GL_DEPTH_BUFFER_BIT)
+        {
+            glGetFloatv(GL_DEPTH_CLEAR_VALUE, &depthClearValue);
+            glClearDepth(depthValue);
+        }
+        
+        if (flags & GL_STENCIL_BUFFER_BIT)
+        {
+            glGetIntegerv(GL_STENCIL_CLEAR_VALUE, &stencilClearValue);
+            glClearStencil(stencilValue);
+        }
+        
+        glClear(flags);
+        
+        // restore
+        if (flags & GL_COLOR_BUFFER_BIT)
+        {
+            glClearColor(clearColor[0], clearColor[1], clearColor[2], clearColor[3]);
+        }
+        if (flags & GL_DEPTH_BUFFER_BIT)
+        {
+            glClearDepth(depthClearValue);
+        }
+        if (flags & GL_STENCIL_BUFFER_BIT)
+        {
+            glClearStencil(stencilClearValue);
+        }
     }
 }
 
@@ -363,14 +439,14 @@ void CARenderImage::end()
     m_pImage = new CAImage();
     m_pImage->initWithRawData(pTempData, CAImage::PixelFormat_RGBA8888, m_uPixelsWide, m_uPixelsHigh);
     m_pImageView->setImage(m_pImage);
-    
+    m_pImage->release();
     CC_SAFE_DELETE_ARRAY(pBuffer);
     CC_SAFE_DELETE_ARRAY(pTempData);
 }
 
-void CARenderImage::clear(float r, float g, float b, float a)
+void CARenderImage::clear(const CAColor4B& backgroundColor)
 {
-    this->beginWithClear(r, g, b, a);
+    this->beginWithClear(backgroundColor);
     this->end();
 }
 
@@ -490,11 +566,16 @@ void CARenderImage::draw()
 bool CARenderImage::saveToFile(const char *szFilePath)
 {
     bool bRet = false;
-    if (m_pImage)
+    if (m_pImageView->getImage())
     {
-        bRet = m_pImage->saveToFile(szFilePath);
+        bRet = m_pImageView->getImage()->saveToFile(szFilePath);
     }
     return bRet;
 }
 
+
+void CARenderImage::setContentSize(const DSize& contentSize)
+{
+    CAView::setContentSize(DSize(m_uPixelsWide, m_uPixelsHigh));
+}
 NS_CC_END

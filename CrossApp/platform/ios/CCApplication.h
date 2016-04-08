@@ -5,10 +5,10 @@
 
 #include "platform/CCCommon.h"
 #include "platform/CCApplicationProtocol.h"
-
+#include "ccTypes.h"
 NS_CC_BEGIN
 
-class CCRect;
+class DRect;
 
 class CC_DLL CCApplication : public CCApplicationProtocol
 {
@@ -52,6 +52,10 @@ public:
      */
     virtual TargetPlatform getTargetPlatform();
 
+    void setStatusBarStyle(const CAStatusBarStyle& var);
+    
+    bool isStatusBarHidden();
+    
 protected:
     static CCApplication * sm_pSharedApplication;
 };

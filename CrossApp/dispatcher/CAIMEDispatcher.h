@@ -40,7 +40,7 @@ public:
 
     void dispatchWillInsertText(const char * pText, int nLen);
     
-    void dispatchAndroidWillInsertText(int start,const std::string &str,int before,int count);
+    void dispatchAndroidWillInsertText(int start, const std::string &str, int before, int count);
     /**
     @brief Dispatches the delete-backward operation.
     */
@@ -52,9 +52,11 @@ public:
 
 	void dispatchCursorMoveBackward();
 	void dispatchCursorMoveForward();
-	void dispatchMoveSelectChars(bool isLeftBtn, const CCPoint& pt);
-	void dispatchMoveSelectCharsCancel(const CCPoint& pt);
-	void dispatchMoveArrowBtn(const CCPoint& pt);
+    void dispatchCursorMoveUp();
+    void dispatchCursorMoveDown();
+	void dispatchMoveSelectChars(bool isLeftBtn, const DPoint& pt);
+	void dispatchMoveSelectCharsCancel(const DPoint& pt);
+	void dispatchMoveArrowBtn(const DPoint& pt);
 	void dispatchCopyToClipboard();
 	void dispatchCutToClipboard();
 	void dispatchPasteFromClipboard();

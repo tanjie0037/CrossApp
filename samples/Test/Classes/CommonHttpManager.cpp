@@ -5,7 +5,7 @@ static const char* common_loadingBackground = "dm_resource/loading_background.pn
 static const char* common_loadingIcon = "dm_resource/loading_icon.png";
 
 #define REQUEST_JSON_COUNT 2
-#define REQUEST_IMAGE_COUNT 2
+#define REQUEST_IMAGE_COUNT 4
 
 static std::map<std::string, CAObject*> _httpResponses;
 
@@ -76,16 +76,18 @@ void CommonImageCacheManager::update()
 {
     CAImageCache::sharedImageCache()->removeImage(m_dImageQueue.front());
     m_dImageQueue.popFront();
+    CCLog("------- %ld", m_dImageQueue.size());
 }
 
 void CommonImageCacheManager::pushImage(CAImage* image)
 {
     CC_RETURN_IF(m_dImageQueue.contains(image));
     m_dImageQueue.pushBack(image);
-    CCArray* array = CCArray::create();
-    array->addObject(CCDelayTime::create(10));
-    array->addObject(CCCallFunc::create(this, callfunc_selector(CommonImageCacheManager::update)));
-    this->runAction(CCSequence::create(array));
+    
+    CAViewAnimation::beginAnimations("", NULL);
+    CAViewAnimation::setAnimationDuration(10);
+    CAViewAnimation::setAnimationDidStopSelector(this, CAViewAnimation0_selector(CommonImageCacheManager::update));
+    CAViewAnimation::commitAnimations();
 }
 
 void CommonImageCacheManager::removeImage(CAImage* image)
@@ -144,17 +146,11 @@ CommonHttpManager::CommonHttpManager()
 
 CommonHttpManager::~CommonHttpManager()
 {
-    std::vector<CAHttpClient*>::iterator itr1;
-    for (itr1 = m_pHttpJsonClients.begin(); itr1!=m_pHttpJsonClients.end(); itr1++)
+    for (int i=0; i<REQUEST_JSON_COUNT + REQUEST_IMAGE_COUNT; i++)
     {
-        (*itr1)->destroyInstance();
+        CAHttpClient::destroyInstance(15 - i);
     }
     m_pHttpJsonClients.clear();
-    
-    for (itr1 = m_pHttpImageClients.begin(); itr1!=m_pHttpImageClients.end(); itr1++)
-    {
-        (*itr1)->destroyInstance();
-    }
     m_pHttpImageClients.clear();
 }
 
@@ -304,7 +300,7 @@ void CommonHttpManager::get_image(const std::string& url,
         std::string imagePath = CCFileUtils::sharedFileUtils()->getWritablePath() + "image/" + key;
         
         unsigned long pSize = 0;
-        
+
         FILE* fp = fopen(imagePath.c_str(), "rb");
         if (fp)
         {
@@ -341,19 +337,19 @@ void CommonHttpManager::starActivityIndicatorView()
     if (m_pActivityIndicatorView == NULL)
     {
         CAWindow* window = CAApplication::getApplication()->getRootWindow();
-        CCRect rect = window->getBounds();
+        DRect rect = window->getBounds();
         
         m_pActivityIndicatorView = CAActivityIndicatorView::createWithFrame(rect);
-        CAImageView* indicator = CAImageView::createWithFrame(CADipRect(0, 0, 50, 50));
+        CAImageView* indicator = CAImageView::createWithFrame(DRect(0, 0, 50, 50));
         indicator->setImage(CAImage::create(common_loadingIcon));
         m_pActivityIndicatorView->setActivityIndicatorView(indicator);
-        CAView* bg = CAView::createWithFrame(CADipRect(0, 0, 275, 300), CAColor_clear);
-        CAImageView* bg2 = CAImageView::createWithFrame(CADipRect(0, 0, 275, 100));
+        CAView* bg = CAView::createWithFrame(DRect(0, 0, 275, 300), CAColor_clear);
+        CAImageView* bg2 = CAImageView::createWithFrame(DRect(0, 0, 275, 100));
         bg2->setImage(CAImage::create(common_loadingBackground));
         bg->addSubview(bg2);
         m_pActivityIndicatorView->setActivityBackView(bg);
         m_pActivityIndicatorView->setLoadingMinTime(0.3f);
-        window->insertSubview(m_pActivityIndicatorView, CAWindowZoderTop);
+        window->insertSubview(m_pActivityIndicatorView, CAWindowZOderTop);
     }
     else
     {
@@ -529,7 +525,7 @@ void CommonHttpResponseCallBack::onResponseJsonNoCache(CAHttpClient* client, CAH
                 CC_RETURN_IF(viewController->isViewRunning() == false);
             }
             
-            CCLog("\n \n \n---------HttpResponse--json---------\n<<<\n%s\n>>>\n--------------END--------------\n \n \n",data.c_str());
+            //CCLog("\n \n \n---------HttpResponse--json---------\n<<<\n%s\n>>>\n--------------END--------------\n \n \n",data.c_str());
             
             CSJson::Reader read;
             CSJson::Value root;
@@ -636,7 +632,7 @@ void CommonHttpResponseCallBack::onResponseJson(CAHttpClient* client, CAHttpResp
             {
                 (m_pTarget->*m_pSelectorJson)(HttpResponseSucceed, root);
             }
-            
+            return;
         }
         while (0);
         
@@ -657,19 +653,11 @@ void CommonHttpResponseCallBack::onResponseImage(CAHttpClient* client, CAHttpRes
         unsigned char* pData = ((unsigned char*)(const_cast<char*>(data.c_str())));
         size_t pSize = data.length();
 
-        CAImage* image = NULL;
         std::string key = MD5(m_sUrl).md5();
+        CAImage* image = NULL;
 
-        if (m_eGetImageType == HttpGetImageDefault)
-        {
-            image = CAImage::createWithImageData(pData, pSize, key);
-        }
-        else
-        {
-            image = CAImage::createWithImageDataNoCache(pData, pSize);
-        }
+        
 
-#if (CC_TARGET_PLATFORM != CC_PLATFORM_MAC)
         if (m_eGetImageType != HttpGetImageNoAllCache)
         {
             std::string imagePath = CCFileUtils::sharedFileUtils()->getWritablePath() + "image/";
@@ -680,11 +668,22 @@ void CommonHttpResponseCallBack::onResponseImage(CAHttpClient* client, CAHttpRes
                 fwrite(pData, sizeof(unsigned char), pSize, fp);
                 fclose(fp);
             }
+            
+            CommonHttpResponseCallBack::imagePathAsync(m_pTarget, m_pSelectorImage, string(imagePath + key).c_str(), m_sUrl, m_eGetImageType);
         }
-#endif
-        if (m_pTarget && m_pSelectorImage && image)
+        else
         {
-            (m_pTarget->*m_pSelectorImage)(image, m_sUrl.c_str());
+            image = CAImage::createWithImageData(pData, pSize, key);
+            
+            if (m_pTarget && m_pSelectorImage && image)
+            {
+                (m_pTarget->*m_pSelectorImage)(image, m_sUrl.c_str());
+            }
+        }
+
+        if (m_eGetImageType != HttpGetImageDefault)
+        {
+            CommonImageCacheManager::getInstance()->pushImage(image);
         }
     }
 }
@@ -712,6 +711,12 @@ CommonUrlImageView::~CommonUrlImageView()
 {
     CC_SAFE_RELEASE(dynamic_cast<CAObject*>(m_pDelegate));
     m_pDelegate = NULL;
+    
+    CC_SAFE_RETAIN(m_pobImage);
+    CAViewAnimation::beginAnimations("", NULL);
+    CAViewAnimation::setAnimationDuration(1.0f);
+    CAViewAnimation::setAnimationDidStopSelector(m_pobImage, CAViewAnimation0_selector(CAImage::release));
+    CAViewAnimation::commitAnimations();
 }
 
 CommonUrlImageView* CommonUrlImageView::createWithImage(CAImage* image)
@@ -726,7 +731,7 @@ CommonUrlImageView* CommonUrlImageView::createWithImage(CAImage* image)
     return NULL;
 }
 
-CommonUrlImageView* CommonUrlImageView::createWithFrame(const CCRect& rect)
+CommonUrlImageView* CommonUrlImageView::createWithFrame(const DRect& rect)
 {
     CommonUrlImageView* imageView = new CommonUrlImageView();
     if (imageView && imageView->CAView::initWithFrame(rect))
@@ -738,7 +743,7 @@ CommonUrlImageView* CommonUrlImageView::createWithFrame(const CCRect& rect)
     return NULL;
 }
 
-CommonUrlImageView* CommonUrlImageView::createWithCenter(const CCRect& rect)
+CommonUrlImageView* CommonUrlImageView::createWithCenter(const DRect& rect)
 {
     CommonUrlImageView* imageView = new CommonUrlImageView();
     if (imageView && imageView->CAView::initWithCenter(rect))

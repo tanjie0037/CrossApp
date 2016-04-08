@@ -6,6 +6,11 @@
 #include "CDNewsViewController.h"
 #include "CDNewsImageController.h"
 #include "CDNewsAboutController.h"
+#include "CDWebViewController.h"
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
+#include <jni.h>
+#include "platform/android/jni/JniHelper.h"
+#endif
 
 static RootWindow* _window = NULL;
 
@@ -25,11 +30,12 @@ RootWindow::RootWindow()
 :m_pRootNavigationController(NULL)
 ,m_pRootDrawerController(NULL)
 {
+    CAApplication::getApplication()->getKeypadDispatcher()->addDelegate(this);
 }
 
 RootWindow::~RootWindow()
 {
-
+    CAApplication::getApplication()->getKeypadDispatcher()->removeDelegate(this);
 }
 
 bool RootWindow::init()
@@ -38,51 +44,78 @@ bool RootWindow::init()
     {
         return false;
     }
-    CCSize winSize = this->getBounds().size;
+    DSize winSize = this->getBounds().size;
     
-    CDUIShowCollectionView* tabBarController = new CDUIShowCollectionView();
-    tabBarController->init();
-    tabBarController->setTitle(UTF8("控件展示"));
-    CANavigationController *nav = new CANavigationController();
-    nav->initWithRootViewController(tabBarController);
-    nav->setNavigationBarBackGroundImage(CAImage::create("image/navbg.jpg"));
-    tabBarController->release();
+    CAApplication::getApplication()->setNotificationView(CAView::createWithFrame(this->getBounds(), CAColor_green));
+    
+    this->initUIView();
     
     MenuViewController* _menuview = MenuViewController::create();
     
     CADrawerController* drawer = new CADrawerController();
-    drawer->initWithController(_menuview, nav, this->getBounds().size.width/6*5);
+    drawer->initWithController(_menuview, m_pRootNavigationController, this->getBounds().size.width/6*5);
     drawer->setBackgroundView(CAImageView::createWithImage(CAImage::create("image/bg.jpg")));
     drawer->setEffect3D(true);
-    nav->release();
     
     this->setRootViewController(drawer);
-    drawer->release();
+    drawer->autorelease();
     
-    m_pRootNavigationController = nav;
     m_pRootDrawerController = drawer;
+    CAApplication::getApplication()->setNotificationView(NULL);
 
     return true;
+}
+
+void RootWindow::draw()
+{
+
 }
 
 void RootWindow::initUIView()
 {
     do
     {
-        CAViewController* viewController = m_pRootNavigationController->getViewControllerAtIndex(0);
+        CAViewController* viewController =
+        m_pRootNavigationController
+        ? m_pRootNavigationController->getViewControllerAtIndex(0) : NULL;
+        
         CC_BREAK_IF(dynamic_cast<CDUIShowCollectionView*>(viewController));
 
         CDUIShowCollectionView* tabBarController = new CDUIShowCollectionView();
         tabBarController->init();
-        tabBarController->setTitle(UTF8("控件展示"));
         tabBarController->autorelease();
-        m_pRootNavigationController->replaceViewController(tabBarController, false);
+        
+        CANavigationBarItem* temp_nav = CANavigationBarItem::create(UTF8("控件展示"));
+        CABarButtonItem* item = CABarButtonItem::create("", CAImage::create("image/ic_category_list.png"), NULL);
+        item->setTarget(this, CAControl_selector(RootWindow::buttonCallBack));
+        temp_nav->addLeftButtonItem(item);
+        tabBarController->setNavigationBarItem(temp_nav);
+        
+        if (m_pRootNavigationController)
+        {
+            m_pRootNavigationController->replaceViewController(tabBarController, false);
+        }
+        else
+        {
+            m_pRootNavigationController = new CANavigationController();
+            m_pRootNavigationController->initWithRootViewController(tabBarController);
+            m_pRootNavigationController->setNavigationBarBackgroundImage(CAImage::create("image/navbg.jpg"));
+        }
+        
     }
     while (0);
-
-    m_pRootDrawerController->hideLeftViewController(true);
+    
+    if (m_pRootDrawerController)
+    {
+        m_pRootDrawerController->hideLeftViewController(true);
+    }
+    
+    CAApplication::getApplication()->setStatusBarStyle(CAStatusBarStyleLightContent);
 }
-
+void RootWindow::buttonCallBack(CAControl* btn,DPoint point)
+{
+    this->getDrawerController()->showLeftViewController(true);
+}
 void RootWindow::intNewsView()
 {
     do
@@ -93,9 +126,11 @@ void RootWindow::intNewsView()
         
         CAVector<CAViewController*> vec_news;
         
+        CATabBarItem* item = CATabBarItem::create(unicode_to_utf8(newsTitle[0]), CAImage::create(""), CAImage::create(""));
+        item->setBadgeValue("new");
         CDNewsViewController* news_controller1 = new CDNewsViewController(0);
         news_controller1->autorelease();
-        news_controller1->setTabBarItem(CATabBarItem::create(unicode_to_utf8(newsTitle[0]), CAImage::create(""), CAImage::create("")));
+        news_controller1->setTabBarItem(item);
         vec_news.pushBack(news_controller1);
         
         CDNewsViewController* news_controller2 = new CDNewsViewController(1);
@@ -123,8 +158,8 @@ void RootWindow::intNewsView()
         newsTabBarController->initWithViewControllers(vec_news,CABarVerticalAlignmentTop);
         newsTabBarController->setScrollEnabled(true);
         newsTabBarController->setTabBarItem(CATabBarItem::create("", CAImage::create("image/tab_news_btn_up.png"),CAImage::create("image/tab_news_btn_down.png")));
-        newsTabBarController->setTabBarBackGroundImage(CAImage::create("source_material/tabbar_background.png"));
-        newsTabBarController->setTabBarSelectedBackGroundColor(CAColor_clear);
+        newsTabBarController->setTabBarBackgroundImage(CAImage::create("source_material/tabbar_background.png"));
+        newsTabBarController->setTabBarSelectedBackgroundColor(CAColor_clear);
         newsTabBarController->setTabBarTitleColorForNormal(CAColor_black);
         newsTabBarController->setTabBarTitleColorForSelected(ccc4(42,117,201,255));
         newsTabBarController->setTitle(" ");
@@ -163,8 +198,8 @@ void RootWindow::intNewsView()
         imageTabBarController->initWithViewControllers(vec_image,CABarVerticalAlignmentTop);
         imageTabBarController->setScrollEnabled(true);
         imageTabBarController->setTabBarItem(CATabBarItem::create("", CAImage::create("image/tab_image_btn_up.png"),CAImage::create("image/tab_image_btn_down.png")));
-        imageTabBarController->setTabBarBackGroundImage(CAImage::create("source_material/tabbar_background.png"));
-        imageTabBarController->setTabBarSelectedBackGroundColor(CAColor_clear);
+        imageTabBarController->setTabBarBackgroundImage(CAImage::create("source_material/tabbar_background.png"));
+        imageTabBarController->setTabBarSelectedBackgroundColor(CAColor_clear);
         imageTabBarController->setTabBarTitleColorForNormal(CAColor_black);
         imageTabBarController->setTabBarTitleColorForSelected(ccc4(42,117,201,255));
         imageTabBarController->setTitle(" ");
@@ -184,8 +219,8 @@ void RootWindow::intNewsView()
         CATabBarController* tabBarController = new CATabBarController();
         tabBarController->initWithViewControllers(vec);
         tabBarController->setTitle(" ");
-        tabBarController->setTabBarSelectedBackGroundColor(CAColor_clear);
-        tabBarController->setTabBarBackGroundImage(CAImage::create("image/tab_news_bg.png"));
+        tabBarController->setTabBarSelectedBackgroundColor(CAColor_clear);
+        tabBarController->setTabBarBackgroundImage(CAImage::create("image/tab_news_bg.png"));
         CANavigationBarItem* temp_nav = CANavigationBarItem::create(" ");
         temp_nav->setNagigationBarHidden(true);
         tabBarController->setNavigationBarItem(temp_nav);
@@ -197,4 +232,27 @@ void RootWindow::intNewsView()
     while (0);
     
     m_pRootDrawerController->hideLeftViewController(true);
+    CAApplication::getApplication()->setStatusBarStyle(CAStatusBarStyleDefault);
+}
+
+void RootWindow::keyBackClicked()
+{
+    CC_RETURN_IF(CAAlertView::hideWithDisplayed());
+    
+    if (this->getModalViewController())
+    {
+        this->dismissModalViewController(true);
+    }
+    else if (this->getDrawerController()->isShowLeftViewController())
+    {
+        this->getDrawerController()->hideLeftViewController(true);
+    }
+    else if (this->getRootNavigationController()->getViewControllerCount() > 1)
+    {
+        this->getRootNavigationController()->popViewControllerAnimated(true);
+    }
+    else
+    {
+        CAApplication::getApplication()->end();
+    }
 }

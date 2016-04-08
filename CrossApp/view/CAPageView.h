@@ -33,22 +33,22 @@ public:
     
     virtual void pageViewDidEndTurning(CAPageView* pageView){};
     
-    virtual void pageViewDidSelectPageAtIndex(CAPageView* pageView, unsigned int index, const CCPoint& point){};
+    virtual void pageViewDidSelectedPageAtIndex(CAPageView* pageView, unsigned int index, const DPoint& point){};
+    
+    CC_DEPRECATED_ATTRIBUTE virtual void pageViewDidSelectPageAtIndex(CAPageView* pageView, unsigned int index, const DPoint& point){};
 };
 
 class CC_DLL CAPageView: public CAScrollView
 {
 public:
     
-    
-    
     CAPageView(const CAPageViewDirection& type);
     
     virtual ~CAPageView();
     
-    static CAPageView* createWithFrame(const CCRect& rect, const CAPageViewDirection& type);
+    static CAPageView* createWithFrame(const DRect& rect, const CAPageViewDirection& type);
     
-    static CAPageView* createWithCenter(const CCRect& rect, const CAPageViewDirection& type);
+    static CAPageView* createWithCenter(const DRect& rect, const CAPageViewDirection& type);
     
     bool init();
     
@@ -57,6 +57,8 @@ public:
     CC_SYNTHESIZE(CAPageViewDelegate* , m_pPageViewDelegate, PageViewDelegate);
     
     CC_PROPERTY_READONLY(int, m_nCurrPage, CurrPage);
+    
+    CC_PROPERTY(int, m_fSpacing, Spacing);
     
     void setCurrPage(int var, bool animated, bool listener = false);
     
@@ -80,15 +82,7 @@ protected:
     
     virtual void contentOffsetFinish(float dt);
     
-    inline virtual float minSpeed(float dt)
-    {
-        return (3000 * dt);
-    }
-    
-    inline virtual float maxSpeed(float dt)
-    {
-        return (CCPoint(m_obContentSize).getLength() * 3000 * dt);
-    }
+    void runAnimation(bool animated);
     
 private:
     
@@ -136,20 +130,16 @@ private:
     
     using CAScrollView::getSubviewByTag;
     
-    using CAResponder::setTouchMovedListenHorizontal;
-    
-    using CAResponder::setTouchMovedListenVertical;
-    
 private:
     
     typedef enum
     {
-        CAPageViewLast,
-        CAPageViewNext,
-        CAPageViewNone
-    }CAPageViewState;
+        Last,
+        Next,
+        None
+    }State;
     
-    CAPageViewState m_ePageViewState;
+    State m_ePageViewState;
     
     CADeque<CAView*> m_pViews;
     

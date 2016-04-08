@@ -8,11 +8,10 @@
 #import "ccConfig.h"
 #import "CCSet.h"
 #import "CATouch.h"
-#import "CAIMEDispatcher.h"
 #import "CCWindow.h"
 #import "CCEventDispatcher.h"
 #import "CCEGLView.h"
-
+#include "CADensityDpi.h"
 
 //USING_NS_CC;
 static EAGLView *view;
@@ -59,7 +58,7 @@ static EAGLView *view;
 	}
     
     CrossApp::CCEGLView::sharedOpenGLView()->setFrameSize(frameRect.size.width, frameRect.size.height);
-    
+
     frameZoomFactor_ = 1.0f;
 	
 	view = self;
@@ -78,6 +77,14 @@ static EAGLView *view;
     
     [super initWithFrame:frameRect pixelFormat:format];
 
+    NSRect bounds = frameRect;
+    bounds.origin = CGPointZero;
+    NSTrackingArea* trackingArea = [[NSTrackingArea alloc]
+                                    initWithRect:bounds
+                                    options: NSTrackingMouseMoved | NSTrackingActiveAlways
+                                    owner:self userInfo:nil];
+    [self addTrackingArea:trackingArea];
+    [self lockOpenGLContext];
     return self;
 }
 
@@ -142,14 +149,13 @@ static EAGLView *view;
 	[self lockOpenGLContext];
 	//NO_FINISH
 	NSRect rect = [self bounds];
-	
 	CrossApp::CAApplication *director = CrossApp::CAApplication::getApplication();
 	CGSize size = NSSizeToCGSize(rect.size);
-	CrossApp::CCSize ccsize = CrossApp::CCSizeMake(size.width, size.height);
-	director->reshapeProjection(ccsize);
+	CrossApp::DSize DSize = CrossApp::DSize(size.width, size.height) * CrossApp::s_px_to_dip(1);
+	director->reshapeProjection(DSize);
 	
 	// avoid flicker
-//	director->drawScene();
+	director->drawScene();
 //	[self setNeedsDisplay:YES];
 	
 	[self unlockOpenGLContext];
@@ -307,14 +313,12 @@ static EAGLView *view;
 	ids[0] = [theEvent eventNumber];
 	xs[0] = x / frameZoomFactor_;
 	ys[0] = y / frameZoomFactor_;
+    CrossApp::CAEvent* event = new CrossApp::CAEvent();
+    event->setEventType(CrossApp::EventType::leftMouseEvent);
 
-	CrossApp::CAApplication::getApplication()->getOpenGLView()->handleTouchesBegin(1, ids, xs, ys);
-}
-
-- (void)mouseMoved:(NSEvent *)theEvent
-{
-	DISPATCH_EVENT(theEvent, _cmd);
-}
+	CrossApp::CAApplication::getApplication()->getOpenGLView()->handleTouchesBegin(1, ids, xs, ys, event);
+    event->release();
+} 
 
 - (void)mouseDragged:(NSEvent *)theEvent
 {
@@ -331,8 +335,11 @@ static EAGLView *view;
 	ids[0] = [theEvent eventNumber];
 	xs[0] = x / frameZoomFactor_;
 	ys[0] = y / frameZoomFactor_;
+    CrossApp::CAEvent* event = new CrossApp::CAEvent();
+    event->setEventType(CrossApp::EventType::leftMouseEvent);
 
-	CrossApp::CAApplication::getApplication()->getOpenGLView()->handleTouchesMove(1, ids, xs, ys);
+	CrossApp::CAApplication::getApplication()->getOpenGLView()->handleTouchesMove(1, ids, xs, ys, event);
+    event->release();
 }
 
 - (void)mouseUp:(NSEvent *)theEvent
@@ -351,7 +358,10 @@ static EAGLView *view;
 	xs[0] = x / frameZoomFactor_;
 	ys[0] = y / frameZoomFactor_;
 
-	CrossApp::CAApplication::getApplication()->getOpenGLView()->handleTouchesEnd(1, ids, xs, ys);
+    CrossApp::CAEvent* event = new CrossApp::CAEvent();
+    event->setEventType(CrossApp::EventType::leftMouseEvent);
+	CrossApp::CAApplication::getApplication()->getOpenGLView()->handleTouchesEnd(1, ids, xs, ys, event);
+    event->release();
 }
 
 - (void)rightMouseDown:(NSEvent *)theEvent {
@@ -359,79 +369,218 @@ static EAGLView *view;
 
 	// pass the event along to the next responder (like your NSWindow subclass)
 	[super rightMouseDown:theEvent];
+    
+    
+    NSPoint event_location = [theEvent locationInWindow];
+    NSPoint local_point = [self convertPoint:event_location fromView:nil];
+    
+    float x = local_point.x;
+    float y = [self getHeight] - local_point.y;
+    
+    intptr_t ids[1] = {0};
+    float xs[1] = {0.0f};
+    float ys[1] = {0.0f};
+    
+    ids[0] = [theEvent eventNumber];
+    xs[0] = x / frameZoomFactor_;
+    ys[0] = y / frameZoomFactor_;
+    CrossApp::CAEvent* event = new CrossApp::CAEvent();
+    event->setEventType(CrossApp::EventType::rightMouseEvent);
+    CrossApp::CAApplication::getApplication()->getOpenGLView()->handleTouchesBegin(1, ids, xs, ys, event);
+    event->release();
 }
 
 - (void)rightMouseDragged:(NSEvent *)theEvent {
 	DISPATCH_EVENT(theEvent, _cmd);
 	[super rightMouseDragged:theEvent];
+    
+    NSPoint event_location = [theEvent locationInWindow];
+    NSPoint local_point = [self convertPoint:event_location fromView:nil];
+    
+    float x = local_point.x;
+    float y = [self getHeight] - local_point.y;
+    
+    intptr_t ids[1] = {0};
+    float xs[1] = {0.0f};
+    float ys[1] = {0.0f};
+    
+    ids[0] = [theEvent eventNumber];
+    xs[0] = x / frameZoomFactor_;
+    ys[0] = y / frameZoomFactor_;
+    CrossApp::CAEvent* event = new CrossApp::CAEvent();
+    event->setEventType(CrossApp::EventType::rightMouseEvent);
+    CrossApp::CAApplication::getApplication()->getOpenGLView()->handleTouchesMove(1, ids, xs, ys, event);
+    event->release();
 }
 
 - (void)rightMouseUp:(NSEvent *)theEvent {
 	DISPATCH_EVENT(theEvent, _cmd);
 	[super rightMouseUp:theEvent];
+    
+    NSPoint event_location = [theEvent locationInWindow];
+    NSPoint local_point = [self convertPoint:event_location fromView:nil];
+    
+    float x = local_point.x;
+    float y = [self getHeight] - local_point.y;
+    
+    intptr_t ids[1] = {0};
+    float xs[1] = {0.0f};
+    float ys[1] = {0.0f};
+    
+    ids[0] = [theEvent eventNumber];
+    xs[0] = x / frameZoomFactor_;
+    ys[0] = y / frameZoomFactor_;
+    CrossApp::CAEvent* event = new CrossApp::CAEvent();
+    event->setEventType(CrossApp::EventType::rightMouseEvent);
+    CrossApp::CAApplication::getApplication()->getOpenGLView()->handleTouchesEnd(1, ids, xs, ys, event);
+    event->release();
 }
 
 - (void)otherMouseDown:(NSEvent *)theEvent {
 	DISPATCH_EVENT(theEvent, _cmd);
-	[super otherMouseDown:theEvent];
+    [super otherMouseDown:theEvent];
+    
+    NSPoint event_location = [theEvent locationInWindow];
+    NSPoint local_point = [self convertPoint:event_location fromView:nil];
+    
+    float x = local_point.x;
+    float y = [self getHeight] - local_point.y;
+    
+    intptr_t ids[1] = {0};
+    float xs[1] = {0.0f};
+    float ys[1] = {0.0f};
+    
+    ids[0] = [theEvent eventNumber];
+    xs[0] = x / frameZoomFactor_;
+    ys[0] = y / frameZoomFactor_;
+    CrossApp::CAEvent* event = new CrossApp::CAEvent();
+    event->setEventType(CrossApp::EventType::middleMouseEvent);
+    CrossApp::CAApplication::getApplication()->getOpenGLView()->handleOtherMouseDown(1, ids, xs, ys, event);
+    event->release();
 }
 
 - (void)otherMouseDragged:(NSEvent *)theEvent {
 	DISPATCH_EVENT(theEvent, _cmd);
-	[super otherMouseDragged:theEvent];
+    [super otherMouseDragged:theEvent];
+    NSPoint event_location = [theEvent locationInWindow];
+    NSPoint local_point = [self convertPoint:event_location fromView:nil];
+    
+    float x = local_point.x;
+    float y = [self getHeight] - local_point.y;
+    
+    intptr_t ids[1] = {0};
+    float xs[1] = {0.0f};
+    float ys[1] = {0.0f};
+    
+    ids[0] = [theEvent eventNumber];
+    xs[0] = x / frameZoomFactor_;
+    ys[0] = y / frameZoomFactor_;
+    CrossApp::CAEvent* event = new CrossApp::CAEvent();
+    event->setEventType(CrossApp::EventType::middleMouseEvent);
+    CrossApp::CAApplication::getApplication()->getOpenGLView()->handleOtherMouseDragged(1, ids, xs, ys, event);
+    event->release();
 }
 
 - (void)otherMouseUp:(NSEvent *)theEvent {
 	DISPATCH_EVENT(theEvent, _cmd);
-	[super otherMouseUp:theEvent];
+    [super otherMouseUp:theEvent];
+    
+    NSPoint event_location = [theEvent locationInWindow];
+    NSPoint local_point = [self convertPoint:event_location fromView:nil];
+    
+    float x = local_point.x;
+    float y = [self getHeight] - local_point.y;
+    
+    intptr_t ids[1] = {0};
+    float xs[1] = {0.0f};
+    float ys[1] = {0.0f};
+    
+    ids[0] = [theEvent eventNumber];
+    xs[0] = x / frameZoomFactor_;
+    ys[0] = y / frameZoomFactor_;
+    CrossApp::CAEvent* event = new CrossApp::CAEvent();
+    event->setEventType(CrossApp::EventType::middleMouseEvent);
+    CrossApp::CAApplication::getApplication()->getOpenGLView()->handleOtherMouseUp(1, ids, xs, ys, event);
+    event->release();
 }
 
 - (void)mouseEntered:(NSEvent *)theEvent {
 	DISPATCH_EVENT(theEvent, _cmd);
 	[super mouseEntered:theEvent];
+    
+    NSPoint event_location = [theEvent locationInWindow];
+    NSPoint local_point = [self convertPoint:event_location fromView:nil];
+    
+    float x = local_point.x;
+    float y = [self getHeight] - local_point.y;
+    
+    intptr_t ids[1] = {0};
+    float xs[1] = {0.0f};
+    float ys[1] = {0.0f};
+    
+    ids[0] = [theEvent eventNumber];
+    xs[0] = x / frameZoomFactor_;
+    ys[0] = y / frameZoomFactor_;
+    CrossApp::CAEvent* event = new CrossApp::CAEvent();
+    event->setEventType(CrossApp::EventType::rightMouseEvent);
+    CrossApp::CAApplication::getApplication()->getOpenGLView()->handleMouseEntered(1, ids, xs, ys, event);
+    event->release();
 }
 
 - (void)mouseExited:(NSEvent *)theEvent {
 	DISPATCH_EVENT(theEvent, _cmd);
 	[super mouseExited:theEvent];
+    
+    NSPoint event_location = [theEvent locationInWindow];
+    NSPoint local_point = [self convertPoint:event_location fromView:nil];
+    
+    float x = local_point.x;
+    float y = [self getHeight] - local_point.y;
+    
+    intptr_t ids[1] = {0};
+    float xs[1] = {0.0f};
+    float ys[1] = {0.0f};
+    
+    ids[0] = [theEvent eventNumber];
+    xs[0] = x / frameZoomFactor_;
+    ys[0] = y / frameZoomFactor_;
+    CrossApp::CAEvent* event = new CrossApp::CAEvent();
+    event->setEventType(CrossApp::EventType::rightMouseEvent);
+    CrossApp::CAApplication::getApplication()->getOpenGLView()->handleMouseExited(1, ids, xs, ys, event);
+}
+
+- (void)mouseMoved:(NSEvent *)theEvent
+{
+    DISPATCH_EVENT(theEvent, _cmd);
+    [super mouseMoved:theEvent];
+
+    NSPoint event_location = [theEvent locationInWindow];
+    NSPoint local_point = [self convertPoint:event_location fromView:nil];
+    
+    float x = local_point.x / frameZoomFactor_;
+    float y = ([self getHeight] - local_point.y) / frameZoomFactor_;
+    
+    CrossApp::CAEvent* event = new CrossApp::CAEvent();
+    event->setEventType(CrossApp::EventType::movedMouseEvent);
+    CrossApp::CAApplication::getApplication()->getOpenGLView()->handleMouseMoved(x, y, event);
+    event->release();
+    
 }
 
 -(void) scrollWheel:(NSEvent *)theEvent {
 	DISPATCH_EVENT(theEvent, _cmd);
 	[super scrollWheel:theEvent];
-}
 
-#pragma mark EAGLView - Key events
+    NSPoint event_location = [theEvent locationInWindow];
+    NSPoint local_point = [self convertPoint:event_location fromView:nil];
+    
+    float x = local_point.x / frameZoomFactor_;
+    float y = ([self getHeight] - local_point.y) / frameZoomFactor_;
 
--(BOOL) becomeFirstResponder
-{
-	return YES;
-}
-
--(BOOL) acceptsFirstResponder
-{
-	return YES;
-}
-
--(BOOL) resignFirstResponder
-{
-	return YES;
-}
-
-- (void)keyDown:(NSEvent *)theEvent
-{
-	DISPATCH_EVENT(theEvent, _cmd);
-	
-	// pass the event along to the next responder (like your NSWindow subclass)
-	[super keyDown:theEvent];
-}
-
-- (void)keyUp:(NSEvent *)theEvent
-{
-	DISPATCH_EVENT(theEvent, _cmd);
-
-	// pass the event along to the next responder (like your NSWindow subclass)
-	[super keyUp:theEvent];
+    CrossApp::CAEvent* event = new CrossApp::CAEvent();
+    event->setEventType(CrossApp::EventType::middleMouseEvent);
+    CrossApp::CAApplication::getApplication()->getOpenGLView()->handleScrollWheel(x, y, theEvent.scrollingDeltaX, theEvent.scrollingDeltaY, event);
+    event->release();
 }
 
 - (void)flagsChanged:(NSEvent *)theEvent
@@ -459,4 +608,5 @@ static EAGLView *view;
 {
 	DISPATCH_EVENT(theEvent, _cmd);
 }
+
 @end

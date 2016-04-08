@@ -14,7 +14,7 @@ struct newsMsg
 {
 	std::string m_title;
 	std::string m_url;
-	std::vector<std::string > m_imageUrl;
+	std::string m_imageUrl;
 	std::string m_desc;
 };
 
@@ -37,7 +37,7 @@ static const CHAR* menuTitle[4] =
 
 static const CHAR* newsTitle[5] =
 {
-	_T("头条"), _T("娱乐"), _T("体育"), _T("财经"), _T("科技")
+	_T("头条"), _T("娱乐"), _T("社会"), _T("汽车"), _T("科技")
 };
 
 static const CHAR* imageTitle[4] =
@@ -47,7 +47,7 @@ static const CHAR* imageTitle[4] =
 
 static const char* menuTag[5] =
 {
-	"weixin", "news_entertainment", "news_sports", "news_car", "news_society"
+	"__all__", "news_entertainment", "news_society", "news_car", "news_tech"
 };
 
 static const char* imageTag[4] =
@@ -71,7 +71,45 @@ static const CHAR* aboutMenuTag[12] =
     _T("关于")
 };
 
-static const char* iconTag[20] =
+static const CHAR* adressTag[34] =
+{
+    _T("北京市"),
+    _T("天津市"),
+    _T("上海市"),
+    _T("重庆市"),
+    _T("河北省"),
+    _T("山西省"),
+    _T("辽宁省"),
+    _T("吉林省"),
+    _T("黑龙江省"),
+    _T("江苏省"),
+    _T("浙江省"),
+    _T("安徽省"),
+    _T("福建省"),
+    _T("江西省"),
+    _T("山东省"),
+    _T("河南省"),
+    _T("湖北省"),
+    _T("湖南省"),
+    _T("广东省"),
+    _T("海南省"),
+    _T("四川省"),
+    _T("贵州省"),
+    _T("云南省"),
+    _T("陕西省"),
+    _T("甘肃省"),
+    _T("青海省"),
+    _T("台湾省"),
+    _T("广西壮族自治区"),
+    _T("内蒙古自治区"),
+    _T("西藏自治区"),
+    _T("宁夏回族自治区"),
+    _T("新疆维吾尔自治区"),
+    _T("香港特别行政区"),
+    _T("澳门特别行政区"),
+};
+
+static const char* iconTag[27] =
 {
 	"image/AlertView.png",
     "image/button.png",
@@ -89,8 +127,15 @@ static const char* iconTag[20] =
     "image/PageView.png",
     "image/TableView.png",
     "image/ListView.png",
-    "image/WebView.png",
     "image/CollectionView.png",
     "image/ScrollView.png",
-    "image/FlashView.png"
+    "image/WebView.png",
+    "image/FlashView.png",
+    "image/GifView.png",
+    "image/PickerView.png",
+    "image/Stepper.png",
+    "image/RenderImage.png",
+    "image/Video.png",
+    "image/Video.png",
+    "image/Video.png"
 };

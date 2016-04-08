@@ -1,6 +1,6 @@
 
 #include "CAWindow.h"
-#include "support/CCPointExtension.h"
+#include "support/CAPointExtension.h"
 #include "basics/CAApplication.h"
 #include "animation/CAViewAnimation.h"
 #include "dispatcher/CATouchDispatcher.h"
@@ -11,7 +11,7 @@ CAWindow::CAWindow()
 :m_pRootViewController(NULL)
 ,m_pModalViewController(NULL)
 {
-
+    this->setDisplayRange(false);
 }
 
 CAWindow::~CAWindow()
@@ -26,13 +26,12 @@ bool CAWindow::init()
     bool bRet = false;
     if (CAApplication* pApplication = CAApplication::getApplication())
     {
-        CCRect rect = CCRectZero;
+        DRect rect = DRectZero;
         rect.size = pApplication->getWinSize();
         this->setFrame(rect);
         bRet = true;
     }
-    
-     return bRet;
+    return bRet;
 }
 
 CAWindow *CAWindow::create()
@@ -63,7 +62,7 @@ void CAWindow::setRootViewController(CrossApp::CAViewController *var)
         var->retain();
         m_pRootViewController = var;
         m_pRootViewController->addViewFromSuperview(this);
-        m_pRootViewController->getView()->setZOrder(CAWindowZoderBottom);
+        m_pRootViewController->getView()->setZOrder(CAWindowZOderBottom);
     }
 }
 
@@ -80,18 +79,18 @@ void CAWindow::presentModalViewController(CAViewController* controller, bool ani
     m_pModalViewController = controller;
     
     m_pModalViewController->addViewFromSuperview(this);
-    m_pModalViewController->getView()->setZOrder(CAWindowZoderCenter);
+    m_pModalViewController->getView()->setZOrder(CAWindowZOderCenter);
     m_pModalViewController->viewDidAppear();
     
     CAApplication::getApplication()->getTouchDispatcher()->setDispatchEventsFalse();
     if (animated)
     {
         CAView* view = m_pModalViewController->getView();
-        CCRect frame = view->getFrame();
+        DRect frame = view->getFrame();
         frame.origin.y = frame.size.height;
         view->setFrame(frame);
         
-        CCRect endFrame = CCRectZero;
+        DRect endFrame = DRectZero;
         endFrame.size = view->getFrame().size;
         
         CAViewAnimation::beginAnimations("", NULL);
@@ -101,6 +100,10 @@ void CAWindow::presentModalViewController(CAViewController* controller, bool ani
         CAViewAnimation::setAnimationDidStopSelector(this, CAViewAnimation0_selector(CAWindow::presentEnd));
         view->setFrame(endFrame);
         CAViewAnimation::commitAnimations();
+    }
+    else
+    {
+        this->presentEnd();
     }
 }
 
@@ -127,7 +130,7 @@ void CAWindow::dismissModalViewController(bool animated)
     {
         CAView* view = m_pModalViewController->getView();
         
-        CCRect endFrame = view->getFrame();
+        DRect endFrame = view->getFrame();
         endFrame.origin.y = endFrame.size.height;
         
         CAViewAnimation::beginAnimations("", NULL);

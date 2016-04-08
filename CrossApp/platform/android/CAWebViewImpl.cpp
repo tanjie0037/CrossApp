@@ -1,10 +1,11 @@
 
 #include "CAWebViewImpl.h"
+#include "view/CAWebView.h"
+#include "basics/CAApplication.h"
+#include "platform/CCFileUtils.h"
+#include "platform/CADensityDpi.h"
 #include "platform/android/jni/JniHelper.h"
 #include <jni.h>
-#include "view/CAWebView.h"
-#include "platform/CCFileUtils.h"
-#include "basics/CAApplication.h"
 
 #define CLASS_NAME "org/CrossApp/lib/Cocos2dxWebViewHelper"
 #define  LOGD(...)  __android_log_print(ANDROID_LOG_DEBUG,"",__VA_ARGS__)
@@ -13,6 +14,7 @@
 NS_CC_BEGIN
 
 static std::string s_cszWebViewImageData;
+static std::string s_cszWebViewHtmSource;
 
 extern "C" {
 
@@ -30,14 +32,11 @@ extern "C" {
 		CAWebViewImpl::didFinishLoading(index, url);
     }
 
-	JNIEXPORT void JNICALL Java_org_CrossApp_lib_Cocos2dxWebViewHelper_didLoadHtmlSource(JNIEnv *env, jclass, jint index, jstring jurl) {
+	JNIEXPORT void JNICALL Java_org_CrossApp_lib_Cocos2dxWebViewHelper_didLoadHtmlSource(JNIEnv *env, jclass, jstring jurl) {
 		const char* charHtml = env->GetStringUTFChars(jurl, NULL);
-		std::string html = charHtml;
+		s_cszWebViewHtmSource = charHtml;
 		env->ReleaseStringUTFChars(jurl, charHtml);
-		CAWebViewImpl::didLoadHtmlSource(index, html);
 	}
-
-	
 
     JNIEXPORT void JNICALL Java_org_CrossApp_lib_Cocos2dxWebViewHelper_didFailLoading(JNIEnv *env, jclass, jint index, jstring jurl) {
 		const char* charUrl = env->GetStringUTFChars(jurl, NULL);
@@ -56,6 +55,14 @@ extern "C" {
     JNIEXPORT void JNICALL Java_org_CrossApp_lib_Cocos2dxWebViewHelper_onSetByteArrayBuffer(JNIEnv *env, jclass, jbyteArray buf, jint len) {
 			s_cszWebViewImageData.resize(len);
 			env->GetByteArrayRegion(buf, 0, len, (jbyte *)&s_cszWebViewImageData[0]);
+    }
+    
+    JNIEXPORT void JNICALL Java_org_CrossApp_lib_Cocos2dxWebViewHelper_pause() {
+        CrossApp::CAApplication::getApplication()->pause();
+    }
+    
+    JNIEXPORT void JNICALL Java_org_CrossApp_lib_Cocos2dxWebViewHelper_resume() {
+        CrossApp::CAApplication::getApplication()->resume();
     }
 }
 
@@ -211,15 +218,18 @@ void goForwardJNI(const int index) {
     }
 }
 
-void evaluateJSJNI(const int index, const std::string &js) {
-    JniMethodInfo t;
+std::string evaluateJSJNI(const int index, const std::string &js) {
+	JniMethodInfo t;
     if (JniHelper::getStaticMethodInfo(t, CLASS_NAME, "evaluateJS", "(ILjava/lang/String;)V")) {
+
+		s_cszWebViewHtmSource.clear();
         jstring jjs = t.env->NewStringUTF(js.c_str());
-        t.env->CallStaticVoidMethod(t.classID, t.methodID, index, jjs);
+		t.env->CallStaticVoidMethod(t.classID, t.methodID, index, jjs);
 
         t.env->DeleteLocalRef(jjs);
         t.env->DeleteLocalRef(t.classID);
     }
+	return s_cszWebViewHtmSource;
 }
 
 void setScalesPageToFitJNI(const int index, const bool scalesPageToFit) {
@@ -307,8 +317,8 @@ void CAWebViewImpl::setJavascriptInterfaceScheme(const std::string &scheme) {
 	setJavascriptInterfaceSchemeJNI(_viewTag, scheme);
 }
 
-void CAWebViewImpl::evaluateJS(const std::string &js) {
-	evaluateJSJNI(_viewTag, js);
+std::string CAWebViewImpl::evaluateJS(const std::string &js) {
+	return evaluateJSJNI(_viewTag, js);
 }
 
 void CAWebViewImpl::setScalesPageToFit(const bool scalesPageToFit) {
@@ -324,12 +334,6 @@ bool CAWebViewImpl::shouldStartLoading(const int viewTag, const std::string &url
 			if (!webView->m_pWebViewDelegate->onShouldStartLoading(webView, url))
 				return false;
 		}
-		if (webView && webView->m_bShowLoadingImage)
-		{
-			it->second->setVisible(false);
-			webView->m_pLoadingView->startAnimating();
-			webView->m_pLoadingView->setVisible(true);
-		}
 	}
 	return true;
 }
@@ -338,39 +342,17 @@ void CAWebViewImpl::didFinishLoading(const int viewTag, const std::string &url){
 	std::map<int, CAWebViewImpl*>::iterator it = s_WebViewImpls.find(viewTag);
 	if (it != s_WebViewImpls.end()) {
 		CAWebView* webView = it->second->_webView;
-		if (webView && webView->m_bShowLoadingImage)
-		{
-			webView->m_pLoadingView->stopAnimating();
-			webView->m_pLoadingView->setVisible(false);
-			it->second->setVisible(true);
-		}
 		if (webView && webView->m_pWebViewDelegate) {
 			webView->m_pWebViewDelegate->onDidFinishLoading(webView, url);
 		}
 	}
 }
 
-void CAWebViewImpl::didLoadHtmlSource(const int viewTag, const std::string &html)
-{
-	std::map<int, CAWebViewImpl*>::iterator it = s_WebViewImpls.find(viewTag);
-	if (it != s_WebViewImpls.end()) {
-		CAWebView* webView = it->second->_webView;
-		if (webView && webView->m_pWebViewDelegate) {
-			webView->m_pWebViewDelegate->onLoadHtmlSource(webView, html);
-		}
-	}
-}
 
 void CAWebViewImpl::didFailLoading(const int viewTag, const std::string &url){
 	std::map<int, CAWebViewImpl*>::iterator it = s_WebViewImpls.find(viewTag);
 	if (it != s_WebViewImpls.end()) {
 		CAWebView* webView = it->second->_webView;
-		if (webView && webView->m_bShowLoadingImage)
-		{
-			webView->m_pLoadingView->stopAnimating();
-			webView->m_pLoadingView->setVisible(false);
-			it->second->setVisible(true);
-		}
 		if (webView && webView->m_pWebViewDelegate) {
 			webView->m_pWebViewDelegate->onDidFailLoading(webView, url);
 		}
@@ -387,9 +369,18 @@ void CAWebViewImpl::onJsCallback(const int viewTag, const std::string &message){
 	}
 }
 
+void CAWebViewImpl::setAllWebviewRectEmpty()
+{
+
+}
+
 void CAWebViewImpl::update(float dt)
 {
-	CCRect cRect = _webView->convertRectToWorldSpace(_webView->getBounds());
+	DRect cRect = _webView->convertRectToWorldSpace(_webView->getBounds());
+    cRect.origin.x = s_dip_to_px(cRect.origin.x);
+    cRect.origin.y = s_dip_to_px(cRect.origin.y);
+    cRect.size.width = s_dip_to_px(cRect.size.width);
+    cRect.size.height = s_dip_to_px(cRect.size.height);
 	setWebViewRectJNI(_viewTag, cRect.origin.x, cRect.origin.y, cRect.size.width, cRect.size.height);
 }
 
@@ -404,7 +395,7 @@ CAImageView* CAWebViewImpl::getWebViewImage()
 	
 	if (!s_cszWebViewImageData.empty())
 	{
-		CCSize size = _webView->getBounds().size;
+		DSize size = _webView->getBounds().size;
 
 		CAImage* pImage = new CAImage();
 		if (!pImage->initWithRawData((const unsigned char*)&s_cszWebViewImageData[0], CAImage::PixelFormat_RGBA8888, size.width, size.height))

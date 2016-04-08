@@ -16,7 +16,7 @@ class CDNewsAboutTableCell : public CATableViewCell
 public:
     CDNewsAboutTableCell();
     virtual ~CDNewsAboutTableCell();
-    static CDNewsAboutTableCell* create(const std::string& identifier, const CADipRect& _rect = CADipRectZero);
+    static CDNewsAboutTableCell* create(const std::string& identifier, const DRect& _rect = DRectZero);
     virtual void highlightedTableViewCell();
     virtual void selectedTableViewCell();
 public:
@@ -37,17 +37,38 @@ public:
     
     virtual void tableViewDidSelectRowAtIndexPath(CATableView* table, unsigned int section, unsigned int row);
     virtual void tableViewDidDeselectRowAtIndexPath(CATableView* table, unsigned int section, unsigned int row);
-    virtual CAView* tableViewSectionViewForHeaderInSection(CATableView* table, const CCSize& viewSize, unsigned int section);
-    virtual CAView* tableViewSectionViewForFooterInSection(CATableView* table, const CCSize& viewSize, unsigned int section);
-    virtual CATableViewCell* tableCellAtIndex(CATableView* table, const CCSize& cellSize, unsigned int section, unsigned int row);
+    virtual CAView* tableViewSectionViewForHeaderInSection(CATableView* table, const DSize& viewSize, unsigned int section);
+    virtual CAView* tableViewSectionViewForFooterInSection(CATableView* table, const DSize& viewSize, unsigned int section);
+    virtual CATableViewCell* tableCellAtIndex(CATableView* table, const DSize& cellSize, unsigned int section, unsigned int row);
     virtual unsigned int numberOfRowsInSection(CATableView *table, unsigned int section);
     virtual unsigned int numberOfSections(CATableView *table);
     virtual unsigned int tableViewHeightForRowAtIndexPath(CATableView* table, unsigned int section, unsigned int row);
     virtual unsigned int tableViewHeightForHeaderInSection(CATableView* table, unsigned int section);
     virtual unsigned int tableViewHeightForFooterInSection(CATableView* table, unsigned int section);
 public:
-    CADipSize winSize;
+    void deleteCallBack(float dt);
+    CAView* _waitview;
+    CAActivityIndicatorView* p_pLoading;
+    DSize winSize;
     CATableView* p_TableView;
+    float _filesize;
+    float _tempfilesize;
+    string temp_Path;
+    pthread_t start()
+    {
+        pthread_t tid;
+        pthread_create(&tid, NULL, hook, this);
+        return tid;
+    }
+private:
+    static void* hook(void* args)
+    
+    {
+        reinterpret_cast<CDNewsAboutController*>(args)->worker();
+        return NULL;
+    }
+protected:
+    void worker();
 };
 
 #endif /* defined(__Test__CDNewsAboutController__) */

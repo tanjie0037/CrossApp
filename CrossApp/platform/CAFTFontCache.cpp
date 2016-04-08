@@ -2,8 +2,7 @@
 #include "basics/CAApplication.h"
 #include "platform/CCFileUtils.h"
 #include "support/ccUTF8.h"
-
-
+#include "CAEmojiFont.h"
 using namespace std;
 
 NS_CC_BEGIN
@@ -13,6 +12,7 @@ CAFTFontCache::CAFTFontCache()
 : m_pCurFontData(NULL)
 {
 	initDefaultFont();
+//    CAEmojiFont::getInstance();
 }
 
 CAFTFontCache::~CAFTFontCache()
@@ -93,20 +93,26 @@ int CAFTFontCache::cutStringByWidth(const char* pFontName, unsigned long nSize, 
 	return m_pCurFontData->ftFont.cutStringByWidth(text, iLimitWidth, cutWidth);
 }
 
+int CAFTFontCache::cutStringByDSize(std::string& text, const DSize& lableSize, const char* pFontName, unsigned long nSize, bool bWordWrap, int iLineSpacing, bool bBold, bool bItalics)
+{
+	setCurrentFontData(pFontName, (int)nSize);
+	return m_pCurFontData->ftFont.cutStringByDSize(text, lableSize, pFontName, nSize, bWordWrap, iLineSpacing, bBold, bItalics);
+}
+
 int CAFTFontCache::getStringHeight(const char* pFontName, unsigned long nSize, const std::string& text, int iLimitWidth, int iLineSpace, bool bWordWrap)
 {
 	setCurrentFontData(pFontName, (int)nSize);
 	return m_pCurFontData->ftFont.getStringHeight(text, iLimitWidth, iLineSpace, bWordWrap);
 }
 
-CAImage* CAFTFontCache::initWithString(const char* pText, const char* pFontName, int nSize, int width, int height, 
-	CATextAlignment hAlignment, CAVerticalTextAlignment vAlignment, bool bWordWrap, int iLineSpacing, bool bBold, bool bItalics, bool bUnderLine, std::vector<TextViewLineInfo>* pLinesText)
+CAImage* CAFTFontCache::initWithString(const char* pText, const CAColor4B& fontColor, const char* pFontName, int nSize, int width, int height,
+	CATextAlignment hAlignment, CAVerticalTextAlignment vAlignment, bool bWordWrap, int iLineSpacing, bool bBold, bool bItalics, bool bUnderLine, bool bDeleteLine, std::vector<TextViewLineInfo>* pLinesText)
 {
 	if (pText == NULL || pFontName == NULL)
 		return NULL;
 
 	setCurrentFontData(pFontName, nSize);
-	CAImage* pImage = m_pCurFontData->ftFont.initWithString(pText, pFontName, nSize, width, height, hAlignment, vAlignment, bWordWrap, iLineSpacing, bBold, bItalics, bUnderLine, pLinesText);
+	CAImage* pImage = m_pCurFontData->ftFont.initWithString(pText, fontColor, pFontName, nSize, width, height, hAlignment, vAlignment, bWordWrap, iLineSpacing, bBold, bItalics, bUnderLine, bDeleteLine, pLinesText);
 	return pImage;
 }
 

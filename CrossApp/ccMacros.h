@@ -131,10 +131,6 @@ It should work same as apples CFSwapInt32LittleToHost(..)
 #define CC_PROFILER_STOP_CATEGORY(__cat__, __name__) do{ if(__cat__) CCProfilingEndTimingBlock(__name__); } while(0)
 #define CC_PROFILER_RESET_CATEGORY(__cat__, __name__) do{ if(__cat__) CCProfilingResetTimingBlock(__name__); } while(0)
 
-#define CC_PROFILER_START_INSTANCE(__id__, __name__) do{ CCProfilingBeginTimingBlock( CCString::createWithFormat("%08X - %s", __id__, __name__)->getCString() ); } while(0)
-#define CC_PROFILER_STOP_INSTANCE(__id__, __name__) do{ CCProfilingEndTimingBlock(    CCString::createWithFormat("%08X - %s", __id__, __name__)->getCString() ); } while(0)
-#define CC_PROFILER_RESET_INSTANCE(__id__, __name__) do{ CCProfilingResetTimingBlock( CCString::createWithFormat("%08X - %s", __id__, __name__)->getCString() ); } while(0)
-
 
 #else
 
@@ -166,13 +162,6 @@ It should work same as apples CFSwapInt32LittleToHost(..)
         } \
     } while (false)
 #endif
-
-/** @def CC_INCREMENT_GL_DRAWS_BY_ONE
- Increments the GL Draws counts by one.
- The number of calls per frame are displayed on the screen when the CAApplication's stats are enabled.
- */
-extern unsigned int CC_DLL g_uNumberOfDraws;
-#define CC_INCREMENT_GL_DRAWS(__n__) g_uNumberOfDraws += __n__
 
 /*******************/
 /** Notifications **/

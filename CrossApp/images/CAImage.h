@@ -16,9 +16,11 @@
 #include "CCGL.h"
 #include "CCStdC.h"
 #include "gif_lib/gif_lib.h"
+#include <list>
 
 NS_CC_BEGIN
 
+class CAFreeTypeFont;
 class CAGLProgram;
 
 typedef struct _ccTexParams
@@ -49,32 +51,35 @@ public:
     /** Supported formats for Image */
     typedef enum
     {
-        //! JPEG
-        JPG,
-        //! PNG
-        PNG,
-        //! GIF
-        GIF,
-        //! TIFF
-        TIFF,
-        //! WebP
-        WEBP,
-        //! ETC
-        ETC,
-        //! TGA
-        TGA,
-        //! Raw Data
-        RAW_DATA,
-        //! Unknown format
-        UNKOWN
-    } Format;
+        JPG,//! JPEG
+        PNG,//! PNG
+        GIF,//! GIF
+        TIFF,//! TIFF
+        WEBP,//! WebP
+        ETC,//! ETC
+        TGA,//! TGA
+        RAW_DATA,//! Raw Data
+        UNKOWN//! Unknown format
+    }
+    Format;
     
     CAImage();
     
     virtual ~CAImage();
     
-    static CAImage* createWithString(const char *text, const char *fontName, float fontSize, const CCSize& dimensions,
-                                     CATextAlignment hAlignment, CAVerticalTextAlignment vAlignment, bool isForTextField = false, int iLineSpacing = 0, bool bBold = false, bool bItalics = false, bool bUnderLine = false);
+    static CAImage* createWithString(const char *text,
+									 const CAColor4B& fontColor,
+                                     const char *fontName,
+                                     float fontSize,
+                                     const DSize& dimensions,
+                                     CATextAlignment hAlignment,
+                                     CAVerticalTextAlignment vAlignment,
+                                     bool isForTextField = false,
+                                     int iLineSpacing = 0,
+                                     bool bBold = false,
+                                     bool bItalics = false,
+                                     bool bUnderLine = false,
+									 bool bDeleteLine = false);
     
     static int getFontHeight(const char* pFontName, unsigned long nSize);
     
@@ -87,6 +92,15 @@ public:
                                 const std::string& text,
                                 int iLimitWidth,
                                 int& cutWidth);
+
+	static int cutStringByDSize(std::string& text, 
+								const DSize& lableSize, 
+								const char* pFontName, 
+								unsigned long nSize, 
+								bool bWordWrap = true, 
+								int iLineSpacing = 0, 
+								bool bBold = false, 
+								bool bItalics = false);
     
     static int getStringHeight(const char* pFontName,
                                unsigned long nSize,
@@ -94,6 +108,12 @@ public:
                                int iLimitWidth,
                                int iLineSpace = 0,
                                bool bWordWrap = true);
+    
+    static CAImage* scaleToNewImageWithImage(CAImage* image, const DSize& size);
+    
+    static CAImage* scaleToNewImageWithImage(CAImage* image, float scaleX, float scaleY);
+    
+    static CAImage* generateMipmapsWithImage(CAImage* image);
     
     static CAImage* create(const std::string& file);
 
@@ -106,7 +126,7 @@ public:
     static CAImage* createWithRawDataNoCache(const unsigned char * data,
                                              const CAImage::PixelFormat& pixelFormat,
                                              unsigned int pixelsWide,
-                                             unsigned int pixelsHigh);
+                                                 unsigned int pixelsHigh);
     
     static CAImage* createWithRawData(const unsigned char * data,
                                       const CAImage::PixelFormat& pixelFormat,
@@ -127,11 +147,13 @@ public:
     
     const char* description(void);
     
-    void releaseData(void *data);
+    void releaseData();
     
-    void drawAtPoint(const CCPoint& point);
+    void releaseData(unsigned char ** data);
     
-    void drawInRect(const CCRect& rect);
+    void drawAtPoint(const DPoint& point);
+    
+    void drawInRect(const DRect& rect);
     
     bool initWithETCFile(const char* file);
     
@@ -148,11 +170,7 @@ public:
     unsigned int bitsPerPixelForFormat();
     
     unsigned int bitsPerPixelForFormat(CAImage::PixelFormat format);
-    
-    static void setDefaultAlphaPixelFormat(CAImage::PixelFormat format);
-    
-    static CAImage::PixelFormat defaultAlphaPixelFormat();
-    
+
     bool hasPremultipliedAlpha();
     
     bool hasMipmaps();
@@ -161,10 +179,10 @@ public:
     
     const char* getImageFileType();
     
-    static CAImage* CC_WHITE_IMAGE();
-    
     float getAspectRatio();
     
+    static CAImage* CC_WHITE_IMAGE();
+
     virtual CAImage* copy();
     
     bool hasAlpha() { return m_bHasAlpha; }
@@ -190,7 +208,7 @@ public:
     
     CC_PROPERTY(GLfloat, m_fMaxT, MaxT)
     
-    CC_PROPERTY_READONLY_PASS_BY_REF(CCSize, m_tContentSize, ContentSize)
+    CC_PROPERTY_READONLY_PASS_BY_REF(DSize, m_tContentSize, ContentSize)
     
     CC_PROPERTY(CAGLProgram*, m_pShaderProgram, ShaderProgram);
     
@@ -198,17 +216,21 @@ public:
     
     CC_SYNTHESIZE_READONLY(unsigned char*, m_pData, Data);
     
-    CC_SYNTHESIZE_READONLY(unsigned long, m_nDataLenght, DataLenght);
+    CC_SYNTHESIZE_READONLY(unsigned long, m_uDataLenght, DataLenght);
     
     void premultipliedImageData();
     
     void repremultipliedImageData();
+    
+    void freeName();
     
     void updateGifImageWithIndex(unsigned int index);
 
     unsigned int getGifImageIndex();
     
     unsigned int getGifImageCounts();
+    
+    static void reloadAllImages();
     
 protected:
     
@@ -221,6 +243,8 @@ protected:
     
     bool saveImageToPNG(const std::string& filePath, bool isToRGB);
     bool saveImageToJPG(const std::string& filePath);
+    
+    void setData(const unsigned char* data, unsigned long dataLenght);
     
     void convertToRawData();
     
@@ -285,7 +309,9 @@ protected:
     bool checkIfWillBeCleared(const SavedImage* frame);
     void copyLine(unsigned char* dst, const unsigned char* src, const ColorMapObject* cmap, int transparent, int width);
     void setGifImageWithIndex(unsigned int index);
-    
+public:
+    std::wstring m_txt;
+    std::string m_FileName;	
 protected:
     
     bool m_bPremultiplied;
@@ -296,11 +322,19 @@ protected:
     
     bool m_bHasAlpha;
     
+    bool m_bTextImage;
+    
     int  m_nBitsPerComponent;
     
     GifFileType* m_pGIF;
     
     int m_iGIFIndex;
+    
+    unsigned char* m_pImageData;
+    
+    unsigned long m_uImageDataLenght;
+    
+    friend class CAFreeTypeFont;
 };
 
 NS_CC_END

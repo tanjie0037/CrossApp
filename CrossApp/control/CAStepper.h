@@ -3,7 +3,7 @@
 //  CrossApp
 //
 //  Created by dai xinping on 14-8-15.
-//  Copyright (c) 2014年 cocos2d-x. All rights reserved.
+//  Copyright (c) 2014年 CrossApp. All rights reserved.
 //
 
 #ifndef __CrossApp__CAStepper__
@@ -14,21 +14,27 @@
 
 NS_CC_BEGIN
 
+typedef enum
+{
+    CAStepperOrientationHorizontal,
+    CAStepperOrientationVertical
+}CAStepperOrientation;
+
 class CAImageView;
 class CAScale9ImageView;
 class CC_DLL CAStepper : public CAControl {
     
 public:
-    CAStepper();
+    CAStepper(const CAStepperOrientation& type = CAStepperOrientationHorizontal);
     virtual ~CAStepper();
 
-    static CAStepper* create();
-    static CAStepper* createWithFrame(const CCRect& rect);
-    static CAStepper* createWithCenter(const CCRect& rect);
+    static CAStepper* create(const CAStepperOrientation& type = CAStepperOrientationHorizontal);
+    static CAStepper* createWithFrame(const DRect& rect
+                                      , const CAStepperOrientation& type = CAStepperOrientationHorizontal);
+    static CAStepper* createWithCenter(const DRect& rect
+                                       , const CAStepperOrientation& type = CAStepperOrientationHorizontal);
     
     virtual bool init();
-    virtual bool initWithFrame(const CCRect& rect);
-    virtual bool initWithCenter(const CCRect& rect);
     
     virtual void onEnter();
     virtual void onExit();
@@ -47,7 +53,7 @@ public:
 //    CC_SYNTHESIZE(CAColor4B, m_tintColor, TintColor);
     
 public:
-    // a background image which will be 3-way stretched over the whole of the control. Each half of the stepper will paint the image appropriate for its state      
+    // a Background image which will be 3-way stretched over the whole of the control. Each half of the stepper will paint the image appropriate for its state      
     void setBackgroundImage(CAImage* image, CAControlState state);
     CAImage* getBackgroundImageForState(CAControlState state);
 
@@ -60,8 +66,11 @@ public:
     CAImage* getDecrementImageForState(CAControlState state);
     
     // an image which will be painted in between the two stepper segments. The image is selected depending both segments' state
-    void setDividerImage(CAImage* image, CAControlState state);
-    CAImage* getDividerImageForState(CAControlState state);
+    void setDividerColor(CAColor4B color);
+    CAColor4B getDividerColor();
+    
+    void setTailorImageAtIndex(int index);
+    CAView* getTailorImageAtIndex(int index);
 
     CC_SYNTHESIZE(bool, m_bTouchEffect, TouchEffect); // default is false, alpha
 
@@ -73,34 +82,42 @@ public:
 
 	virtual void removeAllTargets();
 
-protected:
-    virtual bool ccTouchBegan(CATouch *pTouch, CAEvent *pEvent);    
+    virtual bool ccTouchBegan(CATouch *pTouch, CAEvent *pEvent);
     virtual void ccTouchMoved(CATouch *pTouch, CAEvent *pEvent);
     virtual void ccTouchEnded(CATouch *pTouch, CAEvent *pEvent);
     virtual void ccTouchCancelled(CATouch *pTouch, CAEvent *pEvent);
     
 protected:
+
     void repeat(float dt);
     void click(CATouch* pTouch);
     void action();
-    void setContentSize(const CCSize & var);
+    void setContentSize(const DSize & var);
+    
 private:
+    
     CAImage* m_pBackgroundImage[CAControlStateAll];
     CAImage* m_pIncrementImage[CAControlStateAll];
     CAImage* m_pDecrementImage[CAControlStateAll];
-    CAImage* m_pDividerImage[CAControlStateAll];
     
-    CAImageView* m_pBackgroundImageView;
+    CAScale9ImageView* m_pBackgroundImageView;
+    CAImageView* m_pBackgroundSelectedImageView;
     CAImageView* m_pIncrementImageView;
     CAImageView* m_pDecrementImageView;
-    CAImageView* m_pDividerImageView;
+    CAView* m_pDividerImageView;
+    CAColor4B m_cTintColor;
+    
+    CAStepperOrientation m_pCAStepperOrientation;
     
 private:
-    enum ActionType{
+    
+    enum ActionType
+    {
         ActionNone,
         ActionIncrease,
         ActionDecrease
     };
+    
     int m_actionType;
 };
 

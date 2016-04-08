@@ -28,7 +28,7 @@ CAImageView* CAImageView::createWithImage(CAImage* image)
     return NULL;
 }
 
-CAImageView* CAImageView::createWithFrame(const CCRect& rect)
+CAImageView* CAImageView::createWithFrame(const DRect& rect)
 {
 	CAImageView * pRet = new CAImageView();
     if (pRet && pRet->init())
@@ -41,7 +41,7 @@ CAImageView* CAImageView::createWithFrame(const CCRect& rect)
 	return NULL;
 }
 
-CAImageView* CAImageView::createWithCenter(const CCRect& rect)
+CAImageView* CAImageView::createWithCenter(const DRect& rect)
 {
 	CAImageView * pRet = new CAImageView();
     if (pRet && pRet->init())
@@ -73,15 +73,13 @@ bool CAImageView::init(void)
 
 bool CAImageView::initWithImage(CAImage* image)
 {
-	this->setShaderProgram(CAShaderCache::sharedShaderCache()->programForKey(kCCShader_PositionTextureColor));
-
-	CCRect rect = CCRectZero;
+	DRect rect = DRectZero;
 	if (image)
 	{
 		rect.size = image->getContentSize();
 	}
 	this->setImage(image);
-	this->setImageRect(rect, false, rect.size);
+	this->setImageRect(rect);
 
     return true;
 }
@@ -108,9 +106,9 @@ void CAImageView::updateByImageViewScaleType()
     CC_RETURN_IF(m_bUpdateByImageViewScaleType);
     m_bUpdateByImageViewScaleType = true;
     
-    CCSize viewSize = m_obContentSize;
-    CCRect rect = m_obRect;
-    CCSize imageSize = m_obRect.size;
+    DSize viewSize = DSize(m_obContentSize);
+    DRect rect = DRect(m_obRect);
+    DSize imageSize = m_obRect.size;
     float viewRatio = viewSize.width / viewSize.height;
     float imageRatio = imageSize.width / imageSize.height;
     
@@ -168,11 +166,26 @@ void CAImageView::updateByImageViewScaleType()
         default:
             break;
     }
-    this->setImageRect(rect, false, viewSize);
+    this->setImageRect(rect);
+    if (!viewSize.equals(m_obContentSize))
+    {
+        if (m_bFrame)
+        {
+            DRect rect = this->getFrame();
+            rect.size = viewSize;
+            this->setFrame(rect);
+        }
+        else
+        {
+            DRect rect = this->getCenter();
+            rect.size = viewSize;
+            this->setCenter(rect);
+        }
+    }
     m_bUpdateByImageViewScaleType = false;
 }
 
-void CAImageView::setContentSize(const CCSize & size)
+void CAImageView::setContentSize(const DSize & size)
 {
     if (CAViewAnimation::areAnimationsEnabled()
          && CAViewAnimation::areBeginAnimations())
@@ -183,8 +196,8 @@ void CAImageView::setContentSize(const CCSize & size)
     {
         m_obContentSize = size;
         
-        m_obAnchorPointInPoints = CCPoint(m_obContentSize.width * m_obAnchorPoint.x, m_obContentSize.height * m_obAnchorPoint.y );
-        m_obFrameRect.size = CCSize(m_obContentSize.width * m_fScaleX, m_obContentSize.height * m_fScaleY);
+        m_obAnchorPointInPoints = DPoint(m_obContentSize.width * m_obAnchorPoint.x, m_obContentSize.height * m_obAnchorPoint.y );
+        m_obFrameRect.size = DSize(m_obContentSize.width * m_fScaleX, m_obContentSize.height * m_fScaleY);
         
         this->updateByImageViewScaleType();
         
@@ -206,7 +219,7 @@ void CAImageView::setImage(CAImage* image)
     CAView::setImage(image);
     if (image)
     {
-        CCRect rect = CCRectZero;
+        DRect rect = DRectZero;
         rect.size = image->getContentSize();
         this->setVertexRect(rect);
         this->updateByImageViewScaleType();
@@ -225,6 +238,18 @@ void CAImageView::updateImageRect()
     m_sQuad.br.vertices = vertex3( m_fRight,    m_fTop, m_fVertexZ);
     m_sQuad.tl.vertices = vertex3(  m_fLeft, m_fBottom, m_fVertexZ);
     m_sQuad.tr.vertices = vertex3( m_fRight, m_fBottom, m_fVertexZ);
+}
+
+void CAImageView::setImageViewScaleType(const CAImageViewScaleType &var)
+{
+    CC_RETURN_IF(m_eImageViewScaleType == var);
+    m_eImageViewScaleType = var;
+    this->updateByImageViewScaleType();
+}
+
+const CAImageViewScaleType& CAImageView::getImageViewScaleType()
+{
+    return m_eImageViewScaleType;
 }
 
 void CAImageView::startAnimating()
@@ -295,12 +320,12 @@ CAView* CAImageView::copy()
     return pReturn;
 }
 
-bool CAImageView::initWithFrame(const CCRect& rect, const CAColor4B& color4B)
+bool CAImageView::initWithFrame(const DRect& rect, const CAColor4B& color4B)
 {
     return CAView::initWithFrame(rect);
 }
 
-bool CAImageView::initWithCenter(const CCRect& rect, const CAColor4B& color4B)
+bool CAImageView::initWithCenter(const DRect& rect, const CAColor4B& color4B)
 {
     return CAView::initWithCenter(rect);
 }

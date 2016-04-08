@@ -19,6 +19,25 @@ class CAZone;
 class CAObject;
 class CAEvent;
 class CAView;
+class CAObject;
+
+typedef void (CAObject::*SEL_SCHEDULE)(float);
+typedef void (CAObject::*SEL_CallFunc)();
+typedef void (CAObject::*SEL_CallFuncN)(CAView*);
+typedef void (CAObject::*SEL_CallFuncND)(CAView*, void*);
+typedef void (CAObject::*SEL_CallFuncO)(CAObject*);
+typedef void (CAObject::*SEL_MenuHandler)(CAObject*);
+typedef void (CAObject::*SEL_EventHandler)(CAEvent*);
+typedef int (CAObject::*SEL_Compare)(CAObject*);
+
+#define schedule_selector(_SELECTOR) (SEL_SCHEDULE)(&_SELECTOR)
+#define callfunc_selector(_SELECTOR) (SEL_CallFunc)(&_SELECTOR)
+#define callfuncN_selector(_SELECTOR) (SEL_CallFuncN)(&_SELECTOR)
+#define callfuncND_selector(_SELECTOR) (SEL_CallFuncND)(&_SELECTOR)
+#define callfuncO_selector(_SELECTOR) (SEL_CallFuncO)(&_SELECTOR)
+#define menu_selector(_SELECTOR) (SEL_MenuHandler)(&_SELECTOR)
+#define event_selector(_SELECTOR) (SEL_EventHandler)(&_SELECTOR)
+#define compare_selector(_SELECTOR) (SEL_Compare)(&_SELECTOR)
 
 class CC_DLL CACopying
 {
@@ -30,8 +49,10 @@ class CC_DLL CAObject : public CACopying
 {
 public:
 
-    unsigned int        m_uID;
+    unsigned int        m_u__ID;
 
+    std::string         m_s__StrID;
+    
 protected:
 
     unsigned int        m_uReference;
@@ -62,6 +83,12 @@ public:
 
     virtual void update(float dt) {CC_UNUSED_PARAM(dt);};
     
+    void performSelector(SEL_CallFunc callFunc, float afterDelay);
+    
+    CC_SYNTHESIZE(void*, m_pUserData, UserData);
+    
+    CC_SYNTHESIZE_RETAIN(CAObject*, m_pUserObject, UserObject);
+    
     CC_SYNTHESIZE(int, m_nTag, Tag);
     
     CC_SYNTHESIZE_PASS_BY_REF(std::string, m_sTextTag, TextTag);
@@ -80,23 +107,6 @@ public:
     CAObject *m_pCopyObject;
 };
 
-typedef void (CAObject::*SEL_SCHEDULE)(float);
-typedef void (CAObject::*SEL_CallFunc)();
-typedef void (CAObject::*SEL_CallFuncN)(CAView*);
-typedef void (CAObject::*SEL_CallFuncND)(CAView*, void*);
-typedef void (CAObject::*SEL_CallFuncO)(CAObject*);
-typedef void (CAObject::*SEL_MenuHandler)(CAObject*);
-typedef void (CAObject::*SEL_EventHandler)(CAEvent*);
-typedef int (CAObject::*SEL_Compare)(CAObject*);
-
-#define schedule_selector(_SELECTOR) (SEL_SCHEDULE)(&_SELECTOR)
-#define callfunc_selector(_SELECTOR) (SEL_CallFunc)(&_SELECTOR)
-#define callfuncN_selector(_SELECTOR) (SEL_CallFuncN)(&_SELECTOR)
-#define callfuncND_selector(_SELECTOR) (SEL_CallFuncND)(&_SELECTOR)
-#define callfuncO_selector(_SELECTOR) (SEL_CallFuncO)(&_SELECTOR)
-#define menu_selector(_SELECTOR) (SEL_MenuHandler)(&_SELECTOR)
-#define event_selector(_SELECTOR) (SEL_EventHandler)(&_SELECTOR)
-#define compare_selector(_SELECTOR) (SEL_Compare)(&_SELECTOR)
 
 NS_CC_END
 

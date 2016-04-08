@@ -1,7 +1,7 @@
 
 
 #include "CAIMEDispatcher.h"
-
+#include "platform/CCCommon.h"
 #include <list>
 
 NS_CC_BEGIN
@@ -124,11 +124,11 @@ bool CAIMEDispatcher::attachDelegateWithIME(CAIMEDelegate * pDelegate)
             // if old delegate canDetachWithIME return false 
             // or pDelegate canAttachWithIME return false,
             // do nothing.
-            CC_BREAK_IF(! m_pImpl->m_DelegateWithIme->canDetachWithIME()
-                || ! pDelegate->canAttachWithIME());
+            CC_BREAK_IF(! pDelegate->canAttachWithIME());
 
             // detach first
             CAIMEDelegate * pOldDelegate = m_pImpl->m_DelegateWithIme;
+            m_pImpl->m_DelegateWithIme->getKeyBoardHeight(0);
             m_pImpl->m_DelegateWithIme = 0;
             pOldDelegate->didDetachWithIME();
 
@@ -160,6 +160,7 @@ bool CAIMEDispatcher::detachDelegateWithIME(CAIMEDelegate * pDelegate)
 
         CC_BREAK_IF(! pDelegate->canDetachWithIME());
 
+        m_pImpl->m_DelegateWithIme->getKeyBoardHeight(0);
         m_pImpl->m_DelegateWithIme = 0;
         pDelegate->didDetachWithIME();
         bRet = true;
@@ -202,13 +203,13 @@ void CAIMEDispatcher::dispatchWillInsertText(const char * pText, int nLen)
         m_pImpl->m_DelegateWithIme->willInsertText(pText, nLen);
     } while (0);
 }
-void CAIMEDispatcher::dispatchAndroidWillInsertText(int start,const std::string &str,int before,int count)
+void CAIMEDispatcher::dispatchAndroidWillInsertText(int start, const std::string &str, int before, int count)
 {
     do
     {
         CC_BREAK_IF(! m_pImpl);
         CC_BREAK_IF(! m_pImpl->m_DelegateWithIme);
-        m_pImpl->m_DelegateWithIme->AndroidWillInsertText(start,str.c_str(),before,count);
+        m_pImpl->m_DelegateWithIme->AndroidWillInsertText(start, str.c_str(), before, count);
     } while (0);
 }
 void CAIMEDispatcher::dispatchInsertText(const char * pText, int nLen)
@@ -219,7 +220,6 @@ void CAIMEDispatcher::dispatchInsertText(const char * pText, int nLen)
 
         // there is no delegate attached to IME
         CC_BREAK_IF(! m_pImpl->m_DelegateWithIme);
-
         m_pImpl->m_DelegateWithIme->insertText(pText, nLen);
     } while (0);
 }
@@ -251,7 +251,7 @@ void CAIMEDispatcher::dispatchGetKeyBoradReturnCallBack()
 
 void CAIMEDispatcher::dispatchDeleteBackward()
 {
-    do 
+    do
     {
         CC_BREAK_IF(! m_pImpl);
 
@@ -288,7 +288,33 @@ void CAIMEDispatcher::dispatchCursorMoveForward()
     } while (0);
 }
 
-void CAIMEDispatcher::dispatchMoveSelectChars(bool isLeftBtn, const CCPoint& pt)
+void CAIMEDispatcher::dispatchCursorMoveUp()
+{
+    do
+    {
+        CC_BREAK_IF(!m_pImpl);
+        
+        // there is no delegate attached to IME
+        CC_BREAK_IF(!m_pImpl->m_DelegateWithIme);
+        
+        m_pImpl->m_DelegateWithIme->cursorMoveUp();
+    } while (0);
+}
+
+void CAIMEDispatcher::dispatchCursorMoveDown()
+{
+    do
+    {
+        CC_BREAK_IF(!m_pImpl);
+        
+        // there is no delegate attached to IME
+        CC_BREAK_IF(!m_pImpl->m_DelegateWithIme);
+        
+        m_pImpl->m_DelegateWithIme->cursorMoveDown();
+    } while (0);
+}
+
+void CAIMEDispatcher::dispatchMoveSelectChars(bool isLeftBtn, const DPoint& pt)
 {
     do
     {
@@ -301,7 +327,7 @@ void CAIMEDispatcher::dispatchMoveSelectChars(bool isLeftBtn, const CCPoint& pt)
     } while (0);
 }
 
-void CAIMEDispatcher::dispatchMoveArrowBtn(const CCPoint& pt)
+void CAIMEDispatcher::dispatchMoveArrowBtn(const DPoint& pt)
 {
 	do
 	{
@@ -441,25 +467,14 @@ void CAIMEDispatcher::dispatchKeyboardWillHide(CCIMEKeyboardNotificationInfo& in
 {
     if (m_pImpl)
     {
-        if(m_pImpl->m_DelegateWithIme){
+        if(m_pImpl->m_DelegateWithIme)
+        {
             m_pImpl->m_DelegateWithIme->keyboardWillHide(info);
 #if CC_TARGET_PLATFORM==CC_PLATFORM_IOS
-            m_pImpl->m_DelegateWithIme->canDetachWithIME();
+			CC_RETURN_IF(! m_pImpl->m_DelegateWithIme->canDetachWithIME());
+            m_pImpl->m_DelegateWithIme->getKeyBoardHeight(0);
             m_pImpl->m_DelegateWithIme->didDetachWithIME();
 #endif
-        }
-        
-        return;
-        
-        CAIMEDelegate * pDelegate = 0;
-        DelegateIter last = m_pImpl->m_DelegateList.end();
-        for (DelegateIter first = m_pImpl->m_DelegateList.begin(); first != last; ++first)
-        {
-            pDelegate = *(first);
-            if (pDelegate)
-            {
-                pDelegate->keyboardWillHide(info);
-            }
         }
     }
 }
@@ -471,22 +486,10 @@ void CAIMEDispatcher::dispatchKeyboardDidHide(CCIMEKeyboardNotificationInfo& inf
         if(m_pImpl->m_DelegateWithIme){
             m_pImpl->m_DelegateWithIme->keyboardDidHide(info);
 #if CC_TARGET_PLATFORM==CC_PLATFORM_ANDROID
-            m_pImpl->m_DelegateWithIme->canDetachWithIME();
-            m_pImpl->m_DelegateWithIme->didDetachWithIME();
+			CC_RETURN_IF(!m_pImpl->m_DelegateWithIme->canDetachWithIME());
+			m_pImpl->m_DelegateWithIme->getKeyBoardHeight(0);
+			m_pImpl->m_DelegateWithIme->didDetachWithIME();
 #endif
-        }
-        
-        return;
-        CAIMEDelegate * pDelegate = 0;
-        DelegateIter last = m_pImpl->m_DelegateList.end();
-        for (DelegateIter first = m_pImpl->m_DelegateList.begin(); first != last; ++first)
-        {
-            
-            pDelegate = *(first);
-            if (pDelegate)
-            {
-                pDelegate->keyboardDidHide(info);
-            }
         }
     }
 }

@@ -6,8 +6,8 @@
 //  Copyright (c) 2014 http://www.9miao.com All rights reserved.
 //
 
-#ifndef __cocos2dx__CACollectionView__
-#define __cocos2dx__CACollectionView__
+#ifndef __CrossApp__CACollectionView__
+#define __CrossApp__CACollectionView__
 
 #include "view/CAView.h"
 #include "view/CAScale9ImageView.h"
@@ -37,7 +37,7 @@ public:
 	virtual ~CACollectionViewDataSource(){};
 
     //Necessary
-	virtual CACollectionViewCell* collectionCellAtIndex(CACollectionView *collectionView, const CCSize& cellSize, unsigned int section, unsigned int row, unsigned int item)
+	virtual CACollectionViewCell* collectionCellAtIndex(CACollectionView *collectionView, const DSize& cellSize, unsigned int section, unsigned int row, unsigned int item)
     {
         return NULL;
     }
@@ -65,7 +65,7 @@ public:
         return 1;
     }
     
-	virtual CAView* collectionViewSectionViewForHeaderInSection(CACollectionView *collectionView, const CCSize& viewSize, unsigned int section)
+	virtual CAView* collectionViewSectionViewForHeaderInSection(CACollectionView *collectionView, const DSize& viewSize, unsigned int section)
     {
         return NULL;
     }
@@ -75,7 +75,7 @@ public:
         return 0;
     }
     
-	virtual CAView* collectionViewSectionViewForFooterInSection(CACollectionView *collectionView, const CCSize& viewSize, unsigned int section)
+	virtual CAView* collectionViewSectionViewForFooterInSection(CACollectionView *collectionView, const DSize& viewSize, unsigned int section)
     {
         return NULL;
     }
@@ -84,6 +84,8 @@ public:
     {
         return 0;
     }
+    
+    virtual void collectionViewWillDisplayCellAtIndex(CACollectionView* table, CACollectionViewCell* cell, unsigned int section, unsigned int row, unsigned int item) {};
 };
 
 
@@ -97,12 +99,13 @@ public:
 
 	virtual void onExitTransitionDidStart();
 
-	static CACollectionView* createWithFrame(const CCRect& rect);
+	static CACollectionView* createWithFrame(const DRect& rect);
 
-	static CACollectionView* createWithCenter(const CCRect& rect);
+	static CACollectionView* createWithCenter(const DRect& rect);
 
 	virtual bool init();
 
+	void clearData();
 	void reloadData();
 
 	CACollectionViewCell* dequeueReusableCellWithIdentifier(const char* reuseIdentifier);
@@ -116,6 +119,10 @@ public:
     void setUnSelectRowAtIndexPath(unsigned int section, unsigned int row, unsigned int item);
     
     virtual void setShowsScrollIndicators(bool var);
+    
+    CACollectionViewCell* cellForRowAtIndexPath(unsigned int section, unsigned int row, unsigned int item);
+    
+    const CAVector<CACollectionViewCell*>& displayingCollectionCell();
     
     CC_SYNTHESIZE(CACollectionViewDataSource*, m_pCollectionViewDataSource, CollectionViewDataSource);
     
@@ -143,12 +150,12 @@ public:
     
     CACollectionViewCell* getHighlightCollectionCell();
     
+    virtual void switchPCMode(bool var);
+    
 protected:
     
     inline virtual float maxSpeed(float dt);
-    
-    inline virtual float maxSpeedCache(float dt);
-    
+
     inline virtual float decelerationRatio(float dt);
     
     void reloadViewSizeData();
@@ -172,6 +179,10 @@ public:
 	virtual void ccTouchEnded(CATouch *pTouch, CAEvent *pEvent);
 
 	virtual void ccTouchCancelled(CATouch *pTouch, CAEvent *pEvent);
+    
+    virtual void mouseMoved(CATouch* pTouch, CAEvent* pEvent);
+    
+    virtual void mouseMovedOutSide(CATouch* pTouch, CAEvent* pEvent);
     
 private:
     
@@ -216,9 +227,7 @@ private:
     using CAScrollView::removeSubviewByTag;
     
     using CAScrollView::getSubviewByTag;
-    
-    using CAResponder::setTouchMovedListenHorizontal;
-    
+
 private:
     
     unsigned int m_nSections;
@@ -233,9 +242,9 @@ private:
     
     std::vector<std::vector<unsigned int> > m_nRowHeightss;
     
-    std::vector<CCRect> m_rSectionRects;
+    std::vector<DRect> m_rSectionRects;
     
-    std::map<CAIndexPath3E, CCRect> m_rUsedCollectionCellRects;
+    std::map<CAIndexPath3E, DRect> m_rUsedCollectionCellRects;
     
     std::map<int, CAView*> m_pSectionHeaderViews;
     
@@ -245,13 +254,16 @@ private:
 
 	CACollectionViewCell* m_pHighlightedCollectionCells;
 
-	std::map<CAIndexPath3E, CACollectionViewCell*> m_pUsedCollectionCells;
+	std::map<CAIndexPath3E, CACollectionViewCell*> m_mpUsedCollectionCells;
 
-	std::map<std::string, CAVector<CACollectionViewCell*> > m_pFreedCollectionCells;
+    CAVector<CACollectionViewCell*> m_vpUsedCollectionCells;
+    
+	std::map<std::string, CAVector<CACollectionViewCell*> > m_mpFreedCollectionCells;
 };
 
 class CC_DLL CACollectionViewCell : public CAControl
 {
+	friend class CAAutoCollectionView;
 public:
     
 	CACollectionViewCell();
@@ -262,6 +274,8 @@ public:
 
 	virtual bool initWithReuseIdentifier(const std::string& reuseIdentifier);
 
+    CC_SYNTHESIZE_READONLY(CAView*, m_pContentView, ContentView);
+    
     CC_PROPERTY(CAView*, m_pBackgroundView, BackgroundView);
     
     CC_SYNTHESIZE_PASS_BY_REF(std::string, m_sReuseIdentifier, ReuseIdentifier);
@@ -275,7 +289,7 @@ public:
     CC_SYNTHESIZE_IS(bool, m_bControlStateEffect, ControlStateEffect);
     
     CC_SYNTHESIZE_IS(bool, m_bAllowsSelected, AllowsSelected);
-
+    
 protected:
     
 	virtual void normalCollectionViewCell();
@@ -290,7 +304,7 @@ protected:
     
     void setControlState(const CAControlState& var);
     
-    void setContentSize(const CCSize& var);
+    void setContentSize(const DSize& var);
     
 private:
     

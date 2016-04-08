@@ -11,16 +11,22 @@
 
 #include "RootWindow.h"
 
+
 class CDNewsTableCell : public CATableViewCell
 {
 public:
     CDNewsTableCell();
     virtual ~CDNewsTableCell();
-    static CDNewsTableCell* create(const std::string& identifier, const CADipRect& _rect = CADipRectZero);
+    static CDNewsTableCell* create(const std::string& identifier, const DRect& _rect = DRectZero);
     virtual void highlightedTableViewCell();
     virtual void selectedTableViewCell();
 public:
     void initWithCell();
+    void setModel(const newsMsg& cellmodel);
+private:
+    CALabel* theTitle;
+    CALabel* theDesc;
+    CommonUrlImageView* theImage;
 };
 
 class CDNewsViewController : public CAViewController,CATableViewDelegate,CATableViewDataSource, CAScrollViewDelegate,CAPageViewDelegate
@@ -35,7 +41,7 @@ public:
 public:
     virtual void tableViewDidSelectRowAtIndexPath(CATableView* table, unsigned int section, unsigned int row);
     virtual void tableViewDidDeselectRowAtIndexPath(CATableView* table, unsigned int section, unsigned int row);
-    
+    virtual void tableViewWillDisplayCellAtIndex(CATableView* table, CATableViewCell* cell, unsigned int section, unsigned int row);
     virtual CATableViewCell* tableCellAtIndex(CATableView* table, const CCSize& cellSize, unsigned int section, unsigned int row);
     virtual unsigned int numberOfRowsInSection(CATableView *table, unsigned int section);
     virtual unsigned int numberOfSections(CATableView *table);
@@ -57,7 +63,9 @@ public:
     void pageControlCallBack(CrossApp::CAControl *btn, CrossApp::CCPoint point);
     void showAlert();
     void buttonCallBack(CAControl* btn,CCPoint point);
+    void tempCallBack();
 public:
+    string getSign(std::map<std::string,std::string> key_value);
     CADipSize winSize;
     std::vector<std::string> tempList;
     std::vector<newsMsg > m_msg;

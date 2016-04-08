@@ -7,8 +7,8 @@
 //
 
 
-#ifndef __CrossAppx__CAAlertView__
-#define __CrossAppx__CAAlertView__
+#ifndef __CrossApp__CAAlertView__
+#define __CrossApp__CAAlertView__
 
 #include <iostream>
 #include "view/CAView.h"
@@ -45,8 +45,11 @@ class CC_DLL CAAlertView
 public:
 
 	CAAlertView();
+    
 	virtual ~CAAlertView();
 
+    static bool hideWithDisplayed();
+    
 	static CAAlertView *create();
 
 	static CAAlertView *createWithText(const char* pszTitle, const char* pszAlertMsg, const char* pszBtnText, ...);
@@ -61,6 +64,8 @@ public:
 	
 	void show();
 
+    void hide();
+    
 	//optional
 	void setMessageFontName(std::string &var);
 
@@ -72,13 +77,13 @@ protected:
 
 	bool init();
 
-    virtual CATableViewCell* tableCellAtIndex(CATableView* table, const CCSize& cellSize, unsigned int section, unsigned int row);
+    virtual CATableViewCell* tableCellAtIndex(CATableView* table, const DSize& cellSize, unsigned int section, unsigned int row);
     
 	virtual unsigned int numberOfRowsInSection(CATableView *table, unsigned int section);
     
 	virtual unsigned int tableViewHeightForRowAtIndexPath(CATableView* table, unsigned int section, unsigned int row);
     
-	void onClickButton(CAControl* btn, CCPoint point);
+	void onClickButton(CAControl* btn, DPoint point);
 
 	void setLabel(CALabel*& pLabel, const char* szTitle, const char* fontName, const CAColor4B& col);
 
@@ -121,4 +126,4 @@ private:
 
 NS_CC_END
 
-#endif /* defined(__cocos2dx__CAAlertView__) */
+#endif /* defined(__CrossApp__CAAlertView__) */

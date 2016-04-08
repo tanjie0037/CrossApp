@@ -37,6 +37,8 @@ public:
     virtual void onEnterTransitionDidFinish();
     
     virtual void onExitTransitionDidStart();
+
+	virtual void setColor(const CAColor4B& color);
     
 	void setProgress(float progress, bool animated = false);
 
@@ -54,7 +56,7 @@ public:
     
 protected:
 
-    void setContentSize(const CCSize & var);
+    void setContentSize(const DSize & var);
     
 	void update(float dt);
     

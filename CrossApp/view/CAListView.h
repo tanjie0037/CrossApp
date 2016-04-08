@@ -49,7 +49,9 @@ public:
 
 	virtual unsigned int listViewHeightForIndex(CAListView *listView, unsigned int index) = 0;
 
-	virtual CAListViewCell* listViewCellAtIndex(CAListView *listView, const CCSize& cellSize, unsigned int index) = 0;
+	virtual CAListViewCell* listViewCellAtIndex(CAListView *listView, const DSize& cellSize, unsigned int index) = 0;
+    
+    virtual void listViewWillDisplayCellAtIndex(CAListView* table, CAListViewCell* cell, unsigned int index) {};
 };
 
 
@@ -63,14 +65,15 @@ public:
 
 	virtual void onExitTransitionDidStart();
 
-	static CAListView* createWithFrame(const CCRect& rect);
+	static CAListView* createWithFrame(const DRect& rect);
 
-	static CAListView* createWithCenter(const CCRect& rect);
+	static CAListView* createWithCenter(const DRect& rect);
 
 	virtual bool init();
 
 	void reloadViewSizeData();
 
+	void clearData();
 	void reloadData();
 
 	CAListViewCell* dequeueReusableCellWithIdentifier(const char* reuseIdentifier);
@@ -84,6 +87,10 @@ public:
     void setUnSelectAtIndex(unsigned int index);
     
     virtual void setShowsScrollIndicators(bool var);
+    
+    CAListViewCell* cellForRowAtIndex(unsigned int index);
+    
+    const CAVector<CAListViewCell*>& displayingListCell();
     
 	CC_PROPERTY(CAListViewOrientation, m_pListViewOrientation, ListViewOrientation);
 
@@ -109,11 +116,11 @@ public:
     
 	CC_SYNTHESIZE_IS_READONLY(bool, m_bAllowsMultipleSelection, AllowsMultipleSelection);
 
+    virtual void switchPCMode(bool var);
+    
 protected:
     
     inline virtual float maxSpeed(float dt);
-    
-    inline virtual float maxSpeedCache(float dt);
     
     inline virtual float decelerationRatio(float dt);
     
@@ -137,6 +144,10 @@ public:
 
 	virtual void ccTouchCancelled(CATouch *pTouch, CAEvent *pEvent);
 
+    virtual void mouseMoved(CATouch* pTouch, CAEvent* pEvent);
+    
+    virtual void mouseMovedOutSide(CATouch* pTouch, CAEvent* pEvent);
+    
 private:
     
     using CAScrollView::setBounceHorizontal;
@@ -181,23 +192,23 @@ private:
     
     using CAScrollView::getSubviewByTag;
     
-    using CAResponder::setTouchMovedListenHorizontal;
-    
 private:
     
-	CCRect m_rHeaderRect;
+	DRect m_rHeaderRect;
     
-	CCRect m_rFooterRect;
+	DRect m_rFooterRect;
 
     unsigned int m_nIndexs;
     
-    std::vector<CCRect> m_rIndexRects;
+    std::vector<DRect> m_rIndexRects;
 
-    std::vector<CCRect> m_rLineRects;
+    std::vector<DRect> m_rLineRects;
     
-	std::map<unsigned int, CAListViewCell*> m_pUsedListCells;
+	std::map<unsigned int, CAListViewCell*> m_mpUsedListCells;
 
-	std::map<std::string, CAVector<CAListViewCell*> > m_pFreedListCells;
+    CAVector<CAListViewCell*> m_vpUsedListCells;
+    
+	std::map<std::string, CAVector<CAListViewCell*> > m_mpFreedListCells;
     
     std::map<unsigned int, CAView*> m_pUsedLines;
     
@@ -220,6 +231,8 @@ public:
 
 	virtual bool initWithReuseIdentifier(const std::string& reuseIdentifier);
 
+    CC_SYNTHESIZE_READONLY(CAView*, m_pContentView, ContentView);
+    
     CC_PROPERTY(CAView*, m_pBackgroundView, BackgroundView);
     
     CC_SYNTHESIZE_PASS_BY_REF(std::string, m_sReuseIdentifier, ReuseIdentifier);
@@ -229,7 +242,7 @@ public:
     CC_SYNTHESIZE_IS(bool, m_bControlStateEffect, ControlStateEffect);
     
     CC_SYNTHESIZE_IS(bool, m_bAllowsSelected, AllowsSelected);
-
+    
 protected:
     
     virtual void normalListViewCell();
@@ -244,7 +257,7 @@ protected:
     
     void setControlState(const CAControlState& var);
     
-    void setContentSize(const CCSize& var);
+    void setContentSize(const DSize& var);
     
 private:
     

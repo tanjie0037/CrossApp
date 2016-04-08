@@ -5,7 +5,6 @@
 #include "CAView.h"
 #include "images/CAImageCache.h"
 #include "ccMacros.h"
-#include "cocoa/CCArray.h"
 
 NS_CC_BEGIN
 
@@ -17,7 +16,7 @@ public:
 
     CABatchView();
 
-    ~CABatchView();
+    virtual ~CABatchView();
 
     inline CAImageAtlas* getImageAtlas(void) { return m_pobImageAtlas; }
     

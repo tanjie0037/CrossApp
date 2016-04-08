@@ -31,17 +31,9 @@
     CGRect rect = [[UIScreen mainScreen] bounds];
     //CGFloat scale = [[UIScreen mainScreen] scale];
     
-    if ( [[UIDevice currentDevice].systemVersion floatValue] >= 7.0)
-    {
-        rect.size.height -= 20;
-        rect.origin.y = 20;
-    }
-    else
-    {
-        rect.size = [[UIScreen mainScreen]applicationFrame].size;
-    }
-    
-    EAGLView *__glView = [EAGLView viewWithFrame: rect
+    NSLog(@"%f", rect.size.width);
+
+        EAGLView *__glView = [EAGLView viewWithFrame: rect
                                      pixelFormat: kEAGLColorFormatRGB565
                                      depthFormat: GL_DEPTH24_STENCIL8_OES
                               preserveBackbuffer: NO
@@ -50,6 +42,29 @@
                                  numberOfSamples: 0];
     [__glView setMultipleTouchEnabled:YES];
     [self.view addSubview:__glView];
+
+
+//    NSString *path=@"System/Library/Fonts"; // 要列出来的目录
+//    
+//    NSFileManager *myFileManager=[NSFileManager defaultManager];
+//    
+//    NSDirectoryEnumerator *myDirectoryEnumerator;
+//    
+//    myDirectoryEnumerator=[myFileManager enumeratorAtPath:path];
+//    
+//    //列举目录内容，可以遍历子目录
+//    
+//    NSLog(@"用enumeratorAtPath:显示目录%@的内容：",path);
+//    
+//    NSString* ss = nil;
+//    while((ss=[myDirectoryEnumerator nextObject])!=nil)
+//    {
+//        NSString* s = @"System/Library/Fonts/";
+//        s = [s stringByAppendingString:ss];
+//        NSFileHandle *fileHandle=[NSFileHandle fileHandleForReadingAtPath:s];
+//        NSUInteger length= [fileHandle availableData].length;
+//        NSLog(@"%@ --- %lu",ss, (unsigned long)length);
+//    }
 }
 
 
@@ -57,23 +72,27 @@
 // This method is deprecated on ios6
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation {
     return UIInterfaceOrientationIsPortrait( interfaceOrientation );
+    //return UIInterfaceOrientationIsLandscape( interfaceOrientation );
 }
 
 // For ios6, use supportedInterfaceOrientations & shouldAutorotate instead
 - (NSUInteger) supportedInterfaceOrientations{
+    
 #ifdef __IPHONE_6_0
     return UIInterfaceOrientationMaskPortrait;
+    //return UIInterfaceOrientationMaskLandscapeRight;
 #endif
 }
 
 - (UIInterfaceOrientation)preferredInterfaceOrientationForPresentation
 {
-    return UIInterfaceOrientationMaskPortrait;
+    return UIInterfaceOrientationPortrait;
+    //return UIInterfaceOrientationLandscapeRight;
 }
 
 - (BOOL) shouldAutorotate
 {
-    return NO;
+    return YES;
 }
 
 //fix not hide status on ios7

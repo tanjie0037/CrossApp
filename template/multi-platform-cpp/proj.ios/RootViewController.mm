@@ -31,15 +31,15 @@
     CGRect rect = [[UIScreen mainScreen] bounds];
     //CGFloat scale = [[UIScreen mainScreen] scale];
     
-    if ( [[UIDevice currentDevice].systemVersion floatValue] >= 7.0)
-    {
-        rect.size.height -= 20;
-        rect.origin.y = 20;
-    }
-    else
-    {
-        rect.size = [[UIScreen mainScreen]applicationFrame].size;
-    }
+//    if ( [[UIDevice currentDevice].systemVersion floatValue] >= 7.0)
+//    {
+//        rect.size.height -= 20;
+//        rect.origin.y = 20;
+//    }
+//    else
+//    {
+//        rect.size = [[UIScreen mainScreen]applicationFrame].size;
+//    }
     
     EAGLView *__glView = [EAGLView viewWithFrame: rect
                                      pixelFormat: kEAGLColorFormatRGB565
@@ -57,18 +57,22 @@
 // This method is deprecated on ios6
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation {
     return UIInterfaceOrientationIsPortrait( interfaceOrientation );
+    //return UIInterfaceOrientationIsLandscape( interfaceOrientation );
 }
 
 // For ios6, use supportedInterfaceOrientations & shouldAutorotate instead
 - (NSUInteger) supportedInterfaceOrientations{
+    
 #ifdef __IPHONE_6_0
     return UIInterfaceOrientationMaskPortrait;
+    //return UIInterfaceOrientationMaskLandscapeRight;
 #endif
 }
 
 - (UIInterfaceOrientation)preferredInterfaceOrientationForPresentation
 {
-    return UIInterfaceOrientationMaskPortrait;
+    return UIInterfaceOrientationPortrait;
+    //return UIInterfaceOrientationLandscapeRight;
 }
 
 - (BOOL) shouldAutorotate

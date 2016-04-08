@@ -8,6 +8,7 @@
 
 #include "MenuViewController.h"
 #include "CDWebViewController.h"
+#include "CDUIShowCollectionView.h"
 
 MenuViewController::MenuViewController()
 {
@@ -21,14 +22,15 @@ MenuViewController::~MenuViewController()
 
 void MenuViewController::viewDidLoad()
 {
+    this->getView()->removeAllSubviews();
     this->getView()->setColor(CAColor_clear);
     size = this->getView()->getBounds().size;
     
-    tableView = CATableView::createWithFrame(CADipRect(0, size.height/3, size.width, size.height*0.6));
+    tableView = CATableView::createWithFrame(DRect(0, size.height/3, size.width, size.height*0.6));
     tableView->setAllowsSelection(true);
     tableView->setTableViewDelegate(this);
     tableView->setTableViewDataSource(this);
-    tableView->setBackGroundColor(CAColor_clear);
+    tableView->setBackgroundColor(CAColor_clear);
     tableView->setSeparatorColor(ccc4(166, 166, 166,100));
     tableView->setShowsScrollIndicators(false);
     this->getView()->addSubview(tableView);
@@ -37,12 +39,11 @@ void MenuViewController::viewDidLoad()
 
 void MenuViewController::viewDidUnload()
 {
-    
+
 }
 
 void MenuViewController::tableViewDidSelectRowAtIndexPath(CATableView* table, unsigned int section, unsigned int row)
 {
-    CCLog("index==%d",row);
     RootWindow::getInstance()->dismissModalViewController(true);
     if (row==0)
     {
@@ -61,7 +62,7 @@ void MenuViewController::tableViewDidSelectRowAtIndexPath(CATableView* table, un
         _webController->autorelease();
         RootWindow::getInstance()->getDrawerController()->hideLeftViewController(true);
         RootWindow::getInstance()->getRootNavigationController()->pushViewController(_webController, true);
-        _webController->initWebView("http://www.crossapp.com.cn");
+        _webController->initWebView("http://crossapp.9miao.com");
     }
     else if(row==3)
     {
@@ -77,27 +78,26 @@ void MenuViewController::tableViewDidSelectRowAtIndexPath(CATableView* table, un
     
 }
 
-CATableViewCell* MenuViewController::tableCellAtIndex(CATableView* table, const CCSize& cellSize, unsigned int section, unsigned int row)
+CATableViewCell* MenuViewController::tableCellAtIndex(CATableView* table, const DSize& cellSize, unsigned int section, unsigned int row)
 {
-    CADipSize _size = cellSize;
+    DSize _size = cellSize;
     CATableViewCell* cell = table->dequeueReusableCellWithIdentifier("CrossApp");
     if (cell == NULL)
     {
         cell = CATableViewCell::create("CrossApp");
         cell->setBackgroundView(NULL);
-        CALabel* test = CALabel::createWithCenter(CADipRect(_size.width/2+30,
+        CALabel* test = CALabel::createWithCenter(DRect(_size.width/2+30,
                                                             _size.height/2,
                                                             _size.width,
                                                             _size.height));
-        test->setColor(ccc4(220, 227, 115, 255));
         test->setTextAlignment(CATextAlignmentLeft);
         test->setVerticalTextAlignmet(CAVerticalTextAlignmentCenter);
-        test->setFontSize(_px(32));
-        test->setColor(CAColor_white);
+        test->setFontSize(32);
+		test->setColor(CAColor_white);
         test->setTag(100);
         cell->addSubview(test);
         
-        CAImageView* arrow = CAImageView::createWithCenter(CADipRect(_size.width-64,_size.height/2,64,64));
+        CAImageView* arrow = CAImageView::createWithCenter(DRect(_size.width-64,_size.height/2,64,64));
         arrow->setTag(101);
         cell->addSubview(arrow);
     }
@@ -105,6 +105,7 @@ CATableViewCell* MenuViewController::tableCellAtIndex(CATableView* table, const 
 	test->setText(unicode_to_utf8(menuList[row]));// menuList[row]);
     CAImageView* arrow = (CAImageView*)cell->getSubviewByTag(101);
     arrow->setImage(CAImage::create("source_material/cell_btn_right.png"));
+
     return cell;
 }
 
@@ -120,5 +121,5 @@ unsigned int MenuViewController::numberOfSections(CATableView *table)
 
 unsigned int MenuViewController::tableViewHeightForRowAtIndexPath(CATableView* table, unsigned int section, unsigned int row)
 {
-    return _px(100);
+    return 100;
 }
