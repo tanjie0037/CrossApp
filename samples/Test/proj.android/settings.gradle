@@ -1,0 +1,3 @@
+include ':app', ':java'
+project(':java').projectDir = new File('../../../CrossApp/platform/android/java')
+

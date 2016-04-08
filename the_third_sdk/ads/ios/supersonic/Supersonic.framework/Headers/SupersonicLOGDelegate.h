@@ -9,12 +9,12 @@
 
 typedef enum LogLevelValues
 {
-    LOG_NONE = -1,
-    LOG_INTERNAL = 0,
-    LOG_INFO = 1,
-    LOG_WARNING = 2,
-    LOG_ERROR = 3,
-    LOG_CRITICAL = 4,
+    SU_LOG_NONE = -1,
+    SU_LOG_INTERNAL = 0,
+    SU_LOG_INFO = 1,
+    SU_LOG_WARNING = 2,
+    SU_LOG_ERROR = 3,
+    SU_LOG_CRITICAL = 4,
     
 } LogLevel;
 

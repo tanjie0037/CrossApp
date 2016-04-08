@@ -195,6 +195,7 @@ void CAAlertView::setLabel(CALabel*& pLabel, const char* szTitle, const char* fo
 		pLabel->setVerticalTextAlignmet(CAVerticalTextAlignmentTop);
 		pLabel->setFontName(fontName);
 		pLabel->setFontSize(ALERT_VIEW_MESG_FONT);
+        pLabel->setWordWrap(true);
 	}
 	pLabel->setText(szTitle);
 	pLabel->setColor(col);
@@ -376,10 +377,13 @@ void CAAlertView::calcuAlerViewSize()
 		
 		m_fAlertViewHeight += alertViewButtonHeight;
 	}
+    else if (btnCount == 3)
+    {
+        m_fAlertViewHeight += alertViewButtonHeight * 3;
+    }
     else
     {
-
-		m_fAlertViewHeight += alertViewButtonHeight * 3;
+		m_fAlertViewHeight += alertViewButtonHeight * 3.6;
 	} 
 
 	if (m_fAlertViewMessageHeight > alertViewMessageHeight)
@@ -411,6 +415,11 @@ void CAAlertView::onClickButton(CAControl* btn, DPoint point)
 }
 
 void CAAlertView::show()
+{
+    CAApplication::getApplication()->getRootWindow()->alert(this);
+}
+
+void CAAlertView::_show()
 {
 	if (getSuperview() != NULL)
 		return;

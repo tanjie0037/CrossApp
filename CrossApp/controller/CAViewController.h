@@ -299,6 +299,8 @@ public:
     
     CC_PROPERTY_PASS_BY_REF(CAColor4B, m_sTabBarSelectedTitleColor, TabBarTitleColorForSelected);
     
+    CC_SYNTHESIZE_READONLY(CATabBar*, m_pTabBar, TabBar);
+    
     void updateItem(CAViewController* viewController);
     
     void showTabBarSelectedIndicator();
@@ -351,7 +353,7 @@ protected:
     
     CAPageView* m_pContainer;
     
-    CATabBar* m_pTabBar;
+//    CATabBar* m_pTabBar;
 };
 
 

@@ -107,6 +107,11 @@ public:
     CAObject *m_pCopyObject;
 };
 
+// add by jie.tan
+typedef void (CAObject::*SEL_CallFuncOD)(CAObject*, void*);
+
+// add by jie.tan
+#define callfuncOD_selector(_SELECTOR) (SEL_CallFuncOD)(&_SELECTOR)
 
 NS_CC_END
 

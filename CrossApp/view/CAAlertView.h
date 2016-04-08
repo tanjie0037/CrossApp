@@ -62,7 +62,9 @@ public:
 
     void setTarget(CAObject* target, SEL_CAAlertBtnEvent selector);
 	
-	void show();
+    void show();
+    
+	void _show();
 
     void hide();
     

@@ -23,6 +23,17 @@ namespace cn
 {
     namespace sharesdk
     {
+        static const char* Share_title = "title";
+        static const char* Share_content = "content";
+        static const char* Share_desc = "desc";
+        static const char* Share_image = "image";
+        static const char* Share_url = "url";
+        static const char* Share_type = "type";
+        static const char* Share_siteUrl = "siteUrl";
+        static const char* Share_site = "site";
+        static const char* Share_extInfo = "extInfo";
+        static const char* Share_musicUrl = "musicUrl";
+        
         /**
          *	@brief	平台类型
          */

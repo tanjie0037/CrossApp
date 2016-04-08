@@ -14,15 +14,15 @@
 #import <ShareSDK/ShareSDK.h>
 #import <AGCommon/CMRegexKitLite.h>
 #import <FacebookConnection/ISSFacebookApp.h>
+
+#ifdef __IN_CHINA__
 #import "WXApi.h"
 #import "WeiboApi.h"
 #import <TencentOpenAPI/QQApiInterface.h>
 #import <TencentOpenAPI/TencentOAuth.h>
-
-
-#ifndef utf8cstr
-#define utf8cstr(nsstr) (nsstr ? [nsstr cStringUsingEncoding:NSUTF8StringEncoding] : "")
 #endif
+
+#include "SDKCommon.h"
 
 //static UIView *_refView = nil;
 
@@ -46,24 +46,27 @@ id<ISSContent> convertPublishContent(CSJsonDictionary& content) {
     NSString *desc = nil;
     SSPublishContentMediaType type = SSPublishContentMediaTypeText;
     
-    if (!content.isEmpty()) {
-        message = [NSString stringWithUTF8String:content.getItemStringValue("content").c_str()];
+    CCLOG("content:[%s]", content.getStyledDescription().c_str());
     
-        NSString *imagePath = [NSString stringWithUTF8String:content.getItemStringValue("image").c_str()];
+    if (!content.isEmpty()) {
+        message = [NSString stringWithUTF8String:content.getItemStringValue(Share_content).c_str()];
+    
+        NSString *imagePath = [NSString stringWithUTF8String:content.getItemStringValue(Share_image).c_str()];
         if ([imagePath isMatchedByRegex:@"\\w://.*"]) {
             image = [ShareSDK imageWithUrl:imagePath];
         } else {
             image = [ShareSDK imageWithPath:imagePath];
         }
     
-        title = [NSString stringWithUTF8String:content.getItemStringValue("title").c_str()];
-        url = [NSString stringWithUTF8String:content.getItemStringValue("url").c_str()];
-        desc = [NSString stringWithUTF8String:content.getItemStringValue("desc").c_str()];
-        type = (SSPublishContentMediaType)(content.getItemIntValue("type", 0));
+        title = [NSString stringWithUTF8String:content.getItemStringValue(Share_title).c_str()];
+        
+        url = [NSString stringWithUTF8String:content.getItemStringValue(Share_url).c_str()];
+        desc = [NSString stringWithUTF8String:content.getItemStringValue(Share_desc).c_str()];
+        type = (SSPublishContentMediaType)(content.getItemIntValue(Share_type, 0));
     }
     
     id<ISSContent> contentObj =  [ShareSDK content:message
-                                    defaultContent:nil
+                                    defaultContent:message
                                              image:image
                                              title:title
                                                url:url
@@ -71,8 +74,8 @@ id<ISSContent> convertPublishContent(CSJsonDictionary& content) {
                                          mediaType:type];
     
     if (!content.isEmpty()) {
-        NSString *siteUrlStr = [NSString stringWithUTF8String:content.getItemStringValue("siteUrl").c_str()];
-        NSString *siteStr = [NSString stringWithUTF8String:content.getItemStringValue("site").c_str()];
+        NSString *siteUrlStr = [NSString stringWithUTF8String:content.getItemStringValue(Share_siteUrl).c_str()];
+        NSString *siteStr = [NSString stringWithUTF8String:content.getItemStringValue(Share_site).c_str()];
         
         if ((siteUrlStr && siteUrlStr.length > 0) || (siteStr && siteStr.length > 0)) {
             [contentObj addQQSpaceUnitWithTitle:INHERIT_VALUE
@@ -87,8 +90,8 @@ id<ISSContent> convertPublishContent(CSJsonDictionary& content) {
                                            nswb:INHERIT_VALUE];
         }
         
-        NSString *extInfoStr = [NSString stringWithUTF8String:content.getItemStringValue("extInfo").c_str()];
-        NSString *musicUrlStr = [NSString stringWithUTF8String:content.getItemStringValue("musicUrl").c_str()];
+        NSString *extInfoStr = [NSString stringWithUTF8String:content.getItemStringValue(Share_extInfo).c_str()];
+        NSString *musicUrlStr = [NSString stringWithUTF8String:content.getItemStringValue(Share_musicUrl).c_str()];
 
         if (extInfoStr || musicUrlStr) {
             [contentObj addWeixinSessionUnitWithType:INHERIT_VALUE
@@ -116,34 +119,11 @@ id<ISSContent> convertPublishContent(CSJsonDictionary& content) {
     return contentObj;
 }
 
-/*!
- * @brief 把格式化的JSON格式的字符串转换成字典
- * @param jsonString JSON格式的字符串
- * @return 返回字典
- */
-NSDictionary* dictionaryWithJsonString(NSString *jsonString) {
-    if (jsonString == nil) {
-        return nil;
-    }
-    
-    NSData *jsonData = [jsonString dataUsingEncoding:NSUTF8StringEncoding];
-    NSError *err = nil;
-    NSDictionary *dic = [NSJSONSerialization JSONObjectWithData:jsonData
-                                                        options:NSJSONReadingMutableContainers
-                                                          error:&err];
-    if(err) {
-        NSLog(@"json解析失败：%@",err);
-        NSLog(@"jsonString: %@", jsonString);
-        assert(0);
-        return nil;
-    }
-    return dic;
-}
-
-
 void ShareHelper::open(const std::string& appKey, bool useAppTrusteeship) {
     NSString *appKeyStr = [NSString stringWithCString:appKey.c_str() encoding:NSUTF8StringEncoding];
     [ShareSDK registerApp:appKeyStr useAppTrusteeship:useAppTrusteeship];
+    //激活SSO
+    [ShareSDK ssoEnabled:YES];
 }
 
 bool ShareHelper::close() {
@@ -366,10 +346,11 @@ void ShareHelper::showShareView(cn::sharesdk::C2DXPlatType platType, CSJsonDicti
 
 void ShareHelper::initIOS()
 {
-    //开启Facebook网页授权开关(optional)
+    //开启Facebook网页授权开关(optional). todo: fb审核需要关闭
     id<ISSFacebookApp> facebookApp =(id<ISSFacebookApp>)[ShareSDK getClientWithType:ShareTypeFacebook];
     [facebookApp setIsAllowWebAuthorize:YES];
-    
+
+#ifdef __IN_CHINA__
     //导入微信类型
     [ShareSDK importWeChatClass:[WXApi class]];
     
@@ -378,6 +359,7 @@ void ShareHelper::initIOS()
     
     //导入QQ类型
     [ShareSDK importQQClass:[QQApiInterface class] tencentOAuthCls:[TencentOAuth class]];
+#endif
 }
 
 #endif

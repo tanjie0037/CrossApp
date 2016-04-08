@@ -172,4 +172,21 @@ string CCFileUtilsAndroid::getWritablePath()
     }
 }
 
+std::string CCFileUtilsAndroid::getFullPathForDirectoryAndFilename(const std::string& strDirectory, const std::string& strFilename)
+{
+    string fullPath = strDirectory + strFilename;
+
+    if (fullPath[0] != '/' && fullPath.find(m_strDefaultResRootPath) == string::npos)
+    {
+        fullPath = m_strDefaultResRootPath + fullPath;
+    }
+
+    if (!isFileExist(fullPath))
+    {
+        fullPath = "";
+    }
+
+    return fullPath;
+}
+
 NS_CC_END

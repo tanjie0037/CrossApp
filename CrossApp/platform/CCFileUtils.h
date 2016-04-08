@@ -12,6 +12,11 @@
 
 NS_CC_BEGIN
 
+struct IndexFile{
+    std::string name;
+    unsigned long size;
+};
+
 /**
  * @addtogroup platform
  * @{
@@ -243,6 +248,22 @@ public:
 
     bool createDirectory(const char *path);
     
+    //add by jie.tan
+    void cleanIndex();
+    std::string getIndexVersion();
+    unsigned int getIndexBuild();
+    std::map<std::string, std::string> &getIndexMap();
+    unsigned long getFileSize(const std::string &file);
+    unsigned long saveFile(const std::string &path, const std::string &data);
+        
+    std::string getFileFullPath(const std::string& filename, const std::string& searchPath) {
+        return getPathForFilename(filename, "", searchPath);
+    }
+    
+protected:
+    void loadIndex();
+    //add by jie.tan
+    
 protected:
     /**
      *  The default constructor.
@@ -333,6 +354,13 @@ protected:
     
     std::map<std::string, std::string> m_mFilenameLookupDict;
     
+private:
+    //add by jie.tan
+    std::string _indexVersion;
+    unsigned int _indexBuild;
+    std::map<std::string, std::string> _indexMap;
+    std::map<std::string, unsigned long> _fileSizeMap;
+    //add by jie.tan
 };
 
 // end of platform group

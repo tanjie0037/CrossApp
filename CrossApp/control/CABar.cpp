@@ -313,14 +313,13 @@ void CANavigationBar::showRightButton()
     const CAVector<CAObject*>& buttonItems = m_pItem->getRightButtonItems();
     
     DRect rect;
-    rect.size.width = this->getBounds().size.height * 1.05f;
+    rect.size.width = this->getBounds().size.height * 0.9f;
     rect.size.height = m_pContentView->getBounds().size.height;
-    rect.origin.x = this->getBounds().size.width - rect.size.width * 0.65f;
+    rect.origin.x = this->getBounds().size.width - rect.size.width * 0.7f;
     rect.origin.y = 0;
 
     for (size_t i=0; i<buttonItems.size(); i++)
     {
-        rect.origin.x -= i * rect.size.width * 0.98f;
         CABarButtonItem* item = dynamic_cast<CABarButtonItem*>(buttonItems.at(i));
         
         rect.size.width = item ? item->getItemWidth() : 80;

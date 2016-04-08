@@ -220,6 +220,8 @@ void CAWebView::update(float dt)
         m_obLastPoint = point;
         m_obLastContentSize = contentSize;
 
+		m_pLoadingView->setCenter(CCRect(contentSize.width*0.5f, contentSize.height*0.5f, contentSize.width*0.2f, contentSize.height*0.2f));
+        
         _impl->update(dt);
     }
     while (0);

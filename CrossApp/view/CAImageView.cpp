@@ -80,6 +80,8 @@ bool CAImageView::initWithImage(CAImage* image)
 	}
 	this->setImage(image);
 	this->setImageRect(rect);
+    //jie.tan: 方便初始化图片
+    this->setBounds(rect);
 
     return true;
 }

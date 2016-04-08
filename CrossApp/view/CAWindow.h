@@ -5,6 +5,7 @@
 
 #include "CAView.h"
 #include "controller/CAViewController.h"
+#include "CAAlertView.h"
 NS_CC_BEGIN
 
 enum
@@ -31,6 +32,9 @@ public:
     
     void dismissModalViewController(bool animated);
     
+    virtual void update(float dt);
+    void alert(CAAlertView *alert);
+    
 protected:
 
     void presentEnd();
@@ -42,6 +46,8 @@ protected:
     CC_PROPERTY(CAViewController*, m_pRootViewController, RootViewController);
     
     CC_SYNTHESIZE_READONLY(CAViewController*, m_pModalViewController, ModalViewController);
+    
+    std::deque<CAAlertView *> _alertDeque;
 };
 
 NS_CC_END

@@ -577,7 +577,7 @@ bool CAImageAtlas::initWithImage(CAImage *image, unsigned int capacity)
 #if CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID
     // listen the event when app go to background
     CANotificationCenter::sharedNotificationCenter()->addObserver(this,
-                                                                  callfuncO_selector(CAImageAtlas::listenBackToForeground),
+                                                                  callfuncOD_selector(CAImageAtlas::listenBackToForeground),
                                                                   EVENT_COME_TO_FOREGROUND,
                                                                   NULL);
 #endif

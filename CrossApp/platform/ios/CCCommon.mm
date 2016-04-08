@@ -11,7 +11,7 @@ NS_CC_BEGIN
 
 void CCLog(const char * pszFormat, ...)
 {
-    printf("CrossApp: ");
+    printf("CA:");
     char szBuf[kMaxLogLen+1] = {0};
     va_list ap;
     va_start(ap, pszFormat);

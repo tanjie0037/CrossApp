@@ -17,6 +17,7 @@ NS_CC_BEGIN
 CAActivityIndicatorView::CAActivityIndicatorView()
 : m_bStopAnimation(false)
 , m_hidesWhenStopped(true)
+
 , m_style(CAActivityIndicatorViewStyleGrayLarge)
 , m_color(ccc4(255, 255, 255, 255))
 , m_duration(0.1f)
@@ -113,6 +114,7 @@ void CAActivityIndicatorView::setStyle(CAActivityIndicatorViewStyle style)
         CC_SAFE_RELEASE(m_pBackView);
         
         DRect center = getBounds();
+//        }
         center.origin = center.size/2;
         CAImage* image = NULL;
         

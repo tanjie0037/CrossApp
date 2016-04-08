@@ -525,7 +525,7 @@ void CANavigationController::layoutNewContainer()
     
     DRect container_rect = this->getView()->getBounds();
     
-    if (m_bNavigationBarHidden || viewController->getNavigationBarItem()->isNagigationBarHidden())
+    if (m_bNavigationBarHidden || (viewController->getNavigationBarItem() && viewController->getNavigationBarItem()->isNagigationBarHidden()))
     {
         navigation_bar_rect.origin = this->getNavigationBarTakeBackPoint();
     }

@@ -110,7 +110,7 @@ cJSON * CCJSONConverter::getObjJson(CAObject * obj)
         cJSON * json = cJSON_CreateNull();
         return json;
     }
-    CCLog("CCJSONConverter encountered an unrecognized type");
+    CCLOG("CCJSONConverter encountered an unrecognized type");
     return NULL;
 }
 
@@ -156,7 +156,7 @@ CAObject * CCJSONConverter::getJsonObj(cJSON * json)
         }
         default:
         {
-            CCLog("CCJSONConverter encountered an unrecognized type");
+            CCLOG("CCJSONConverter encountered an unrecognized type");
             return NULL;
         }
     }

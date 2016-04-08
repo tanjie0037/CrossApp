@@ -11,13 +11,16 @@
 
 @interface SupersonicConfiguration : NSObject<SupersonicConfigurationProtocol>
 
-@property (nonatomic, strong)   NSString *  userId;
-@property (nonatomic, strong)   NSString *  appKey;
-@property (nonatomic, strong)   NSDictionary *  rewardedVideoCustomParameters;
-@property (nonatomic, strong)   NSDictionary *  offerwallCustomParameters;
-@property (nonatomic,strong)    NSString*  version;
-@property (nonatomic,strong)    NSNumber*  adapterTimeOutInSeconds;
-@property (nonatomic,strong)    NSNumber*  maxNumOfAdaptersToLoadOnStart;
+@property (nonatomic, strong)   NSString        *userId;
+@property (nonatomic, strong)   NSString        *appKey;
+@property (nonatomic, strong)   NSDictionary    *rewardedVideoCustomParameters;
+@property (nonatomic, strong)   NSDictionary    *offerwallCustomParameters;
+@property (nonatomic, strong)   NSString        *version;
+@property (nonatomic, strong)   NSNumber        *adapterTimeOutInSeconds;
+@property (nonatomic, strong)   NSNumber        *maxNumOfAdaptersToLoadOnStart;
+@property (nonatomic, strong)   NSString        *plugin;
+@property (nonatomic, strong)   NSString        *pluginVersion;
+@property (nonatomic)           NSNumber        *maxVideosPerIteration;
 
 + (SupersonicConfiguration *)getConfiguration;
 

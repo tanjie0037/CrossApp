@@ -22,7 +22,7 @@ public:
      *  @param obj The extra parameter which will be passed to the callback function.
      */
     CANotificationObserver(CAObject *target,
-                           SEL_CallFuncO selector,
+                           SEL_CallFuncOD selector,
                            const char *name,
                            CAObject *obj);
     
@@ -30,10 +30,10 @@ public:
     ~CANotificationObserver();
     
     /** Invokes the callback function of this observer */
-    void performSelector(CAObject *obj);
+    void performSelector(CAObject *obj, void *data);
 private:
     CC_PROPERTY_READONLY(CAObject *, m_target, Target);
-    CC_PROPERTY_READONLY(SEL_CallFuncO, m_selector, Selector);
+    CC_PROPERTY_READONLY(SEL_CallFuncOD, m_selector, Selector);
     CC_PROPERTY_READONLY(char *, m_name, Name);
     CC_PROPERTY_READONLY(CAObject *, m_object, Object);
     CC_PROPERTY(int, m_nHandler,Handler);
@@ -64,7 +64,7 @@ public:
      *  @param obj The extra parameter which will be passed to the callback function.
      */
     void addObserver(CAObject *target, 
-                     SEL_CallFuncO selector,
+                     SEL_CallFuncOD selector,
                      const char *name,
                      CAObject *obj);
 
@@ -99,6 +99,8 @@ public:
      *  @param object The extra parameter.
      */
     void postNotification(const char *name, CAObject *object);
+    
+    void postNotification(const char *name, CAObject *object, void* data);
     
     /** @brief Gets script handler.
      *  @note Only supports Lua Binding now.
