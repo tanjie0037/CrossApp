@@ -358,6 +358,7 @@ private:
     //add by jie.tan
     std::string _indexVersion;
     unsigned int _indexBuild;
+    bool _indexMissing;
     std::map<std::string, std::string> _indexMap;
     std::map<std::string, unsigned long> _fileSizeMap;
     //add by jie.tan

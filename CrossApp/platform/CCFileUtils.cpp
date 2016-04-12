@@ -27,7 +27,8 @@ void CCFileUtils::purgeFileUtils()
 }
 
 CCFileUtils::CCFileUtils()
-, _indexBuild(0)
+: _indexBuild(0)
+, _indexMissing(false)
 {
 }
 
@@ -178,10 +179,12 @@ std::string CCFileUtils::fullPathForFilename(const std::string& pszFileName)
     
     //jie.tan: 使用__index匹配实际文件名
 #if defined(__FILE_INDEX) && (__FILE_INDEX == 1)
-    strFileName = getIndexMap()[pszFileName];
-    
-    if (strFileName == "") {
-        strFileName = std::string(pszFileName);
+    if (pszFileName.find("__index") != string::npos) {
+        strFileName = getIndexMap()[pszFileName];
+        
+        if (strFileName == "") {
+            strFileName = std::string(pszFileName);
+        }
     }
 #endif
     //jie.tan: 使用__index匹配实际文件名
@@ -452,10 +455,11 @@ void CCFileUtils::loadIndex() {
         string dataIn = getFileString(getPathForFilename("__index", "", "Res/").c_str());
         string data;
         
-        // 因为插入了一个'\0'
+        // index丢失的情况,2是因为插入了一个'\0'
         if (dataOut.length() < 2 && dataIn.length() < 2) {
-            CCAssert(0, "no index found.");
-            return;
+            CCLOG("__index is missing.");
+            _indexMissing = true;
+            break;
         }
             
         if (dataOut.length() < 2) {
@@ -478,8 +482,6 @@ void CCFileUtils::loadIndex() {
             
             data = buildIn > buildOut ? dataIn : dataOut;
         }
-        
-        data.find("\n");
         
         CCLOG("---index:------------\n%s\n------------", data.c_str());
         
@@ -549,13 +551,12 @@ unsigned int CCFileUtils::getIndexBuild() {
 
 std::map<std::string, std::string> & CCFileUtils::getIndexMap() {
 #if defined(__FILE_INDEX) && (__FILE_INDEX == 1)
-    if (_indexMap.empty()) {
+    if (_indexMap.empty() && !_indexMissing) {
         loadIndex();
     }
     
     if (_indexMap.empty()) {
         CCLOG("__index error!");
-        assert(0);
     }
 #endif
     

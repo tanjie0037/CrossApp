@@ -155,7 +155,7 @@ public: virtual void set##funName(varType var)   \
 #define CC_CONTINUE_IF(cond)        if(cond) continue
 
 #define __CCLOGWITHFUNCTION(format, ...) \
-CrossApp::CCLog("Func:[%s], Line:[%d]:\n> "format"", __PRETTY_FUNCTION__, __LINE__, ##__VA_ARGS__)
+CrossApp::CCLog("Func:[%s], Line:[%d]:\n>" format"", __PRETTY_FUNCTION__, __LINE__, ##__VA_ARGS__)
 // CrossApp debug
 #if !defined(CROSSAPP_DEBUG) || CROSSAPP_DEBUG == 0
 #define CCLOG(...)       do {} while (0)
