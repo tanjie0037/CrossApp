@@ -211,6 +211,8 @@
 		1AC6CE8116B9075B00330EFD /* CCFileUtilsIOS.h in Headers */ = {isa = PBXBuildFile; fileRef = 1AC6CE8016B9075B00330EFD /* CCFileUtilsIOS.h */; };
 		1AC6CE8816B910CD00330EFD /* CCFileUtils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1AC6CE8616B910CD00330EFD /* CCFileUtils.cpp */; };
 		1AC6CE8916B910CD00330EFD /* CCFileUtils.h in Headers */ = {isa = PBXBuildFile; fileRef = 1AC6CE8716B910CD00330EFD /* CCFileUtils.h */; };
+		2B6107111CBF6E1500B67A55 /* CCString.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2B61070F1CBF6E1500B67A55 /* CCString.cpp */; };
+		2B6107121CBF6E1500B67A55 /* CCString.h in Headers */ = {isa = PBXBuildFile; fileRef = 2B6107101CBF6E1500B67A55 /* CCString.h */; };
 		3E0F75381B7DD0C4004CFD41 /* CADevice.h in Headers */ = {isa = PBXBuildFile; fileRef = 3E0F74E01B7DD0C3004CFD41 /* CADevice.h */; };
 		3E0F75491B7DD0C4004CFD41 /* CSContentJsonDictionary.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3E0F74F41B7DD0C3004CFD41 /* CSContentJsonDictionary.cpp */; };
 		3E0F754A1B7DD0C4004CFD41 /* CSContentJsonDictionary.h in Headers */ = {isa = PBXBuildFile; fileRef = 3E0F74F51B7DD0C3004CFD41 /* CSContentJsonDictionary.h */; };
@@ -576,6 +578,8 @@
 		1AC6CE8016B9075B00330EFD /* CCFileUtilsIOS.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CCFileUtilsIOS.h; sourceTree = "<group>"; };
 		1AC6CE8616B910CD00330EFD /* CCFileUtils.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = CCFileUtils.cpp; sourceTree = "<group>"; };
 		1AC6CE8716B910CD00330EFD /* CCFileUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CCFileUtils.h; sourceTree = "<group>"; };
+		2B61070F1CBF6E1500B67A55 /* CCString.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = CCString.cpp; sourceTree = "<group>"; };
+		2B6107101CBF6E1500B67A55 /* CCString.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CCString.h; sourceTree = "<group>"; };
 		3727122B1A1C785D00FB827E /* Accelerate.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Accelerate.framework; path = System/Library/Frameworks/Accelerate.framework; sourceTree = SDKROOT; };
 		3727122D1A1C78AD00FB827E /* ExternalAccessory.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ExternalAccessory.framework; path = System/Library/Frameworks/ExternalAccessory.framework; sourceTree = SDKROOT; };
 		3727122F1A1C78D400FB827E /* CoreAudio.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreAudio.framework; path = System/Library/Frameworks/CoreAudio.framework; sourceTree = SDKROOT; };
@@ -1032,6 +1036,8 @@
 				1551A38C158F2ADE00E66CFE /* CCNS.h */,
 				1551A38F158F2ADE00E66CFE /* CCSet.cpp */,
 				1551A390158F2ADE00E66CFE /* CCSet.h */,
+				2B61070F1CBF6E1500B67A55 /* CCString.cpp */,
+				2B6107101CBF6E1500B67A55 /* CCString.h */,
 			);
 			path = cocoa;
 			sourceTree = "<group>";
@@ -1558,6 +1564,7 @@
 				3E0F75501B7DD0C4004CFD41 /* forwards.h in Headers */,
 				B0ADAE8C1B2E7F1B00BE8FA3 /* CAScale9ImageView.h in Headers */,
 				B07E81141C33B34800A39C95 /* CATextView.h in Headers */,
+				2B6107121CBF6E1500B67A55 /* CCString.h in Headers */,
 				1551A65C158F2ADE00E66CFE /* CCNS.h in Headers */,
 				3E0F754D1B7DD0C4004CFD41 /* autolink.h in Headers */,
 				1551A660158F2ADE00E66CFE /* CCSet.h in Headers */,
@@ -1926,6 +1933,7 @@
 				022CAAE41BF185DA00ED015B /* sqlite3.c in Sources */,
 				B0596B431976356C00B1E8CB /* ConvertUTFWrapper.cpp in Sources */,
 				0460ED2E1957019600D13001 /* CCApplication.mm in Sources */,
+				2B6107111CBF6E1500B67A55 /* CCString.cpp in Sources */,
 				B0ADAE6F1B2E7F1B00BE8FA3 /* CACollectionView.cpp in Sources */,
 				0460ED301957019600D13001 /* CCEGLView.mm in Sources */,
 				0460ED351957031200D13001 /* CAGLProgram.cpp in Sources */,

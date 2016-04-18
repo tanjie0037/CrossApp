@@ -106,7 +106,7 @@
 #include "cocoa/CCSet.h"
 #include "cocoa/CCNS.h"
 #include "cocoa/CACalendar.h"
-
+#include "cocoa/CCString.h"
 
 // kazmath
 #include "kazmath/include/kazmath/kazmath.h"

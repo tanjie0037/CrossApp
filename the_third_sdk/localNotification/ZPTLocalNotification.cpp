@@ -48,7 +48,7 @@ void ZPTLocalNotification::addNotification(uint32_t alertId, uint64_t alertTime,
     notiConfig["alertBody"] = alertBody;
     notiConfig["interval"] = interval;
     
-    const char *alertIdString = CCString::createWithFormat("%d", alertId)->getCString();
+    const char *alertIdString = crossapp_format_string("%d", alertId).c_str();
     
     if (interval == IntervalTypeNone) {
         _singleNoti[alertIdString] = notiConfig;
@@ -63,7 +63,7 @@ void ZPTLocalNotification::addNotification(uint32_t alertId, uint64_t alertTime,
 }
 
 void ZPTLocalNotification::removeNotification(uint32_t alertId) {
-    const char *alertIdString = CCString::createWithFormat("%d", alertId)->getCString();
+    const char *alertIdString = crossapp_format_string("%d", alertId).c_str();
     
     Value noti;
     noti = _singleNoti[alertIdString];
