@@ -179,7 +179,7 @@ std::string CCFileUtils::fullPathForFilename(const std::string& pszFileName)
     
     //jie.tan: 使用__index匹配实际文件名
 #if defined(__FILE_INDEX) && (__FILE_INDEX == 1)
-    if (pszFileName.find("__index") != string::npos) {
+    if (pszFileName.find("__index") == string::npos) {
         strFileName = getIndexMap()[pszFileName];
         
         if (strFileName == "") {
