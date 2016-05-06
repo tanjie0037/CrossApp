@@ -25,6 +25,7 @@ void TextFieldTest::viewDidLoad()
     textField1->setKeyboardType(CATextField::Default);
     //TextField的对齐方式
     textField1->setTextFieldAlign(CATextField::Left);
+    textField1->setDelegate(this);
     this->getView()->addSubview(textField1);
     
     CATextField* textField2 = CATextField::createWithLayout(DLayout(DHorizontalLayout_L_R(100, 100), DVerticalLayout_T_H(450, 100)));
@@ -35,14 +36,47 @@ void TextFieldTest::viewDidLoad()
     textField2->setClearButtonMode(CATextField::WhileEditing);
     textField2->setTextFieldAlign(CATextField::Left);
     textField2->setSecureTextEntry(true);
+    textField2->setDelegate(this);
     this->getView()->addSubview(textField2);
- 
 }
 
 void TextFieldTest::viewDidUnload()
 {
     // Release any retained subviews of the main view.
     // e.g. self.myOutlet = nil;
+}
+
+bool TextFieldTest::textFieldShouldBeginEditing(CATextField* sender)
+{
+    return true;
+}
+
+//If the sender doesn't want to detach from the IME, return true;
+bool TextFieldTest::textFieldShouldEndEditing(CATextField* sender)
+{
+
+    return true;
+}
+
+
+//
+void TextFieldTest::textFieldShouldReturn(CATextField* sender)
+{
+}
+
+
+void TextFieldTest::keyBoardHeight(CATextField* sender, int height)
+{
+}
+
+
+//Warning!!! Warning!!! Warning!!!  This method is not on the OpenGL thread.
+bool TextFieldTest::textFieldShouldChangeCharacters(CATextField* sender,
+                                             unsigned int location,
+                                             unsigned int lenght,
+                                                    const std::string& changedText)
+{
+    return true;
 }
 
 

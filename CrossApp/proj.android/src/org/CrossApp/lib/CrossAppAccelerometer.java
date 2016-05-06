@@ -11,7 +11,6 @@ import android.util.Log;
 import android.view.Display;
 import android.view.Surface;
 import android.view.WindowManager;
-import android.os.Build.*;
 
 public class CrossAppAccelerometer implements SensorEventListener {
 	// ===========================================================
@@ -29,6 +28,10 @@ public class CrossAppAccelerometer implements SensorEventListener {
 	private final Sensor mAccelerometer;
 	private final int mNaturalOrientation;
 
+	private long lastUpdateTime;
+	private static final int UPTATE_INTERVAL_TIME = 1000;
+	private float mInterval;
+	
 	// ===========================================================
 	// Constructors
 	// ===========================================================
@@ -51,14 +54,20 @@ public class CrossAppAccelerometer implements SensorEventListener {
 		this.mSensorManager.registerListener(this, this.mAccelerometer, SensorManager.SENSOR_DELAY_GAME);
 	}
 
-        public void setInterval(float interval) {
-	        // Honeycomb version is 11
-	        if(android.os.Build.VERSION.SDK_INT < 11) {
-		    this.mSensorManager.registerListener(this, this.mAccelerometer, SensorManager.SENSOR_DELAY_GAME);
-		} else {
-		    //convert seconds to microseconds
-		    this.mSensorManager.registerListener(this, this.mAccelerometer, (int)(interval*100000));
-		}
+    public void setInterval(float interval) 
+    {
+    	mInterval = interval;
+    	
+        // Honeycomb version is 11
+        if(android.os.Build.VERSION.SDK_INT < 11) 
+        {
+	    this.mSensorManager.registerListener(this, this.mAccelerometer, SensorManager.SENSOR_DELAY_GAME);
+        } 
+        else
+        {
+	    //convert seconds to microseconds
+	    this.mSensorManager.registerListener(this, this.mAccelerometer, (int)(interval*100000));
+        }
 	}
       
 	public void disable() {
@@ -75,6 +84,19 @@ public class CrossAppAccelerometer implements SensorEventListener {
 			return;
 		}
 
+		// The current time
+		long currentUpdateTime = System.currentTimeMillis();
+		
+		// Two detection time interval
+		long timeInterval = currentUpdateTime - lastUpdateTime;
+		
+		// Determine whether detection time interval has been reached
+		if (timeInterval < UPTATE_INTERVAL_TIME*mInterval)		
+			return;
+		
+		// The time into the last time
+		lastUpdateTime = currentUpdateTime;
+				
 		float x = pSensorEvent.values[0];
 		float y = pSensorEvent.values[1];
 		final float z = pSensorEvent.values[2];
@@ -96,7 +118,7 @@ public class CrossAppAccelerometer implements SensorEventListener {
 			y = -tmp;
 		}		
 		
-		CrossAppGLSurfaceView.queueAccelerometer(x,y,z,pSensorEvent.timestamp);
+		CrossAppGLSurfaceView.queueAccelerometer(x,y,z,mInterval);
 		
 		/*
 		if(BuildConfig.DEBUG) {
@@ -114,7 +136,7 @@ public class CrossAppAccelerometer implements SensorEventListener {
         // Native method called from CrossAppGLSurfaceView (To be in the same thread)
 	// ===========================================================
     
-	public static native void onSensorChanged(final float pX, final float pY, final float pZ, final long pTimestamp);
+	public static native void onSensorChanged(final float pX, final float pY, final float pZ, float pTimestamp);
 
 	// ===========================================================
 	// Inner and Anonymous Classes

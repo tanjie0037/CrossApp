@@ -92,6 +92,7 @@ view/CAImageView.cpp \
 view/CALabel.cpp \
 view/CARenderImage.cpp \
 view/CAScale9ImageView.cpp \
+view/CACell.cpp \
 view/CAScrollView.cpp \
 view/CAListView.cpp \
 view/CATableView.cpp \
@@ -136,7 +137,7 @@ platform/CCEGLViewProtocol.cpp \
 platform/CATempTypeFont.cpp \
 platform/android/CADensityDpi.cpp \
 platform/android/CCEGLView.cpp \
-platform/android/CCAccelerometer.cpp \
+platform/android/CAAccelerometer.cpp \
 platform/android/CCApplication.cpp \
 platform/android/CCCommon.cpp \
 platform/android/CCFileUtilsAndroid.cpp \

@@ -108,6 +108,14 @@ void CAViewController::viewOnExitTransitionDidStart()
     
 }
 
+void CAViewController::viewOnSizeTransitionDidChanged()
+{
+    if (m_bLifeLock)
+    {
+        this->viewSizeDidChanged();
+    }
+}
+
 std::string CAViewController::getNibName()
 {
     return typeid(*this).name();
@@ -1322,21 +1330,27 @@ void CATabBarController::viewDidLoad()
     DLayout tabBarLayout;
     tabBarLayout.horizontal = DHorizontalLayoutFill;
     
-    
     if (m_iTabBarHeight == 0)
     {
         if (m_eTabBarVerticalAlignment == CABarVerticalAlignmentTop)
         {
             m_iTabBarHeight = clearance ? 138 : 98;
-            tabBarLayout.vertical.top = m_bTabBarHidden ? -m_iTabBarHeight : 0;
-            tabBarLayout.vertical.height = m_iTabBarHeight;
         }
         else
         {
             m_iTabBarHeight = 98;
-            tabBarLayout.vertical.bottom = m_bTabBarHidden ? -m_iTabBarHeight : 0;
-            tabBarLayout.vertical.height = m_iTabBarHeight;
         }
+    }
+    
+    if (m_eTabBarVerticalAlignment == CABarVerticalAlignmentTop)
+    {
+        tabBarLayout.vertical.top = m_bTabBarHidden ? -m_iTabBarHeight : 0;
+        tabBarLayout.vertical.height = m_iTabBarHeight;
+    }
+    else
+    {
+        tabBarLayout.vertical.bottom = m_bTabBarHidden ? -m_iTabBarHeight : 0;
+        tabBarLayout.vertical.height = m_iTabBarHeight;
     }
     
     m_pTabBar = CATabBar::createWithLayout(tabBarLayout, clearance);

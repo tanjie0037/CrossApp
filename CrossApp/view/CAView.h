@@ -18,7 +18,7 @@
 #include "shaders/CAGLProgram.h"
 #include "kazmath/kazmath.h"
 #include "dispatcher/CAProtocols.h"
-#include "platform/CCAccelerometerDelegate.h"
+#include "platform/CAAccelerometerDelegate.h"
 #include "basics/CAResponder.h"
 #include "images/CAImageCache.h"
 
@@ -39,6 +39,7 @@ class CAContentContainer;
 class CABatchView;
 class CAScrollView;
 class CAViewAnimation;
+class CARenderImage;
 struct transformValues_;
 
 
@@ -146,23 +147,23 @@ public:
     
     virtual void setFrame(const DRect& rect);
     
-    virtual DRect getFrame() const;
+    virtual const DRect& getFrame();
     
     virtual void setFrameOrigin(const DPoint& point);
     
-    virtual DPoint getFrameOrigin();
+    virtual const DPoint& getFrameOrigin();
     
     virtual void setCenter(const DRect& rect);
     
-    virtual DRect getCenter();
+    virtual const DRect&  getCenter();
     
     virtual void setBounds(const DRect& rect);
     
-    virtual DRect getBounds() const;
+    virtual const DRect& getBounds();
 
     virtual void setCenterOrigin(const DPoint& point);
     
-    virtual DPoint getCenterOrigin();
+    virtual const DPoint& getCenterOrigin();
 
     virtual void setLayout(const DLayout& layout);
     
@@ -244,7 +245,7 @@ public:
 
     virtual void updateTransform(void);
 
-    virtual CATransformation nodeToParentTransform(void);
+    virtual CATransformation viewToSuperviewTransform(void);
 
     DRect convertRectToNodeSpace(const DRect& worldRect);
 
@@ -342,9 +343,9 @@ protected:
     
     void detachSubview(CAView *subview);
     
-    void updateDraw();
+    virtual void updateDraw();
     
-    void updateColor(void);
+    virtual void updateColor(void);
     
     virtual void setPoint(const DPoint &point);
     
@@ -378,87 +379,90 @@ protected:
     
     CC_SYNTHESIZE(CAImageAtlas*, m_pobImageAtlas, ImageAtlas);
     
-    int m_fRotationX;                 ///< rotation angle on x-axis
-    int m_fRotationY;                 ///< rotation angle on y-axis
+    float                       m_fSkewX;
+    float                       m_fSkewY;
     
-    float m_fScaleX;                    ///< scaling factor on x-axis
-    float m_fScaleY;                    ///< scaling factor on y-axis
+    int                         m_fRotationX;
+    int                         m_fRotationY;
     
-    float m_fVertexZ;                   ///< OpenGL real Z vertex
+    float                       m_fScaleX;
+    float                       m_fScaleY;
     
-    DPoint m_obPoint;               ///< position of the node
+    float                       m_fVertexZ;
     
-    float m_fSkewX;                     ///< skew angle on x-axis
-    float m_fSkewY;                     ///< skew angle on y-axis
+    DPoint                      m_obAnchorPointInPoints;
+    DPoint                      m_obAnchorPoint;
     
-    DPoint m_obAnchorPointInPoints;    ///< anchor point in points
-    DPoint m_obAnchorPoint;            ///< anchor point normalized (NOT in points)
+    DPoint                      m_obPoint;
+    DSize                       m_obContentSize;
     
-    DSize m_obContentSize;             ///< untransformed size of the node
+    DLayout                     m_obLayout;
+    DRect                       m_obReturn;
     
-    DLayout m_obLayout;
     
-    CATransformation m_sAdditionalTransform; ///< transform
-    CATransformation m_sTransform;     ///< transform
+    CATransformation            m_sAdditionalTransform;
+    CATransformation            m_sTransform;
     
-    CACamera *m_pCamera;                ///< a camera
+    CACamera*                   m_pCamera;
 
-    int m_nZOrder;                      ///< z-order value that affects the draw order
+    int                         m_nZOrder;
     
-    CAVector<CAView*> m_obSubviews;               ///< array of children nodes              ///< weak reference to parent node
-    CAView* m_pSuperview;
-    
-    CAGLProgram *m_pShaderProgram;      ///< OpenGL shader
-    
-    ccGLServerState m_eGLServerState;   ///< OpenGL servier side state
-    
-    unsigned int m_uOrderOfArrival;     ///< used to preserve sequence while sorting children with the same zOrder
-    
-    bool m_bRunning;                    ///< is running
-    
-    bool m_bTransformDirty;             ///< transform dirty flag
-    bool m_bInverseDirty;               ///< transform dirty flag
-    bool m_bVisible;                    ///< is this node visible
+    CAVector<CAView*>           m_obSubviews;
+    CAView*                     m_pSuperview;
 
-    bool m_bReorderChildDirty;          ///< children order dirty flag
     
-    float		_displayedAlpha;
-    float       _realAlpha;
-	CAColor4B	_displayedColor;
-    CAColor4B   _realColor;
+    CAGLProgram*                m_pShaderProgram;
     
-    bool m_bDisplayRange;
+    
+    ccGLServerState             m_eGLServerState;
+    
+    unsigned int                m_uOrderOfArrival;
+    
+    bool                        m_bRunning;
+    
+    bool                        m_bTransformDirty;
+    bool                        m_bInverseDirty;
+    bool                        m_bVisible;
 
-    unsigned int        m_uAtlasIndex;          /// Absolute (real) Index on the SpriteSheet
+    bool                        m_bReorderChildDirty;
     
-    bool                m_bDirty;               /// Whether the sprite needs to be updated
-    bool                m_bRecursiveDirty;      /// Whether all of the sprite's children needs to be
+    float                       _displayedAlpha;
+    float                       _realAlpha;
+	CAColor4B                   _displayedColor;
+    CAColor4B                   _realColor;
     
-    bool                m_bHasChildren;         /// Whether the sprite contains children
-    bool                m_bShouldBeHidden;      /// should not be drawn because one of the ancestors
-    
-    CATransformation   m_transformToBatch;
+    bool                        m_bDisplayRange;
 
-    DRect m_obRect;                            /// Retangle of CAImage
-    bool   m_bRectRotated;                      /// Whether the Image is rotated
+    unsigned int                m_uAtlasIndex;
+    
+    bool                        m_bDirty;
+    bool                        m_bRecursiveDirty;
+    
+    bool                        m_bHasChildren;
+    bool                        m_bShouldBeHidden;
+    
+    CATransformation            m_transformToBatch;
+
+    DRect                       m_obRect;
+    bool                        m_bRectRotated;
     
 
-    bool m_bIsAnimation;
+    bool                        m_bIsAnimation;
     
-    // vertex coords, Image coords and color info
-    ccV3F_C4B_T2F_Quad m_sQuad;
+    ccV3F_C4B_T2F_Quad          m_sQuad;
     
-    // image is flipped
-    bool m_bFlipX;                              /// Whether the sprite is flipped horizaontally or not.
-    bool m_bFlipY;                              /// Whether the sprite is flipped vertically or not.
+    bool                        m_bFlipX;
+    bool                        m_bFlipY;
     
-    ccBlendFunc        m_sBlendFunc;            /// It's required for CAImageProtocol inheritance
+    ccBlendFunc                 m_sBlendFunc;
     
-    CAImage*       m_pobImage;            /// CAImage object that is used to render the sprite
+    CAImage*                    m_pobImage;
     
-    friend class CAScrollView;
+    friend class                CARenderImage;
     
-    friend class CAViewAnimation;
+    friend class                CAScrollView;
+    
+    friend class                CAViewAnimation;
 };
 
 class CC_DLL CAContentContainer: public CAResponder
@@ -470,6 +474,8 @@ public:
     virtual void viewOnEnterTransitionDidFinish() = 0;
     
     virtual void viewOnExitTransitionDidStart() = 0;
+    
+    virtual void viewOnSizeTransitionDidChanged() = 0;
 };
 
 static bool compareSubviewZOrder(CAView* one, CAView* two)

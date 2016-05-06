@@ -298,16 +298,16 @@ CATextView::CATextView()
 , m_eReturnType(Default)
 , m_obLastPoint(DPoint(-0xffff, -0xffff))
 {
-    s_map[m_u__ID] = this;
     this->setHaveNextResponder(false);
+    s_map[m_u__ID] = this;
 	textViewOnCreateView(m_u__ID);
-    textViewSetFontSizeJNI(m_u__ID, m_iFontSize / 2);
 }
 
 CATextView::~CATextView()
 {
     s_map.erase(m_u__ID);
     textViewOnRemoveView(m_u__ID);
+    CAViewAnimation::removeAnimations(m_s__StrID + "showImage");
 }
 
 void CATextView::onEnterTransitionDidFinish()
@@ -390,7 +390,7 @@ void CATextView::delayShowImage()
     if (!CAViewAnimation::areBeginAnimationsWithID(m_s__StrID + "showImage"))
     {
         CAViewAnimation::beginAnimations(m_s__StrID + "showImage", NULL);
-        CAViewAnimation::setAnimationDuration(0);
+        CAViewAnimation::setAnimationDuration(0.1f);
 		CAViewAnimation::setAnimationDidStopSelector(this, CAViewAnimation0_selector(CATextView::showImage));
         CAViewAnimation::commitAnimations();
     }
@@ -481,8 +481,6 @@ void CATextView::setContentSize(const DSize& contentSize)
     size.width = s_dip_to_px(worldContentSize.width);
     size.height =  s_dip_to_px(worldContentSize.height);
     textViewSetTextViewSizeJNI(m_u__ID, size.width, size.height);
-    
-    this->showImage();
 }
 
 bool CATextView::ccTouchBegan(CATouch *pTouch, CAEvent *pEvent)

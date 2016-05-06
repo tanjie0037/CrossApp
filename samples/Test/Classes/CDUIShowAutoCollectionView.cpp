@@ -33,7 +33,7 @@
 #include "AutoCollectionViewVerticalTest.h"
 #include "WaterfallViewTest.h"
 
-CDUIShowAutoCollectionView::CDUIShowAutoCollectionView():showImageViewNavigationBar(0),showActivityIndicatorNavigationBar(0),showSliderNavigationBar(0),showLabelNavigationBar(0),showTabBarNavigationBar(0),showPickerViewNavigationBar(0),showViewAnimationNavigationBar(0)
+CDUIShowAutoCollectionView::CDUIShowAutoCollectionView():showImageViewNavigationBar(0),showActivityIndicatorNavigationBar(0),showSliderNavigationBar(0),showLabelNavigationBar(0),showPickerViewNavigationBar(0),showViewAnimationNavigationBar(0),showAutoCollectionVerticalNavigationBar(0),showAutoCollectionHorizontalNavigationBar(0)
 {
     m_vTitle.push_back("AlertView");
     m_vTitle.push_back("Button");
@@ -134,6 +134,7 @@ void CDUIShowAutoCollectionView::collectionViewDidSelectCellAtIndexPath(CAAutoCo
             
         case 3:
         {
+            showImageViewNavigationBar = 0;
             ImageViewNavigationBar = CANavigationBarItem::create(m_vTitle.at(item));
             
             CABarButtonItem* ImageViewRightBtn = CABarButtonItem::create("", CAImage::create("source_material/btn_right_white.png"), NULL);
@@ -158,6 +159,7 @@ void CDUIShowAutoCollectionView::collectionViewDidSelectCellAtIndexPath(CAAutoCo
         }
         case 5:
         {
+            showActivityIndicatorNavigationBar = 0;
             ActivityIndicatorNavigationBar = CANavigationBarItem::create(m_vTitle.at(item));
             
             CABarButtonItem* ActivityIndicatorRightBtn = CABarButtonItem::create("", CAImage::create("source_material/btn_right_white.png"), NULL);
@@ -183,6 +185,7 @@ void CDUIShowAutoCollectionView::collectionViewDidSelectCellAtIndexPath(CAAutoCo
         }
         case 7:
         {
+            showSliderNavigationBar = 0;
             SliderNavigationBar = CANavigationBarItem::create(m_vTitle.at(item));
             
             CABarButtonItem* SliderRightBtn = CABarButtonItem::create("", CAImage::create("source_material/btn_right_white.png"), NULL);
@@ -217,6 +220,7 @@ void CDUIShowAutoCollectionView::collectionViewDidSelectCellAtIndexPath(CAAutoCo
         }
         case 10:
         {
+            showLabelNavigationBar = 0;
             LabelNavigationBar = CANavigationBarItem::create(m_vTitle.at(item));
             
             CABarButtonItem* LabelRightBtn = CABarButtonItem::create("", CAImage::create("source_material/btn_right_white.png"), NULL);
@@ -279,18 +283,32 @@ void CDUIShowAutoCollectionView::collectionViewDidSelectCellAtIndexPath(CAAutoCo
         }
         case 16:
         {
-            AutoCollectionViewVerticalTest* ViewContrllerAutoCollectionViewVerticalTest = new class AutoCollectionViewVerticalTest();
+            showAutoCollectionVerticalNavigationBar = 0;
+            AutoCollectionVerticalNavigationBar = CANavigationBarItem::create(m_vTitle.at(item));
+            
+            CABarButtonItem* AutoCollectionVerticalRightBtn = CABarButtonItem::create("", CAImage::create("source_material/btn_right_white.png"), NULL);
+            AutoCollectionVerticalRightBtn->setTarget(this, CAControl_selector(CDUIShowAutoCollectionView::AutoCollectionVerticalRightBtnRightcallback));
+            AutoCollectionVerticalNavigationBar->addRightButtonItem(AutoCollectionVerticalRightBtn);
+
+            AutoCollectionViewVerticalTest* ViewContrllerAutoCollectionViewVerticalTest = new AutoCollectionViewVerticalTest();
             ViewContrllerAutoCollectionViewVerticalTest->init();
-            ViewContrllerAutoCollectionViewVerticalTest->setNavigationBarItem(CANavigationBarItem::create(m_vTitle.at(item)));
+            ViewContrllerAutoCollectionViewVerticalTest->setNavigationBarItem(AutoCollectionVerticalNavigationBar);
             ViewContrllerAutoCollectionViewVerticalTest->autorelease();
             RootWindow::getInstance()->getRootNavigationController()->pushViewController(ViewContrllerAutoCollectionViewVerticalTest, true);
             break;
         }
         case 17:
         {
+            showAutoCollectionHorizontalNavigationBar = 0;
+            AutoCollectionHorizontalNavigationBar = CANavigationBarItem::create(m_vTitle.at(item));
+            
+            CABarButtonItem* AutoCollectionHorizontalRightBtn = CABarButtonItem::create("", CAImage::create("source_material/btn_right_white.png"), NULL);
+            AutoCollectionHorizontalRightBtn->setTarget(this, CAControl_selector(CDUIShowAutoCollectionView::AutoCollectionHorizontalRightBtnRightcallback));
+            AutoCollectionHorizontalNavigationBar->addRightButtonItem(AutoCollectionHorizontalRightBtn);
+            
             AutoCollectionViewHorizontalTest* ViewContrllerAutoCollectionViewHorizontalTest = new AutoCollectionViewHorizontalTest();
             ViewContrllerAutoCollectionViewHorizontalTest->init();
-            ViewContrllerAutoCollectionViewHorizontalTest->setNavigationBarItem(CANavigationBarItem::create(m_vTitle.at(item)));
+            ViewContrllerAutoCollectionViewHorizontalTest->setNavigationBarItem(AutoCollectionHorizontalNavigationBar);
             ViewContrllerAutoCollectionViewHorizontalTest->autorelease();
             RootWindow::getInstance()->getRootNavigationController()->pushViewController(ViewContrllerAutoCollectionViewHorizontalTest, true);
             break;
@@ -335,6 +353,7 @@ void CDUIShowAutoCollectionView::collectionViewDidSelectCellAtIndexPath(CAAutoCo
         }
         case 22:
         {
+            showPickerViewNavigationBar = 0;
             PickerViewNavigationBar = CANavigationBarItem::create(m_vTitle.at(item));
             
             CABarButtonItem* PickerViewRightBtn = CABarButtonItem::create("", CAImage::create("source_material/btn_right_white.png"), NULL);
@@ -397,6 +416,7 @@ void CDUIShowAutoCollectionView::collectionViewDidSelectCellAtIndexPath(CAAutoCo
         }
         case 28:
         {
+            showViewAnimationNavigationBar = 0;
             ViewAnimationNavigationBar = CANavigationBarItem::create(m_vTitle.at(item));
             
             CABarButtonItem* ViewAnimationRightBtn = CABarButtonItem::create("", CAImage::create("source_material/btn_right_white.png"), NULL);

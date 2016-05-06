@@ -398,17 +398,16 @@ CATextField::CATextField()
 , m_eReturnType(Done)
 , m_obLastPoint(DPoint(-0xffff, -0xffff))
 {
-    s_map[m_u__ID] = this;
     this->setHaveNextResponder(false);
+    s_map[m_u__ID] = this;
     onCreateView(m_u__ID);
-    this->setPlaceHolderText("");
-    setFontSizeJNI(m_u__ID, m_iFontSize / 2);
 }
 
 CATextField::~CATextField()
 {
     s_map.erase(m_u__ID);
     onRemoveView(m_u__ID);
+    CAViewAnimation::removeAnimations(m_s__StrID + "showImage");
 }
 
 void CATextField::onEnterTransitionDidFinish()
@@ -474,9 +473,9 @@ bool CATextField::becomeFirstResponder()
 
 	bool result = CAView::becomeFirstResponder();
 
-	becomeFirstResponderID(m_u__ID);
-
-	this->showNativeTextField();
+    becomeFirstResponderID(m_u__ID);
+    
+    this->showNativeTextField();
 
 	if (m_eClearBtn == WhileEditing)
 	{
@@ -509,7 +508,6 @@ void CATextField::hideNativeTextField()
 
 void CATextField::showNativeTextField()
 {
-    this->update(0);
     CAScheduler::schedule(schedule_selector(CATextField::update), this, 1/60.0f);
 }
 
@@ -518,7 +516,7 @@ void CATextField::delayShowImage()
     if (!CAViewAnimation::areBeginAnimationsWithID(m_s__StrID + "showImage"))
     {
         CAViewAnimation::beginAnimations(m_s__StrID + "showImage", NULL);
-        CAViewAnimation::setAnimationDuration(0);
+        CAViewAnimation::setAnimationDuration(0.1f);
         CAViewAnimation::setAnimationDidStopSelector(this, CAViewAnimation0_selector(CATextField::showImage));
         CAViewAnimation::commitAnimations();
     }
@@ -601,14 +599,22 @@ void CATextField::setContentSize(const DSize& contentSize)
 {
     CAView::setContentSize(contentSize);
     
+    if (m_eClearBtn == WhileEditing)
+    {
+        if (m_eClearBtn == WhileEditing)
+        {
+            m_eClearBtn = None;
+            this->setMarginImageRight(DSize(contentSize.height, contentSize.height), "");
+            m_eClearBtn = WhileEditing;
+        }
+    }
+    
     DSize worldContentSize = this->convertToWorldSize(m_obContentSize);
     
     DSize size;
     size.width = s_dip_to_px(worldContentSize.width);
     size.height =  s_dip_to_px(worldContentSize.height);
     setTextFieldSizeJNI(m_u__ID, size.width, size.height);
-    
-    this->showImage();
 }
 
 bool CATextField::ccTouchBegan(CATouch *pTouch, CAEvent *pEvent)

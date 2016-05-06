@@ -15,7 +15,6 @@
 #include "platform/CCFileUtils.h"
 #include "CCApplication.h"
 #include "dispatcher/CAKeypadDispatcher.h"
-#include "CCAccelerometer.h"
 #include "dispatcher/CATouch.h"
 #include "support/user_default/CAUserDefault.h"
 #include "shaders/ccGLStateCache.h"
@@ -97,7 +96,7 @@ bool CAApplication::init(void)
     m_pKeypadDispatcher = new CAKeypadDispatcher();
 
     // Accelerometer
-    m_pAccelerometer = new CCAccelerometer();
+    m_pAccelerometer = new CAAccelerometer();
 
     // create autorelease pool
     CAPoolManager::sharedPoolManager()->push();
@@ -728,7 +727,7 @@ CAKeypadDispatcher* CAApplication::getKeypadDispatcher()
     return m_pKeypadDispatcher;
 }
 
-void CAApplication::setAccelerometer(CCAccelerometer* pAccelerometer)
+void CAApplication::setAccelerometer(CAAccelerometer* pAccelerometer)
 {
     if (m_pAccelerometer != pAccelerometer)
     {
@@ -737,7 +736,7 @@ void CAApplication::setAccelerometer(CCAccelerometer* pAccelerometer)
     }
 }
 
-CCAccelerometer* CAApplication::getAccelerometer()
+CAAccelerometer* CAApplication::getAccelerometer()
 {
     return m_pAccelerometer;
 }

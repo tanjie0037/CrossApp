@@ -16,7 +16,7 @@ CAListView::CAListView()
 , m_bAllowsSelection(false)
 , m_bAllowsMultipleSelection(false)
 , m_pHighlightedListCells(NULL)
-, m_pListViewOrientation(CAListViewOrientationVertical)
+, m_eOrientation(Vertical)
 , m_bAllowsHeadAndFootHover(true)
 , m_pListHeaderView(NULL)
 , m_pListFooterView(NULL)
@@ -181,7 +181,7 @@ void CAListView::setUnSelectAtIndex(unsigned int index)
 
 void CAListView::setShowsScrollIndicators(bool var)
 {
-    bool bVertScroll = m_pListViewOrientation == CAListViewOrientationVertical;
+    bool bVertScroll = m_eOrientation == Vertical;
     this->setShowsHorizontalScrollIndicator(var && !bVertScroll);
     this->setShowsVerticalScrollIndicator(var && bVertScroll);
     m_bShowsScrollIndicators = var;
@@ -197,10 +197,10 @@ const CAVector<CAListViewCell*>& CAListView::displayingListCell()
     return m_vpUsedListCells;
 }
 
-void CAListView::setListViewOrientation(CAListViewOrientation var)
+void CAListView::setOrientation(const CAListView::Orientation& var)
 {
-	m_pListViewOrientation = var;
-	bool bVertScroll = m_pListViewOrientation == CAListViewOrientationVertical;
+	m_eOrientation = var;
+	bool bVertScroll = m_eOrientation == Vertical;
 	
 	setShowsVerticalScrollIndicator(bVertScroll);
 	setBounceVertical(bVertScroll);
@@ -208,11 +208,16 @@ void CAListView::setListViewOrientation(CAListViewOrientation var)
 	setBounceHorizontal(!bVertScroll);
 	setHorizontalScrollEnabled(!bVertScroll);
 	setVerticalScrollEnabled(bVertScroll);
+    
+    if(!m_mpUsedListCells.empty())
+    {
+        this->reloadData();
+    }
 }
 
-CAListViewOrientation CAListView::getListViewOrientation()
+const CAListView::Orientation& CAListView::getOrientation()
 {
-	return m_pListViewOrientation;
+	return m_eOrientation;
 }
 
 bool CAListView::ccTouchBegan(CATouch *pTouch, CAEvent *pEvent)
@@ -423,7 +428,7 @@ void CAListView::reloadViewSizeData()
     int iStartPosition = 0;
     if (m_nListHeaderHeight > 0)
     {
-        m_rHeaderRect = (m_pListViewOrientation == CAListViewOrientationVertical)
+        m_rHeaderRect = (m_eOrientation == Vertical)
         ? DRect(0, iStartPosition, width, m_nListHeaderHeight)
         : DRect(iStartPosition, 0, m_nListHeaderHeight, height);
         iStartPosition += m_nListHeaderHeight;
@@ -437,7 +442,7 @@ void CAListView::reloadViewSizeData()
         unsigned int cellHeight = m_pListViewDataSource->listViewHeightForIndex(this, i);
         if (cellHeight > 0)
         {
-            DRect cellRect = (m_pListViewOrientation == CAListViewOrientationVertical)
+            DRect cellRect = (m_eOrientation == Vertical)
             ? DRect(0, iStartPosition, width, cellHeight)
             : DRect(iStartPosition, 0, cellHeight, height);
             m_rIndexRects[i] = cellRect;
@@ -445,22 +450,22 @@ void CAListView::reloadViewSizeData()
         }
         if (m_nSeparatorViewHeight > 0)
         {
-            m_rLineRects[i] = (m_pListViewOrientation == CAListViewOrientationVertical)
+            m_rLineRects[i] = (m_eOrientation == Vertical)
             ? DRect(0, iStartPosition, width, s_px_to_dip(m_nSeparatorViewHeight))
             : DRect(iStartPosition, 0, s_px_to_dip(m_nSeparatorViewHeight), height);
-            iStartPosition += m_nSeparatorViewHeight;
+            iStartPosition += s_px_to_dip(m_nSeparatorViewHeight);
         }
     }
     
     if (m_nListFooterHeight > 0)
     {
-        m_rFooterRect = (m_pListViewOrientation == CAListViewOrientationVertical)
+        m_rFooterRect = (m_eOrientation == Vertical)
         ? DRect(0, iStartPosition, width, m_nListFooterHeight)
         : DRect(iStartPosition, 0, m_nListFooterHeight, height);
         iStartPosition += m_nListFooterHeight;
     }
     
-    if (m_pListViewOrientation == CAListViewOrientationVertical)
+    if (m_eOrientation == Vertical)
     {
         this->setViewSize(DSize(0, iStartPosition));
     }
@@ -490,7 +495,7 @@ void CAListView::clearData()
 		CC_CONTINUE_IF(cell == NULL);
 		m_mpFreedListCells[cell->getReuseIdentifier()].pushBack(cell);
 		cell->removeFromSuperview();
-		cell->resetListViewCell();
+		cell->resetCell();
 	}
 	m_vpUsedListCells.clear();
 	
@@ -554,6 +559,8 @@ void CAListView::recoveryCell()
 	DRect rect = this->getBounds();
 	rect.origin = getContentOffset();
     rect.origin.y -= rect.size.height * 0.1f;
+    rect.origin.x -= rect.size.width * 0.1f;
+    rect.size.width *= 1.2f;
     rect.size.height *= 1.2f;
     
 	std::map<unsigned int, CAListViewCell*>::iterator itr;
@@ -567,7 +574,7 @@ void CAListView::recoveryCell()
 		
 		m_mpFreedListCells[cell->getReuseIdentifier()].pushBack(cell);
 		cell->removeFromSuperview();
-		cell->resetListViewCell();
+		cell->resetCell();
 		itr->second = NULL;
         m_vpUsedListCells.eraseObject(cell);
 		
@@ -584,6 +591,8 @@ void CAListView::loadCell()
 	DRect rect = this->getBounds();
 	rect.origin = getContentOffset();
     rect.origin.y -= rect.size.height * 0.1f;
+    rect.origin.x -= rect.size.width * 0.1f;
+    rect.size.width *= 1.2f;
     rect.size.height *= 1.2f;
     
 	std::map<unsigned int, CAListViewCell*>::iterator itr;
@@ -677,22 +686,14 @@ CAView* CAListView::dequeueReusableLine()
 #pragma CAListViewCell
 
 CAListViewCell::CAListViewCell()
-:m_pBackgroundView(NULL)
-,m_pContentView(NULL)
-,m_nIndex(UINT_NONE)
-,m_bControlStateEffect(true)
-,m_bAllowsSelected(true)
+:m_nIndex(UINT_NONE)
 {
-    this->setHaveNextResponder(true);
-    this->setDisplayRange(false);
-    this->setColor(CAColor_clear);
 }
 
 
 CAListViewCell::~CAListViewCell()
 {
-    CC_SAFE_RELEASE_NULL(m_pContentView);
-    CC_SAFE_RELEASE_NULL(m_pBackgroundView);
+
 }
 
 CAListViewCell* CAListViewCell::create(const std::string& reuseIdentifier)
@@ -705,67 +706,6 @@ CAListViewCell* CAListViewCell::create(const std::string& reuseIdentifier)
 	}
 	CC_SAFE_DELETE(cell);
 	return NULL;
-}
-
-bool CAListViewCell::initWithReuseIdentifier(const std::string& reuseIdentifier)
-{
-    m_pContentView = new CAView();
-    m_pContentView->setLayout(DLayoutFill);
-    this->addSubview(m_pContentView);
-    
-    this->setBackgroundView(CAView::create());
-    this->setReuseIdentifier(reuseIdentifier);
-    this->normalListViewCell();
-    
-    return true;
-}
-
-void CAListViewCell::setBackgroundView(CrossApp::CAView *var)
-{
-    CC_RETURN_IF(var == m_pBackgroundView);
-    m_pContentView->removeSubview(m_pBackgroundView);
-    CC_SAFE_RETAIN(var);
-    CC_SAFE_RELEASE(m_pBackgroundView);
-    m_pBackgroundView = var;
-    CC_RETURN_IF(m_pBackgroundView == NULL);
-    m_pBackgroundView->setLayout(DLayoutFill);
-    m_pContentView->insertSubview(m_pBackgroundView, -1);
-}
-
-CAView* CAListViewCell::getBackgroundView()
-{
-    return m_pBackgroundView;
-}
-
-void CAListViewCell::setControlState(const CAControlState& var)
-{
-    if (m_bAllowsSelected == false && var == CAControlStateSelected)
-    {
-        CAControl::setControlState(CAControlStateNormal);
-    }
-    else
-    {
-        CAControl::setControlState(var);
-    }
-    
-    CC_RETURN_IF(m_bControlStateEffect == false);
-    switch (var)
-    {
-        case CAControlStateNormal:
-			this->normalListViewCell();
-            break;
-        case CAControlStateHighlighted:
-			this->highlightedListViewCell();
-            break;
-        case CAControlStateSelected:
-			this->selectedListViewCell();
-            break;
-        case CAControlStateDisabled:
-			this->disabledListViewCell();
-            break;
-        default:
-            break;
-    }
 }
 
 void CAListViewCell::normalListViewCell()
@@ -794,14 +734,29 @@ void CAListViewCell::disabledListViewCell()
     m_pBackgroundView->setColor(ccc4(127, 127, 127, 255));
 }
 
-void CAListViewCell::resetListViewCell()
+void CAListViewCell::normalCell()
 {
-    this->setVisible(true);
     this->normalListViewCell();
+}
+
+void CAListViewCell::highlightedCell()
+{
+    this->highlightedListViewCell();
+}
+
+void CAListViewCell::selectedCell()
+{
+    this->selectedListViewCell();
+}
+
+void CAListViewCell::disabledCell()
+{
+    this->disabledListViewCell();
+}
+
+void CAListViewCell::recoveryCell()
+{
     this->recoveryListViewCell();
-    m_pContentView->setLayout(DLayoutFill);
-    m_pContentView->setScale(1.0f);
-    m_pContentView->setRotation(0);
 }
 
 NS_CC_END

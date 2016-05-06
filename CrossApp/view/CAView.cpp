@@ -19,7 +19,6 @@
 #include <stdarg.h>
 #include "dispatcher/CATouchDispatcher.h"
 #include "dispatcher/CAKeypadDispatcher.h"
-#include "CCAccelerometer.h"
 #include "shaders/CAShaderCache.h"
 #include "shaders/CAGLProgram.h"
 #include "shaders/ccGLStateCache.h"
@@ -567,15 +566,24 @@ void CAView::setAnchorPointInPoints(const DPoint& anchorPointInPoints)
     {
         DPoint anchorPoint = DPoint(anchorPointInPoints.x / m_obContentSize.width,
                                     anchorPointInPoints.y / m_obContentSize.height);
-        
-        DPoint point = ccpSub(m_obPoint, ccpCompMult(ccpSub(m_obAnchorPointInPoints, anchorPointInPoints),
-                                                     DPoint(m_fScaleX, m_fScaleY)));
+
+        if (m_bRunning)
+        {
+            this->viewToSuperviewTransform();
+        }
         
         m_obAnchorPoint = anchorPoint;
         m_obAnchorPointInPoints = anchorPointInPoints;
         
-        this->setPoint(point);
-        this->updateDraw();
+        if (m_bRunning)
+        {
+            DPoint point = anchorPointInPoints;
+            point.y = m_obContentSize.height - point.y;
+            point = DPointApplyAffineTransform(point, m_sTransform);
+            point.y = this->m_pSuperview->m_obContentSize.height - point.y;
+            this->setPoint(point);
+            this->updateDraw();
+        }
     }
 }
 
@@ -585,14 +593,23 @@ void CAView::setAnchorPoint(const DPoint& anchorPoint)
     {
         DPoint anchorPointInPoints = ccpCompMult(m_obContentSize, anchorPoint);
         
-        DPoint point = ccpSub(m_obPoint, ccpCompMult(ccpSub(m_obAnchorPointInPoints, anchorPointInPoints),
-                                                     DPoint(m_fScaleX, m_fScaleY)));
+        if (m_bRunning)
+        {
+            this->viewToSuperviewTransform();
+        }
         
         m_obAnchorPoint = anchorPoint;
         m_obAnchorPointInPoints = anchorPointInPoints;
         
-        this->setPoint(point);
-        this->updateDraw();
+        if (m_bRunning)
+        {
+            DPoint point = anchorPointInPoints;
+            point.y = m_obContentSize.height - point.y;
+            point = DPointApplyAffineTransform(point, m_sTransform);
+            point.y = this->m_pSuperview->m_obContentSize.height - point.y;
+            this->setPoint(point);
+            this->updateDraw();
+        }
     }
 }
 
@@ -610,6 +627,10 @@ void CAView::setContentSize(const DSize & contentSize)
         m_obAnchorPointInPoints.y = m_obContentSize.height * m_obAnchorPoint.y;
         
         this->updateImageRect();
+        if (m_pContentContainer)
+        {
+            m_pContentContainer->viewOnSizeTransitionDidChanged();
+        }
         
         CAVector<CAView*>::iterator itr;
         for (itr=m_obSubviews.begin(); itr!=m_obSubviews.end(); itr++)
@@ -621,12 +642,12 @@ void CAView::setContentSize(const DSize & contentSize)
     }
 }
 
-DRect CAView::getFrame() const
+const DRect& CAView::getFrame()
 {
-    DRect frame;
-    frame.origin = ccpSub(m_obPoint, m_obAnchorPointInPoints);
-    frame.size = m_obContentSize;
-    return frame;
+    m_obReturn.setType(DRect::Frame);
+    m_obReturn.origin = ccpSub(m_obPoint, m_obAnchorPointInPoints);
+    m_obReturn.size = m_obContentSize;
+    return m_obReturn;
 }
 
 void CAView::setFrame(const DRect &rect)
@@ -660,6 +681,12 @@ void CAView::setFrame(const DRect &rect)
     }
 }
 
+const DPoint& CAView::getFrameOrigin()
+{
+    m_obReturn.origin = ccpSub(m_obPoint, m_obAnchorPointInPoints);
+    return m_obReturn.origin;
+}
+
 void CAView::setFrameOrigin(const DPoint& point)
 {
     m_obLayout = DLayoutZero;
@@ -677,19 +704,13 @@ void CAView::setFrameOrigin(const DPoint& point)
     m_eLayoutType = 0;
 }
 
-DPoint CAView::getFrameOrigin()
+const DRect& CAView::getCenter()
 {
-    return ccpSub(m_obPoint, m_obAnchorPointInPoints);
-}
-
-DRect CAView::getCenter()
-{
-    DRect center;
-    center.origin = ccpAdd(ccpSub(m_obPoint, m_obAnchorPointInPoints),
+    m_obReturn.setType(DRect::Center);
+    m_obReturn.origin = ccpAdd(ccpSub(m_obPoint, m_obAnchorPointInPoints),
                            ccpMult(m_obContentSize, 0.5f));
-    center.size = m_obContentSize;
-    center.setType(DRect::Center);
-    return center;
+    m_obReturn.size = m_obContentSize;
+    return m_obReturn;
 }
 
 void CAView::setCenter(const DRect& rect)
@@ -723,10 +744,11 @@ void CAView::setCenter(const DRect& rect)
     }
 }
 
-DPoint CAView::getCenterOrigin()
+const DPoint& CAView::getCenterOrigin()
 {
-    return ccpAdd(ccpSub(m_obPoint, m_obAnchorPointInPoints),
+    m_obReturn.origin = ccpAdd(ccpSub(m_obPoint, m_obAnchorPointInPoints),
                   ccpMult(m_obContentSize, 0.5f));
+    return m_obReturn.origin;
 }
 
 void CAView::setCenterOrigin(const DPoint& point)
@@ -747,11 +769,12 @@ void CAView::setCenterOrigin(const DPoint& point)
     m_eLayoutType = 1;
 }
 
-DRect CAView::getBounds() const
+const DRect& CAView::getBounds()
 {
-    DRect rect = DRectZero;
-    rect.size = m_obContentSize;
-    return rect;
+    m_obReturn.setType(DRect::Frame);
+    m_obReturn.origin = DPointZero;
+    m_obReturn.size = m_obContentSize;
+    return m_obReturn;
 }
 
 void CAView::setBounds(const DRect& rect)
@@ -910,7 +933,7 @@ void CAView::reViewlayout(const DSize& contentSize, bool allowAnimation)
         }
 
         if (allowAnimation
-            &&CAViewAnimation::areAnimationsEnabled()
+            && CAViewAnimation::areAnimationsEnabled()
             && CAViewAnimation::areBeginAnimations())
         {
             CAViewAnimation::getInstance()->setContentSize(size, this);
@@ -924,7 +947,7 @@ void CAView::reViewlayout(const DSize& contentSize, bool allowAnimation)
         p = ccpAdd(p, point);
         
         if (allowAnimation
-            &&CAViewAnimation::areAnimationsEnabled()
+            && CAViewAnimation::areAnimationsEnabled()
             && CAViewAnimation::areBeginAnimations())
         {
             CAViewAnimation::getInstance()->setPoint(p, this);
@@ -933,6 +956,10 @@ void CAView::reViewlayout(const DSize& contentSize, bool allowAnimation)
         {
             this->setPoint(p);
         }
+    }
+    else
+    {
+        this->updateDraw();
     }
 }
 
@@ -1356,7 +1383,7 @@ void CAView::transform()
     kmMat4 transfrom4x4;
     
     // Convert 3x3 into 4x4 matrix
-    CATransformation tmpAffine = this->nodeToParentTransform();
+    CATransformation tmpAffine = this->viewToSuperviewTransform();
     CGAffineToGL(&tmpAffine, transfrom4x4.mat);
     
     // Update Z vertex manually
@@ -1486,7 +1513,7 @@ void CAView::update(float fDelta)
 
 }
 
-CATransformation CAView::nodeToParentTransform(void)
+CATransformation CAView::viewToSuperviewTransform(void)
 {
     if (m_bTransformDirty)
     {
@@ -1494,9 +1521,9 @@ CATransformation CAView::nodeToParentTransform(void)
         // Translate values
         float height = 0;
         
-        if (this->getSuperview())
+        if (this->m_pSuperview)
         {
-            height = this->getSuperview()->getBounds().size.height;
+            height = this->m_pSuperview->m_obContentSize.height;
         }
         else
         {
@@ -1665,11 +1692,11 @@ void CAView::updateTransform()
             
             if( !m_pSuperview || m_pSuperview == m_pobBatchView)
             {
-                m_transformToBatch = nodeToParentTransform();
+                m_transformToBatch = viewToSuperviewTransform();
             }
             else
             {
-                m_transformToBatch = CATransformationConcat( nodeToParentTransform() , m_pSuperview->m_transformToBatch );
+                m_transformToBatch = CATransformationConcat( viewToSuperviewTransform() , m_pSuperview->m_transformToBatch );
             }
 
             DSize size = m_obContentSize;

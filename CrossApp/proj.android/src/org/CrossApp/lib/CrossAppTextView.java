@@ -7,6 +7,7 @@ import java.util.Iterator;
 import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.Map.Entry;
 
 import android.R.bool;
 import android.R.integer;
@@ -76,8 +77,8 @@ import android.widget.TextView.OnEditorActionListener;
 	private String  beforeTextString = "";
 	private int selection = 0;
 	
-	private boolean isShowKey = false;
-	private boolean isKeyAction = false;
+	private boolean isFocus = false;
+	private boolean isFocusAction = false;
 	
  	protected void finalize()
     {
@@ -106,19 +107,7 @@ import android.widget.TextView.OnEditorActionListener;
     		layout = CrossAppActivity.getFrameLayout();
     	}
 	}
-	
-	public static void updateImage()
-	{
-		Set<Integer> keys = (Set<Integer>) dict.keySet() ; 
-		Iterator<Integer> iterator = keys.iterator() ; 
-		while (iterator.hasNext())
-		{
-			Integer key = iterator.next();
-			CrossAppTextView textView = dict.get(key);
-			textView.getImage();
-		}
-	}
-	
+
 	public static void reload()
 	{
 		handler = new Handler(Looper.myLooper());
@@ -133,6 +122,23 @@ import android.widget.TextView.OnEditorActionListener;
 			CrossAppTextView textView = dict.get(key);
 			textView.initWithTextView(key);
 		}
+	}
+	
+	public static boolean isShowKeyboard()
+	{
+		boolean showKeyboard = false;
+		Iterator<Entry<Integer, CrossAppTextView>> iter = dict.entrySet().iterator();
+		while (iter.hasNext())
+		{
+			HashMap.Entry entry = (HashMap.Entry) iter.next();
+			CrossAppTextView val = (CrossAppTextView)entry.getValue();
+			if (val.textView.isFocused())
+			{
+				showKeyboard = true;
+				break;
+			}
+		}
+		return showKeyboard;
 	}
 	
 	//keyBoard return call back
@@ -185,10 +191,10 @@ import android.widget.TextView.OnEditorActionListener;
             			public void run() 
             			{
             				// TODO Auto-generated method stub
-            				if (keyboardheightTemp < 1 && isShowKey == true)
+            				if (keyboardheightTemp < 1 && isFocus == true)
             				{
     							//hide
-            					isShowKey = false;
+            					isFocus = false;
             					context.runOnGLThread(new Runnable() 
                             	{
                                     @Override
@@ -206,7 +212,7 @@ import android.widget.TextView.OnEditorActionListener;
 //            				Log.d("android", "call c++");
             				
             				//keyBoardReturn
-            				if (isKeyAction)
+            				if (isFocusAction)
             				{
             					context.runOnGLThread(new Runnable() 
                             	{
@@ -216,7 +222,7 @@ import android.widget.TextView.OnEditorActionListener;
                                     	keyBoardHeightReturn(mykey, keyboardheightTemp);
                                     }
                                 });
-            					isKeyAction = false;
+            					isFocusAction = false;
             				}
             			}
             		});
@@ -369,6 +375,17 @@ import android.widget.TextView.OnEditorActionListener;
             	params.width = width;
             	params.height = height;
             	textView.setLayoutParams(params);
+            	
+            	TimerTask task = new TimerTask()
+        		{    
+        			public void run()
+        			{    
+        				getImage();
+        			}    
+        		};  
+        		
+        		Timer timer = new Timer();  
+        		timer.schedule(task, (long) 100);
             }
         });
     }
@@ -384,7 +401,7 @@ import android.widget.TextView.OnEditorActionListener;
             public void run()
             {
             	bmp = textView.getDrawingCache();
-            	if (bmp != null)
+            	if (bmp != null && imageData == null)
             	{
             		imageData = ByteBuffer.allocate(bmp.getRowBytes() * bmp.getHeight());
             		bmp.copyPixelsToBuffer(imageData);
@@ -395,6 +412,7 @@ import android.widget.TextView.OnEditorActionListener;
                         public void run()
                         {
                         	onByte(mykey, imageData.array(), bmp.getWidth(), bmp.getHeight());
+                        	imageData = null;
                         }
                     });
             	}
@@ -412,16 +430,28 @@ import android.widget.TextView.OnEditorActionListener;
             @Override
             public void run()
             {
-            	isShowKey = true;
-            	isKeyAction = true;
+            	isFocus = true;
+            	isFocusAction = true;
             	
             	//show
-              	InputMethodManager imm = (InputMethodManager)context.getSystemService(Context.INPUT_METHOD_SERVICE); 
-        		imm.toggleSoftInput(0, InputMethodManager.HIDE_NOT_ALWAYS);
         		textView.requestFocus();
         		Editable etext = textView.getText();
             	textView.setSelection(etext.length());
         		
+            	TimerTask task = new TimerTask()
+        		{    
+        			public void run()
+        			{    
+        				if (CrossAppTextField.isShowKeyboard() || CrossAppTextView.isShowKeyboard())
+        				{
+        					InputMethodManager imm = (InputMethodManager)context.getSystemService(Context.INPUT_METHOD_SERVICE);
+        					imm.showSoftInput(textView, 0);  
+        				}
+        			}    
+        		};  
+        		Timer timer = new Timer();  
+        		timer.schedule(task, (long) 20);
+            	
         		context.runOnGLThread(new Runnable() 
             	{
                     @Override
@@ -442,43 +472,46 @@ import android.widget.TextView.OnEditorActionListener;
             @Override
             public void run()
             {        
-            	isShowKey = false;
-            	isKeyAction = true;
+            	isFocus = false;
+            	isFocusAction = true;
             	
-            	InputMethodManager imm = (InputMethodManager)context.getSystemService(Context.INPUT_METHOD_SERVICE);  
-            	imm.hideSoftInputFromWindow(textView.getWindowToken(), 0);
-        		textView.clearFocus();
+            	textView.clearFocus();
+        		
+        		TimerTask task = new TimerTask()
+        		{    
+        			public void run()
+        			{    
+        				if (!CrossAppTextField.isShowKeyboard() && !CrossAppTextView.isShowKeyboard())
+        				{
+        					InputMethodManager imm = (InputMethodManager)context.getSystemService(Context.INPUT_METHOD_SERVICE);
+        					imm.hideSoftInputFromWindow(textView.getWindowToken(), 0);
+        				}
+        			}    
+        		};  
+        		Timer timer = new Timer();  
+        		timer.schedule(task, (long) 20);
         		
         		FrameLayout.LayoutParams params = (FrameLayout.LayoutParams)textView.getLayoutParams(); 
         		params.leftMargin = -10000; 
             	params.topMargin = 0;
             	textView.setLayoutParams(params);
         		
-            	TimerTask task = new TimerTask()
-            	{    
-            		public void run()
-            		{    
-            			bmp = textView.getDrawingCache();
-                    	if (bmp != null)
-                    	{
-                    		imageData = ByteBuffer.allocate(bmp.getRowBytes() * bmp.getHeight());
-                    		bmp.copyPixelsToBuffer(imageData);
-                    		
-                    		context.runOnGLThread(new Runnable() 
-                        	{
-                                @Override
-                                public void run()
-                                {
-                                	onByte(mykey, imageData.array(), bmp.getWidth(), bmp.getHeight());
-                                }
-                            });
-                    	}
-            		}    
-            	};  
+            	bmp = textView.getDrawingCache();
+            	if (bmp != null && imageData == null)
+            	{
+            		imageData = ByteBuffer.allocate(bmp.getRowBytes() * bmp.getHeight());
+            		bmp.copyPixelsToBuffer(imageData);
             		
-            	Timer timer = new Timer();  
-            	timer.schedule(task, (long) 50);
-				
+            		context.runOnGLThread(new Runnable() 
+                	{
+                        @Override
+                        public void run()
+                        {
+                        	onByte(mykey, imageData.array(), bmp.getWidth(), bmp.getHeight());
+                        	imageData = null;
+                        }
+                    });
+            	} 
             }
         });
     }
@@ -526,6 +559,7 @@ import android.widget.TextView.OnEditorActionListener;
 		if (textView != null)
 		{
 			layout.removeView(textView);
+			textView = null;
 		}
 		
 		textView = new EditText(context) ; 
