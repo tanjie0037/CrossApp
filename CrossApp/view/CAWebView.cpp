@@ -60,12 +60,25 @@ CAWebView *CAWebView::createWithCenter(const DRect& rect)
 	return NULL;
 }
 
+CAWebView *CAWebView::createWithLayout(const CrossApp::DLayout &layout)
+{
+    CAWebView* webView = new CAWebView();
+    if (webView && webView->initWithLayout(layout))
+    {
+        webView->autorelease();
+        return webView;
+    }
+    CC_SAFE_DELETE(webView);
+    return NULL;
+}
+
 bool CAWebView::init()
 {
     CAScheduler::schedule(schedule_selector(CAWebView::update), this, 1/60.0f);
     
     m_pLoadingView = CAActivityIndicatorView::create();
     m_pLoadingView->setStyle(CAActivityIndicatorViewStyleGrayLarge);
+    m_pLoadingView->setLayout(DLayoutFill);
 	m_pLoadingView->setVisible(false);
 	this->addSubview(m_pLoadingView);
     
@@ -216,7 +229,7 @@ void CAWebView::update(float dt)
         CC_BREAK_IF(!CAApplication::getApplication()->isDrawing());
         DPoint point = this->convertToWorldSpace(m_obPoint);
         DSize contentSize = this->convertToWorldSize(m_obContentSize);
-        //CC_BREAK_IF(m_obLastPoint.equals(point) && m_obLastContentSize.equals(contentSize));
+        CC_BREAK_IF(m_obLastPoint.equals(point) && m_obLastContentSize.equals(contentSize));
         m_obLastPoint = point;
         m_obLastContentSize = contentSize;
 
@@ -227,14 +240,6 @@ void CAWebView::update(float dt)
     while (0);
 }
 
-void CAWebView::setContentSize(const DSize &contentSize)
-{
-    CAView::setContentSize(contentSize);
-    if (m_pLoadingView)
-    {
-        m_pLoadingView->setFrame(this->getBounds());
-    }
-}
 
 NS_CC_END
 

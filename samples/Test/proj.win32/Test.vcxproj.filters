@@ -7,6 +7,9 @@
     <Filter Include="Classes">
       <UniqueIdentifier>{20545893-551c-4f10-ae10-8d1be8921597}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Classes\Controls">
+      <UniqueIdentifier>{3510897d-7605-4a19-9eb2-84c291e3b59a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -27,12 +30,6 @@
     <ClCompile Include="..\Classes\CDShowNewsImage.cpp">
       <Filter>Classes</Filter>
     </ClCompile>
-    <ClCompile Include="..\Classes\CDUIShowCollectionView.cpp">
-      <Filter>Classes</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Classes\CDUIShowView.cpp">
-      <Filter>Classes</Filter>
-    </ClCompile>
     <ClCompile Include="..\Classes\CDWebViewController.cpp">
       <Filter>Classes</Filter>
     </ClCompile>
@@ -44,6 +41,96 @@
     </ClCompile>
     <ClCompile Include="..\Classes\CommonHttpManager.cpp">
       <Filter>Classes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\Control\AlertViewTest.cpp">
+      <Filter>Classes\Controls</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\Control\ButtonTest.cpp">
+      <Filter>Classes\Controls</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\Control\CollectionViewTest.cpp">
+      <Filter>Classes\Controls</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\Control\FlashViewTest.cpp">
+      <Filter>Classes\Controls</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\Control\GifViewTest.cpp">
+      <Filter>Classes\Controls</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\Control\ImageViewTest.cpp">
+      <Filter>Classes\Controls</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\Control\LabelTest.cpp">
+      <Filter>Classes\Controls</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\Control\ListViewTest.cpp">
+      <Filter>Classes\Controls</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\Control\PageViewTest.cpp">
+      <Filter>Classes\Controls</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\Control\ProgressTest.cpp">
+      <Filter>Classes\Controls</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\Control\RenderImageTest.cpp">
+      <Filter>Classes\Controls</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\Control\Scale9ImageViewTest.cpp">
+      <Filter>Classes\Controls</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\Control\ScrollViewTest.cpp">
+      <Filter>Classes\Controls</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\Control\SegmentedControlTest.cpp">
+      <Filter>Classes\Controls</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\Control\SliderTest.cpp">
+      <Filter>Classes\Controls</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\Control\StepperTest.cpp">
+      <Filter>Classes\Controls</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\Control\SwitchTest.cpp">
+      <Filter>Classes\Controls</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\Control\TabBarControllerTest.cpp">
+      <Filter>Classes\Controls</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\Control\TableViewTest.cpp">
+      <Filter>Classes\Controls</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\Control\TextFieldTest.cpp">
+      <Filter>Classes\Controls</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\Control\TextViewTest.cpp">
+      <Filter>Classes\Controls</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\Control\VideoPlayerControlViewTest.cpp">
+      <Filter>Classes\Controls</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\Control\ViewAnimationTest.cpp">
+      <Filter>Classes\Controls</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\Control\WebViewTest.cpp">
+      <Filter>Classes\Controls</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\CDUIShowAutoCollectionView.cpp">
+      <Filter>Classes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\Control\PickerViewTest.cpp">
+      <Filter>Classes\Controls</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\Control\WaterfallViewTest.cpp">
+      <Filter>Classes\Controls</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\Control\ActivityIndicatorViewTest.cpp">
+      <Filter>Classes\Controls</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\Control\AutoCollectionViewHorizontalTest.cpp">
+      <Filter>Classes\Controls</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\Control\AutoCollectionViewVerticalTest.cpp">
+      <Filter>Classes\Controls</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -71,12 +158,6 @@
     <ClInclude Include="..\Classes\CDShowNewsImage.h">
       <Filter>Classes</Filter>
     </ClInclude>
-    <ClInclude Include="..\Classes\CDUIShowCollectionView.h">
-      <Filter>Classes</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Classes\CDUIShowView.h">
-      <Filter>Classes</Filter>
-    </ClInclude>
     <ClInclude Include="..\Classes\CDWebViewController.h">
       <Filter>Classes</Filter>
     </ClInclude>
@@ -88,6 +169,96 @@
     </ClInclude>
     <ClInclude Include="..\Classes\CommonHttpManager.h">
       <Filter>Classes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\Control\ActivityIndicatorViewTest.h">
+      <Filter>Classes\Controls</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\Control\AlertViewTest.h">
+      <Filter>Classes\Controls</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\Control\ButtonTest.h">
+      <Filter>Classes\Controls</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\Control\CollectionViewTest.h">
+      <Filter>Classes\Controls</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\Control\FlashViewTest.h">
+      <Filter>Classes\Controls</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\Control\GifViewTest.h">
+      <Filter>Classes\Controls</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\Control\ImageViewTest.h">
+      <Filter>Classes\Controls</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\Control\LabelTest.h">
+      <Filter>Classes\Controls</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\Control\ListViewTest.h">
+      <Filter>Classes\Controls</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\Control\PageViewTest.h">
+      <Filter>Classes\Controls</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\Control\PickerViewTest.h">
+      <Filter>Classes\Controls</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\Control\ProgressTest.h">
+      <Filter>Classes\Controls</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\Control\RenderImageTest.h">
+      <Filter>Classes\Controls</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\Control\Scale9ImageViewTest.h">
+      <Filter>Classes\Controls</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\Control\ScrollViewTest.h">
+      <Filter>Classes\Controls</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\Control\SegmentedControlTest.h">
+      <Filter>Classes\Controls</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\Control\SliderTest.h">
+      <Filter>Classes\Controls</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\Control\StepperTest.h">
+      <Filter>Classes\Controls</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\Control\SwitchTest.h">
+      <Filter>Classes\Controls</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\Control\TabBarControllerTest.h">
+      <Filter>Classes\Controls</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\Control\TableViewTest.h">
+      <Filter>Classes\Controls</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\Control\TextFieldTest.h">
+      <Filter>Classes\Controls</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\Control\TextViewTest.h">
+      <Filter>Classes\Controls</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\Control\VideoPlayerControlViewTest.h">
+      <Filter>Classes\Controls</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\Control\ViewAnimationTest.h">
+      <Filter>Classes\Controls</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\Control\WebViewTest.h">
+      <Filter>Classes\Controls</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\CDUIShowAutoCollectionView.h">
+      <Filter>Classes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\Control\WaterfallViewTest.h">
+      <Filter>Classes\Controls</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\Control\AutoCollectionViewHorizontalTest.h">
+      <Filter>Classes\Controls</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\Control\AutoCollectionViewVerticalTest.h">
+      <Filter>Classes\Controls</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

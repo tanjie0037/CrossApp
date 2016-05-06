@@ -1,8 +1,6 @@
 #include "AppDelegate.h"
-#include "CrossApp.h"
 #include "ccTypes.h"
 #include "platform/android/jni/JniHelper.h"
-#include "platform/android/CAWebViewImpl.h"
 #include <jni.h>
 #include <android/log.h>
 
@@ -21,7 +19,7 @@ jint JNI_OnLoad(JavaVM *vm, void *reserved)
     return JNI_VERSION_1_4;
 }
 
-void Java_org_CrossApp_lib_Cocos2dxRenderer_nativeInit(JNIEnv*  env, jobject thiz, jint w, jint h)
+void Java_org_CrossApp_lib_CrossAppRenderer_nativeInit(JNIEnv*  env, jobject thiz, jint w, jint h)
 {
     if (!CAApplication::getApplication()->getOpenGLView())
     {

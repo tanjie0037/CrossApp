@@ -394,10 +394,6 @@
     <ClCompile Include="..\script_support\JSViewController.cpp">
       <Filter>script_support</Filter>
     </ClCompile>
-    <ClCompile Include="..\basics\CAThread.cpp" />
-    <ClCompile Include="..\view\CALabelStyle.cpp">
-      <Filter>view</Filter>
-    </ClCompile>
     <ClCompile Include="..\view\CAWebView.cpp">
       <Filter>view</Filter>
     </ClCompile>
@@ -511,6 +507,21 @@
     </ClCompile>
     <ClCompile Include="..\platform\win32\CATextView.cpp">
       <Filter>platform\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\view\CARichLabel.cpp">
+      <Filter>view</Filter>
+    </ClCompile>
+    <ClCompile Include="..\basics\CAThread.cpp">
+      <Filter>basics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\platform\CAFTRichFont.cpp">
+      <Filter>platform</Filter>
+    </ClCompile>
+    <ClCompile Include="..\controller\CAFont.cpp">
+      <Filter>controller</Filter>
+    </ClCompile>
+    <ClCompile Include="..\basics\CALayout.cpp">
+      <Filter>basics</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -894,11 +905,6 @@
     <ClInclude Include="..\script_support\JSViewController.h">
       <Filter>script_support</Filter>
     </ClInclude>
-    <ClInclude Include="..\basics\CASyncQueue.h" />
-    <ClInclude Include="..\basics\CAThread.h" />
-    <ClInclude Include="..\view\CALabelStyle.h">
-      <Filter>view</Filter>
-    </ClInclude>
     <ClInclude Include="..\view\CAWebView.h">
       <Filter>view</Filter>
     </ClInclude>
@@ -1028,6 +1034,27 @@
     </ClInclude>
     <ClInclude Include="..\platform\CATextView.h">
       <Filter>platform</Filter>
+    </ClInclude>
+    <ClInclude Include="..\view\CARichLabel.h">
+      <Filter>view</Filter>
+    </ClInclude>
+    <ClInclude Include="..\basics\CAThread.h">
+      <Filter>basics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\basics\CASyncQueue.h">
+      <Filter>basics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\platform\CAFTRichFont.h">
+      <Filter>platform</Filter>
+    </ClInclude>
+    <ClInclude Include="..\support\deelx.h">
+      <Filter>support</Filter>
+    </ClInclude>
+    <ClInclude Include="..\controller\CAFont.h">
+      <Filter>controller</Filter>
+    </ClInclude>
+    <ClInclude Include="..\basics\CALayout.h">
+      <Filter>basics</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -8,7 +8,7 @@
 
 #include "CAPickerView.h"
 #include "CALabel.h"
-
+#include "platform/CADensityDpi.h"
 NS_CC_BEGIN
 
 CAPickerView::CAPickerView()
@@ -32,7 +32,8 @@ CAPickerView::~CAPickerView()
 CAPickerView* CAPickerView::create()
 {
     CAPickerView* view = new CAPickerView();
-    if (view && view->init()) {
+    if (view && view->init())
+    {
         view->autorelease();
     } else {
         CC_SAFE_DELETE(view);
@@ -43,7 +44,8 @@ CAPickerView* CAPickerView::create()
 CAPickerView* CAPickerView::createWithFrame(const DRect& rect)
 {
     CAPickerView* view = new CAPickerView();
-    if (view && view->initWithFrame(rect)) {
+    if (view && view->initWithFrame(rect))
+    {
         view->autorelease();
     } else {
         CC_SAFE_DELETE(view);
@@ -54,7 +56,20 @@ CAPickerView* CAPickerView::createWithFrame(const DRect& rect)
 CAPickerView* CAPickerView::createWithCenter(const DRect& rect)
 {
     CAPickerView* view = new CAPickerView();
-    if (view && view->initWithCenter(rect)) {
+    if (view && view->initWithCenter(rect))
+    {
+        view->autorelease();
+    } else {
+        CC_SAFE_DELETE(view);
+    }
+    return view;
+}
+
+CAPickerView* CAPickerView::createWithLayout(const CrossApp::DLayout &layout)
+{
+    CAPickerView* view = new CAPickerView();
+    if (view && view->initWithLayout(layout))
+    {
         view->autorelease();
     } else {
         CC_SAFE_DELETE(view);
@@ -72,44 +87,53 @@ bool CAPickerView::init()
     return true;
 }
 
-bool CAPickerView::initWithCenter(const CrossApp::DRect &rect)
-{
-    if (!CAView::initWithCenter(rect))
-    {
-        return false;
-    }
-    
-    return true;
-}
-
-bool CAPickerView::initWithFrame(const CrossApp::DRect &rect)
-{
-    if (!CAView::initWithFrame(rect))
-    {
-        return false;
-    }
-    
-    return true;
-}
-
-void CAPickerView::onEnter()
-{
-    CAView::onEnter();
-}
-
-void CAPickerView::onExit()
-{
-    CAView::onExit();
-}
 
 void CAPickerView::onEnterTransitionDidFinish()
 {
 	CAView::onEnterTransitionDidFinish();
+    if (!m_obContentSize.equals(DSizeZero))
+    {
+        this->reloadAllComponents();
+    }
 }
 
 void CAPickerView::onExitTransitionDidStart()
 {
 	CAView::onExitTransitionDidStart();
+}
+
+void CAPickerView::setContentSize(const DSize& size)
+{
+    CC_RETURN_IF(m_obContentSize.equals(size));
+    CAView::setContentSize(size);
+    if (m_bRunning)
+    {
+        std::vector<int> selected = m_selected;
+        this->reloadAllComponents();
+        
+        for (size_t i=0; i<selected.size(); i++)
+        {
+            if (CATableView* tableView = m_tableViews.at(i))
+            {
+                int maxRow = m_dataSource->numberOfRowsInComponent(this, (unsigned int)i);
+                float height = m_dataSource->rowHeightForComponent(this, (unsigned int)i);
+                DPoint offset = DPointZero;
+                int row = selected.at(i);
+                if (maxRow <= m_displayRow[i])
+                {
+                    m_selected[i] = row ;
+                    offset.y = row * height;
+                    tableView->setContentOffset(offset, false);
+                }
+                else
+                {
+                    m_selected[i] = row;
+                    offset.y = m_selected[i] * height + height/2 - tableView->getBounds().size.height/2;
+                    tableView->setContentOffset(offset, false);
+                }
+            }
+        }
+    }
 }
 
 int CAPickerView::numberOfComponents()
@@ -213,7 +237,7 @@ void CAPickerView::reloadAllComponents()
             CAView* select = m_dataSource->viewForSelect(this, i, selectSize);
             if (!select)
             {
-                DRect sepRect = DRect(start_x, getFrame().size.height/2 - m_dataSource->rowHeightForComponent(this, i)/2, tableWidth, 1);
+                DRect sepRect = DRect(start_x, getFrame().size.height/2 - m_dataSource->rowHeightForComponent(this, i)/2, tableWidth, s_px_to_dip(1));
                 addSubview(CAView::createWithFrame(sepRect, m_separateColor));
                 sepRect.origin.y += m_dataSource->rowHeightForComponent(this, i);
                 addSubview(CAView::createWithFrame(sepRect, m_separateColor));
@@ -394,7 +418,7 @@ void CAPickerView::selectRow(unsigned int row, unsigned int component, bool anim
             else
             {
                 m_selected[component] = maxRow + row;
-                offset.y = m_selected[component] * height + height/2 - tableView->getFrame().size.height/2;
+                offset.y = m_selected[component] * height + height/2 - tableView->getBounds().size.height/2;
                 tableView->setContentOffset(offset, false);
             }
         }

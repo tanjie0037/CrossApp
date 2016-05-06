@@ -31,6 +31,7 @@
 #include "basics/CACamera.h"
 #include "basics/CAFPSImages.h"
 #include "basics/CAGeometry.h"
+#include "basics/CALayout.h"
 #include "basics/CAObject.h"
 #include "basics/CAResponder.h"
 #include "basics/CAScheduler.h"
@@ -52,6 +53,7 @@
 
 //controller
 #include "controller/CABarItem.h"
+#include "controller/CAFont.h"
 #include "controller/CAViewController.h"
 #include "controller/CADrawerController.h"
 
@@ -76,6 +78,7 @@
 #include "view/CAGifView.h"
 #include "view/CAScale9ImageView.h"
 #include "view/CALabel.h"
+#include "view/CARichLabel.h"
 #include "view/CABatchView.h"
 #include "view/CARenderImage.h"
 #include "view/CAClippingView.h"

@@ -22,7 +22,6 @@ CAScale9ImageView::CAScale9ImageView()
 , m_pScale9ImageView(NULL)
 , m_bUpdatePositions(false)
 {
-    m_obFrameRect = DRectZero;
     memset(m_pImageView, 0, sizeof(m_pImageView));
 }
 
@@ -58,7 +57,7 @@ CAScale9ImageView* CAScale9ImageView::createWithImage(CAImage* image)
 CAScale9ImageView* CAScale9ImageView::createWithFrame(const DRect& rect)
 {
 	CAScale9ImageView* pReturn = new CAScale9ImageView();
-	if (pReturn && pReturn->CAView::initWithFrame(rect))
+	if (pReturn && pReturn->initWithFrame(rect))
 	{
 		pReturn->autorelease();
 		return pReturn;
@@ -70,13 +69,25 @@ CAScale9ImageView* CAScale9ImageView::createWithFrame(const DRect& rect)
 CAScale9ImageView* CAScale9ImageView::createWithCenter(const DRect& rect)
 {
     CAScale9ImageView* pReturn = new CAScale9ImageView();
-	if (pReturn && pReturn->CAView::initWithCenter(rect))
+	if (pReturn && pReturn->initWithCenter(rect))
 	{
 		pReturn->autorelease();
 		return pReturn;
 	}
 	CC_SAFE_DELETE(pReturn);
 	return NULL;
+}
+
+CAScale9ImageView* CAScale9ImageView::createWithLayout(const CrossApp::DLayout &layout)
+{
+    CAScale9ImageView* pReturn = new CAScale9ImageView();
+    if (pReturn && pReturn->initWithLayout(layout))
+    {
+        pReturn->autorelease();
+        return pReturn;
+    }
+    CC_SAFE_DELETE(pReturn);
+    return NULL;
 }
 
 bool CAScale9ImageView::init()
@@ -98,13 +109,17 @@ CAView* CAScale9ImageView::copy()
 {
     CAScale9ImageView* pReturn = CAScale9ImageView::createWithImage(this->getImage());
     pReturn->setColor(this->getColor());
-    if (m_bFrame)
+    if (m_eLayoutType == 0)
     {
         pReturn->setFrame(this->getFrame());
     }
-    else
+    else if (m_eLayoutType == 1)
     {
         pReturn->setCenter(this->getCenter());
+    }
+    else
+    {
+        pReturn->setLayout(this->getLayout());
     }
     return pReturn;
 }
@@ -126,6 +141,7 @@ void CAScale9ImageView::updateWithImage()
     CC_RETURN_IF(!m_pobImage);
 
     m_pScale9ImageView = CABatchView::createWithImage(m_pobImage);
+    m_pScale9ImageView->setLayout(DLayoutFill);
     this->addSubview(m_pScale9ImageView);
     
     m_obOriginalSize = m_pScale9ImageView->getImageAtlas()->getImage()->getContentSize();
@@ -259,7 +275,6 @@ void CAScale9ImageView::setContentSize(const DSize &size)
     CAView::setContentSize(size);
     
     this->updateCapInset();
-    this->updatePositions();
 }
 
 void CAScale9ImageView::draw(void)
@@ -404,19 +419,7 @@ void CAScale9ImageView::setImage(CrossApp::CAImage *image)
 {
     CAView::setImage(image);
     this->updateWithImage();
-    this->updatePositions();
 }
-
-bool CAScale9ImageView::initWithFrame(const DRect& rect, const CAColor4B& color4B)
-{
-    return CAView::initWithFrame(rect);
-}
-
-bool CAScale9ImageView::initWithCenter(const DRect& rect, const CAColor4B& color4B)
-{
-    return CAView::initWithCenter(rect);
-}
-
 
 
 NS_CC_END

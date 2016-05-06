@@ -37,6 +37,7 @@ public:
     static CADatePickerView* create(const CADatePickerMode& m_mode);
     static CADatePickerView* createWithFrame(const DRect& rect,const CADatePickerMode& m_mode);
     static CADatePickerView* createWithCenter(const DRect& rect,const CADatePickerMode& m_mode);
+    static CADatePickerView* createWithLayout(const DLayout& layout,const CADatePickerMode& m_mode);
     
     CADatePickerView(const CADatePickerMode& m_mode);
     virtual ~CADatePickerView();
@@ -44,10 +45,6 @@ public:
     virtual bool init();
     virtual void onEnter();
     virtual void onExit();
-    virtual void visit();
-    
-    virtual bool initWithFrame(const DRect& rect);
-    virtual bool initWithCenter(const DRect& rect);
     
 public:
     void setDate(int year, int month, int day, bool animated);

@@ -48,6 +48,7 @@ protected:
     CC_SYNTHESIZE_READONLY(CAViewController*, m_pModalViewController, ModalViewController);
     
     std::deque<CAAlertView *> _alertDeque;
+    CAMap<std::string, CAViewController*> m_obViewControllerMap;
 };
 
 NS_CC_END

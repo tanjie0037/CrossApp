@@ -35,6 +35,8 @@ public:
     
     static CAImageView* createWithCenter(const DRect& rect);
     
+    static CAImageView* createWithLayout(const DLayout& layout);
+    
     CAImageView(void);
 
     virtual ~CAImageView(void);
@@ -71,15 +73,11 @@ protected:
     
     virtual void asyncFinish(CAObject* var);
     
-    virtual void setContentSize(const DSize& size);
+    virtual void setContentSize(const DSize& contentSize);
     
     virtual void updateByImageViewScaleType();
     
     virtual void updateImageRect();
-    
-    virtual bool initWithFrame(const DRect& rect, const CAColor4B& color4B);
-  
-    virtual bool initWithCenter(const DRect& rect, const CAColor4B& color4B);
     
     using CAView::initWithColor;
     

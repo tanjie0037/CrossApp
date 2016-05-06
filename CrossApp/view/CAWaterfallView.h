@@ -88,6 +88,8 @@ public:
 
 	static CAWaterfallView* createWithCenter(const DRect& rect);
 
+    static CAWaterfallView* createWithLayout(const DLayout& layout);
+    
 	virtual bool init();
 
 	void reloadData();
@@ -138,9 +140,10 @@ public:
 
 	CC_SYNTHESIZE_IS(bool, m_bAlwaysBottomSectionFooter, AlwaysBottomSectionFooter);
 	
-
 protected:
 
+    virtual void setContentSize(const DSize& var);
+    
 	inline virtual float maxSpeed(float dt);
 
 	inline virtual float decelerationRatio(float dt);
@@ -272,8 +275,6 @@ protected:
     virtual void recoveryWaterfallViewCell(){};
     
     void setControlState(const CAControlState& var);
-    
-    void setContentSize(const DSize& var);
     
 private:
     

@@ -66,7 +66,6 @@ CAView::CAView(void)
 , m_obAnchorPointInPoints(kCAViewPointInvalid)
 , m_obAnchorPoint(kCAViewPointInvalid)
 , m_obContentSize(kCAViewSizeInvalid)
-, m_obFrameRect(kCAViewRectInvalid)
 , m_obPoint(kCAViewPointInvalid)
 , m_obRect(DRectZero)
 , m_sAdditionalTransform(CATransformationMakeIdentity())
@@ -94,10 +93,11 @@ CAView::CAView(void)
 , m_bDirty(false)
 , m_bHasChildren(false)
 , m_pContentContainer(NULL)
-, m_bFrame(true)
 , m_bIsAnimation(false)
 , m_pobBatchView(NULL)
 , m_pobImageAtlas(NULL)
+, m_obLayout(DLayoutZero)
+, m_eLayoutType(0)
 {
     m_sBlendFunc.src = CC_BLEND_SRC;
     m_sBlendFunc.dst = CC_BLEND_DST;
@@ -172,8 +172,9 @@ CAView* CAView::createWithFrame(const DRect& rect)
 CAView* CAView::createWithFrame(const DRect& rect, const CAColor4B& color4B)
 {
 	CAView * pRet = new CAView();
-    if (pRet && pRet->initWithFrame(rect, color4B))
+    if (pRet && pRet->initWithFrame(rect))
     {
+        pRet->setColor(color4B);
         pRet->autorelease();
     }
     else
@@ -200,8 +201,9 @@ CAView* CAView::createWithCenter(const DRect& rect)
 CAView* CAView::createWithCenter(const DRect& rect, const CAColor4B& color4B)
 {
     CAView * pRet = new CAView();
-    if (pRet && pRet->initWithCenter(rect, color4B))
+    if (pRet && pRet->initWithCenter(rect))
     {
+        pRet->setColor(color4B);
         pRet->autorelease();
     }
     else
@@ -209,6 +211,35 @@ CAView* CAView::createWithCenter(const DRect& rect, const CAColor4B& color4B)
         CC_SAFE_DELETE(pRet);
     }
 	return pRet;
+}
+
+CAView* CAView::createWithLayout(const DLayout& layout)
+{
+    CAView * pRet = new CAView();
+    if (pRet && pRet->initWithLayout(layout))
+    {
+        pRet->autorelease();
+    }
+    else
+    {
+        CC_SAFE_DELETE(pRet);
+    }
+    return pRet;
+}
+
+CAView* CAView::createWithLayout(const DLayout& layout, const CAColor4B& color4B)
+{
+    CAView * pRet = new CAView();
+    if (pRet && pRet->initWithLayout(layout))
+    {
+        pRet->setColor(color4B);
+        pRet->autorelease();
+    }
+    else
+    {
+        CC_SAFE_DELETE(pRet);
+    }
+    return pRet;
 }
 
 CAView* CAView::createWithColor(const CAColor4B& color4B)
@@ -247,17 +278,6 @@ bool CAView::initWithFrame(const DRect& rect)
     return true;
 }
 
-bool CAView::initWithFrame(const DRect& rect, const CAColor4B& color4B)
-{
-    if (!CAView::initWithColor(color4B))
-    {
-        return false;
-    }
-    this->setFrame(rect);
-
-    return true;
-}
-
 bool CAView::initWithCenter(const DRect& rect)
 {
     if (!this->init())
@@ -269,13 +289,13 @@ bool CAView::initWithCenter(const DRect& rect)
     return true;
 }
 
-bool CAView::initWithCenter(const DRect& rect, const CAColor4B& color4B)
+bool CAView::initWithLayout(const CrossApp::DLayout &layout)
 {
-    if (!this->initWithColor(color4B))
+    if (!this->init())
     {
         return false;
     }
-    this->setCenter(rect);
+    this->setLayout(layout);
     
     return true;
 }
@@ -463,9 +483,6 @@ void CAView::setScaleX(float newScaleX)
     else if (m_fScaleX != newScaleX)
     {
         m_fScaleX = newScaleX;
-        m_obFrameRect.size.width = m_fScaleX * m_obContentSize.width;
-        float x = m_obAnchorPointInPoints.x * m_fScaleX;
-        m_obFrameRect.origin.x = m_obPoint.x - x;
         this->updateDraw();
     }
 }
@@ -487,9 +504,6 @@ void CAView::setScaleY(float newScaleY)
     else if (m_fScaleY != newScaleY)
     {
         m_fScaleY = newScaleY;
-        m_obFrameRect.size.height = m_fScaleY * m_obContentSize.height;
-        float y = m_obAnchorPointInPoints.y * m_fScaleY;
-        m_obFrameRect.origin.y = m_obPoint.y - y;
         this->updateDraw();
     }
 }
@@ -498,9 +512,6 @@ void CAView::setScaleY(float newScaleY)
 void CAView::setPoint(const DPoint& newPoint)
 {
     m_obPoint = newPoint;
-    DPoint point = DPoint(m_obAnchorPointInPoints.x * m_fScaleX,
-                          m_obAnchorPointInPoints.y * m_fScaleY);
-    m_obFrameRect.origin = ccpSub(m_obPoint, point);
     this->updateDraw();
 }
 
@@ -552,63 +563,35 @@ const DPoint& CAView::getAnchorPoint()
 
 void CAView::setAnchorPointInPoints(const DPoint& anchorPointInPoints)
 {
-    if( ! anchorPointInPoints.equals(m_obAnchorPointInPoints))
+    if (!m_obContentSize.equals(DPointZero))
     {
-        DPoint p;
-        if (m_bFrame)
-        {
-            p = this->getFrameOrigin();
-        }
-        else
-        {
-            p = this->getCenterOrigin();
-        }
+        DPoint anchorPoint = DPoint(anchorPointInPoints.x / m_obContentSize.width,
+                                    anchorPointInPoints.y / m_obContentSize.height);
         
+        DPoint point = ccpSub(m_obPoint, ccpCompMult(ccpSub(m_obAnchorPointInPoints, anchorPointInPoints),
+                                                     DPoint(m_fScaleX, m_fScaleY)));
+        
+        m_obAnchorPoint = anchorPoint;
         m_obAnchorPointInPoints = anchorPointInPoints;
-        m_obAnchorPoint = DPoint(m_obAnchorPointInPoints.x / m_obContentSize.width,
-                              m_obAnchorPointInPoints.y / m_obContentSize.height);
         
-        if (m_bFrame)
-        {
-            this->setFrameOrigin(p);
-        }
-        else
-        {
-            this->setCenterOrigin(p);
-        }
-        
+        this->setPoint(point);
         this->updateDraw();
     }
 }
 
-void CAView::setAnchorPoint(const DPoint& point)
+void CAView::setAnchorPoint(const DPoint& anchorPoint)
 {
-    if( ! point.equals(m_obAnchorPoint))
+    if( ! anchorPoint.equals(m_obAnchorPoint))
     {
-        DPoint p;
-        if (m_bFrame)
-        {
-            p = this->getFrameOrigin();
-        }
-        else
-        {
-            p = this->getCenterOrigin();
-        }
+        DPoint anchorPointInPoints = ccpCompMult(m_obContentSize, anchorPoint);
         
+        DPoint point = ccpSub(m_obPoint, ccpCompMult(ccpSub(m_obAnchorPointInPoints, anchorPointInPoints),
+                                                     DPoint(m_fScaleX, m_fScaleY)));
         
-        m_obAnchorPoint = point;
-        m_obAnchorPointInPoints = ccp(m_obContentSize.width * m_obAnchorPoint.x,
-                                      m_obContentSize.height * m_obAnchorPoint.y );
-      
-        if (m_bFrame)
-        {
-            this->setFrameOrigin(p);
-        }
-        else
-        {
-            this->setCenterOrigin(p);
-        }
+        m_obAnchorPoint = anchorPoint;
+        m_obAnchorPointInPoints = anchorPointInPoints;
         
+        this->setPoint(point);
         this->updateDraw();
     }
 }
@@ -623,54 +606,46 @@ void CAView::setContentSize(const DSize & contentSize)
     else if (!contentSize.equals(m_obContentSize))
     {
         m_obContentSize = contentSize;
-        
-        float anchorPointInPointsX = m_obContentSize.width * m_obAnchorPoint.x;
-        float anchorPointInPointsY = m_obContentSize.height * m_obAnchorPoint.y;
-        m_obAnchorPointInPoints = DPoint(anchorPointInPointsX, anchorPointInPointsY);
-        
-        float frameRectWidth = m_obContentSize.width * m_fScaleX;
-        float frameRectHeight = m_obContentSize.height * m_fScaleY;
-        m_obFrameRect.size = DSize(frameRectWidth, frameRectHeight);
+        m_obAnchorPointInPoints.x = m_obContentSize.width * m_obAnchorPoint.x;
+        m_obAnchorPointInPoints.y = m_obContentSize.height * m_obAnchorPoint.y;
         
         this->updateImageRect();
         
-        if(!m_obSubviews.empty())
+        CAVector<CAView*>::iterator itr;
+        for (itr=m_obSubviews.begin(); itr!=m_obSubviews.end(); itr++)
         {
-            CAVector<CAView*>::iterator itr;
-            for (itr=m_obSubviews.begin(); itr!=m_obSubviews.end(); itr++)
-            {
-                (*itr)->reViewlayout();
-            }
+            (*itr)->reViewlayout(m_obContentSize);
         }
         
         this->updateDraw();
     }
 }
 
-const DRect& CAView::getFrame() const
+DRect CAView::getFrame() const
 {
-    return m_obFrameRect;
+    DRect frame;
+    frame.origin = ccpSub(m_obPoint, m_obAnchorPointInPoints);
+    frame.size = m_obContentSize;
+    return frame;
 }
 
 void CAView::setFrame(const DRect &rect)
 {
-    float width = rect.size.width / m_fScaleX;
-    float height = rect.size.height / m_fScaleY;
-    DSize contentSize = DSize(width, height);
+    m_obLayout = DLayoutZero;
     DSize originalSize = m_obContentSize;
     if (CAViewAnimation::areAnimationsEnabled()
         && CAViewAnimation::areBeginAnimations())
     {
-        CAViewAnimation::getInstance()->setContentSize(contentSize, this);
+        CAViewAnimation::getInstance()->setContentSize(rect.size, this);
         
-        m_obContentSize = contentSize;
+        m_obContentSize = rect.size;
         m_obAnchorPointInPoints = m_obContentSize;
         m_obAnchorPointInPoints.x *= m_obAnchorPoint.x;
         m_obAnchorPointInPoints.y *= m_obAnchorPoint.y;
     }
     else
     {
-        this->setContentSize(contentSize);
+        this->setContentSize(rect.size);
     }
     
     this->setFrameOrigin(rect.origin);
@@ -687,57 +662,53 @@ void CAView::setFrame(const DRect &rect)
 
 void CAView::setFrameOrigin(const DPoint& point)
 {
-    float x = m_obAnchorPointInPoints.x * m_fScaleX;
-    float y = m_obAnchorPointInPoints.y * m_fScaleY;
-    
-    DPoint p = DPoint(x, y);
-    p = ccpAdd(p, point);
+    m_obLayout = DLayoutZero;
+    DPoint p = ccpAdd(point, m_obAnchorPointInPoints);
     
     if (CAViewAnimation::areAnimationsEnabled()
         && CAViewAnimation::areBeginAnimations())
     {
         CAViewAnimation::getInstance()->setPoint(p, this);
-        m_bFrame = true;
     }
     else
     {
         this->setPoint(p);
-        m_bFrame = true;
     }
+    m_eLayoutType = 0;
 }
 
-const DPoint& CAView::getFrameOrigin()
+DPoint CAView::getFrameOrigin()
 {
-    return m_obFrameRect.origin;
+    return ccpSub(m_obPoint, m_obAnchorPointInPoints);
 }
 
 DRect CAView::getCenter()
 {
-    DRect rect = this->getFrame();
-    rect.origin = ccpAdd(rect.origin, ccpMult(rect.size, 0.5f));
-    rect.setCenter(true);
-    return rect;
+    DRect center;
+    center.origin = ccpAdd(ccpSub(m_obPoint, m_obAnchorPointInPoints),
+                           ccpMult(m_obContentSize, 0.5f));
+    center.size = m_obContentSize;
+    center.setType(DRect::Center);
+    return center;
 }
 
 void CAView::setCenter(const DRect& rect)
 {
-    float width = rect.size.width / m_fScaleX;
-    float height = rect.size.height / m_fScaleY;
-    DSize contentSize = DSize(width, height);
+    m_obLayout = DLayoutZero;
     DSize originalSize = m_obContentSize;
     if (CAViewAnimation::areAnimationsEnabled()
         && CAViewAnimation::areBeginAnimations())
     {
-        CAViewAnimation::getInstance()->setContentSize(contentSize, this);
+        CAViewAnimation::getInstance()->setContentSize(rect.size, this);
         
-        m_obContentSize = contentSize;
+        m_obContentSize = rect.size;
         m_obAnchorPointInPoints = m_obContentSize;
         m_obAnchorPointInPoints.x *= m_obAnchorPoint.x;
         m_obAnchorPointInPoints.y *= m_obAnchorPoint.y;
     }
     else
     {
-        this->setContentSize(contentSize);
+        this->setContentSize(rect.size);
     }
     
     this->setCenterOrigin(rect.origin);
@@ -754,27 +725,26 @@ void CAView::setCenter(const DRect& rect)
 
 DPoint CAView::getCenterOrigin()
 {
-    return this->getCenter().origin;
+    return ccpAdd(ccpSub(m_obPoint, m_obAnchorPointInPoints),
+                  ccpMult(m_obContentSize, 0.5f));
 }
 
 void CAView::setCenterOrigin(const DPoint& point)
 {
-    DPoint p = ccpMult(m_obContentSize, 0.5f);
-    p = ccpSub(p, m_obAnchorPointInPoints);
-    p = DPoint(p.x * m_fScaleX, p.y * m_fScaleY);
-    p = ccpSub(point, p);
-    
+    m_obLayout = DLayoutZero;
+    DPoint p = ccpSub(point, ccpMult(m_obContentSize, 0.5f));
+    p = ccpAdd(p, m_obAnchorPointInPoints);
+
     if (CAViewAnimation::areAnimationsEnabled()
         && CAViewAnimation::areBeginAnimations())
     {
         CAViewAnimation::getInstance()->setPoint(p, this);
-        m_bFrame = false;
     }
     else
     {
         this->setPoint(p);
-        m_bFrame = false;
     }
+    m_eLayoutType = 1;
 }
 
 DRect CAView::getBounds() const
@@ -790,6 +760,22 @@ void CAView::setBounds(const DRect& rect)
     {
         this->setContentSize(rect.size);
     }
+}
+
+void CAView::setLayout(const CrossApp::DLayout &layout)
+{
+    m_obLayout = layout;
+    m_eLayoutType = 2;
+    
+    if (m_bRunning)
+    {
+        this->reViewlayout(this->getSuperview()->m_obContentSize, true);
+    }
+}
+
+const DLayout& CAView::getLayout()
+{
+    return m_obLayout;
 }
 
 // isRunning getter
@@ -846,9 +832,108 @@ const char* CAView::description()
     return crossapp_format_string("<CAView | TextTag = %s | Tag = %d >", m_sTextTag.c_str(), m_nTag).c_str();
 }
 
-void CAView::reViewlayout()
+void CAView::reViewlayout(const DSize& contentSize, bool allowAnimation)
 {
-    m_bTransformDirty = m_bInverseDirty = true;
+    if (m_eLayoutType == 2)
+    {
+        DPoint point;
+        DSize size;
+        
+        {
+            const DHorizontalLayout& horizontalLayout = m_obLayout.horizontal;
+            
+            if (horizontalLayout.left < FLOAT_NONE && horizontalLayout.right < FLOAT_NONE)
+            {
+                size.width = contentSize.width - horizontalLayout.left - horizontalLayout.right;
+                point.x = horizontalLayout.left;
+            }
+            else if (horizontalLayout.left < FLOAT_NONE && horizontalLayout.width < FLOAT_NONE)
+            {
+                size.width = horizontalLayout.width;
+                point.x = horizontalLayout.left;
+            }
+            else if (horizontalLayout.left < FLOAT_NONE && horizontalLayout.center < FLOAT_NONE)
+            {
+                size.width = (contentSize.width * horizontalLayout.center - horizontalLayout.left) * 2;
+                point.x = horizontalLayout.left;
+            }
+            else if (horizontalLayout.right < FLOAT_NONE && horizontalLayout.width < FLOAT_NONE)
+            {
+                size.width = horizontalLayout.width;
+                point.x = contentSize.width - horizontalLayout.right - size.width;
+            }
+            else if (horizontalLayout.right < FLOAT_NONE && horizontalLayout.center < FLOAT_NONE)
+            {
+                size.width = (contentSize.width * (1.0f - horizontalLayout.center) - horizontalLayout.right) * 2;;
+                point.x = contentSize.width - horizontalLayout.right - size.width;
+            }
+            else if (horizontalLayout.width < FLOAT_NONE && horizontalLayout.center < FLOAT_NONE)
+            {
+                size.width = horizontalLayout.width;
+                point.x = contentSize.width * horizontalLayout.center - size.width / 2;
+            }
+        }
+        
+        {
+            const DVerticalLayout& verticalLayout = m_obLayout.vertical;
+            
+            if (verticalLayout.top < FLOAT_NONE && verticalLayout.bottom < FLOAT_NONE)
+            {
+                size.height = contentSize.height - verticalLayout.top - verticalLayout.bottom;
+                point.y = verticalLayout.top;
+            }
+            else if (verticalLayout.top < FLOAT_NONE && verticalLayout.height < FLOAT_NONE)
+            {
+                size.height = verticalLayout.height;
+                point.y = verticalLayout.top;
+            }
+            else if (verticalLayout.top < FLOAT_NONE && verticalLayout.center < FLOAT_NONE)
+            {
+                size.height = (contentSize.height * verticalLayout.center - verticalLayout.top) * 2;
+                point.y = verticalLayout.top;
+            }
+            else if (verticalLayout.bottom < FLOAT_NONE && verticalLayout.height < FLOAT_NONE)
+            {
+                size.height = verticalLayout.height;
+                point.y = contentSize.height - verticalLayout.bottom - size.height;
+            }
+            else if (verticalLayout.bottom < FLOAT_NONE && verticalLayout.center < FLOAT_NONE)
+            {
+                size.height = (contentSize.height * (1.0f - verticalLayout.center) - verticalLayout.bottom) * 2;
+                point.y = contentSize.height - verticalLayout.bottom - size.height;
+            }
+            else if (verticalLayout.height < FLOAT_NONE && verticalLayout.center < FLOAT_NONE)
+            {
+                size.height = verticalLayout.height;
+                point.y = contentSize.height * verticalLayout.center - size.height / 2;
+            }
+        }
+
+        if (allowAnimation
+            &&CAViewAnimation::areAnimationsEnabled()
+            && CAViewAnimation::areBeginAnimations())
+        {
+            CAViewAnimation::getInstance()->setContentSize(size, this);
+        }
+        else
+        {
+            this->setContentSize(size);
+        }
+        
+        DPoint p = ccpCompMult(size, m_obAnchorPoint);
+        p = ccpAdd(p, point);
+        
+        if (allowAnimation
+            &&CAViewAnimation::areAnimationsEnabled()
+            && CAViewAnimation::areBeginAnimations())
+        {
+            CAViewAnimation::getInstance()->setPoint(p, this);
+        }
+        else
+        {
+            this->setPoint(p);
+        }
+    }
 }
 
 void CAView::updateDraw()
@@ -862,7 +947,7 @@ void CAView::updateDraw()
     }
     
     SET_DIRTY_RECURSIVELY();
-    this->reViewlayout();
+    m_bTransformDirty = m_bInverseDirty = true;
     CAApplication::getApplication()->updateDraw();
 }
 
@@ -930,7 +1015,7 @@ void CAView::insertSubview(CAView* subview, int z)
     subview->setSuperview(this);
     subview->setOrderOfArrival(s_globalOrderOfArrival++);
     
-    if( m_bRunning )
+    if(m_bRunning)
     {
         subview->onEnter();
         subview->onEnterTransitionDidFinish();
@@ -1028,6 +1113,7 @@ void CAView::detachSubview(CAView *subview)
     // IMPORTANT:
     //  -1st do onExit
     //  -2nd cleanup
+    
     if (m_bRunning)
     {
         subview->onExitTransitionDidStart();
@@ -1283,7 +1369,7 @@ void CAView::transform()
     if ( m_pCamera != NULL)
     {
         DPoint anchorPointInPoints = DPoint(m_obAnchorPointInPoints.x,
-                                              m_obContentSize.height - m_obAnchorPointInPoints.y);
+                                            m_obContentSize.height - m_obAnchorPointInPoints.y);
         
         bool translate = (anchorPointInPoints.x != 0.0f || anchorPointInPoints.y != 0.0f);
 
@@ -1305,13 +1391,17 @@ void CAView::transform()
 CAView* CAView::copy()
 {
     CAView* view = NULL;
-    if (m_bFrame)
+    if (m_eLayoutType == 0)
     {
         view = CAView::createWithFrame(this->getFrame(), this->getColor());
     }
-    else
+    else if (m_eLayoutType == 1)
     {
         view = CAView::createWithCenter(this->getCenter(), this->getColor());
+    }
+    else
+    {
+        view = CAView::createWithLayout(this->getLayout(), this->getColor());
     }
     view->setImage(this->getImage());
     
@@ -1334,15 +1424,18 @@ CAResponder* CAView::nextResponder()
 
 void CAView::onEnter()
 {
+    this->reViewlayout(this->getSuperview()->m_obContentSize);
+    m_bRunning = true;
+    this->updateDraw();
+    
     if (!m_obSubviews.empty())
     {
         CAVector<CAView*>::iterator itr;
         for (itr=m_obSubviews.begin(); itr!=m_obSubviews.end(); itr++)
+        {
             (*itr)->onEnter();
+        }
     }
-    
-    m_bRunning = true;
-    this->updateDraw();
 }
 
 void CAView::onEnterTransitionDidFinish()
@@ -1356,7 +1449,6 @@ void CAView::onEnterTransitionDidFinish()
     
     if (m_pContentContainer)
     {
-        m_pContentContainer->getSuperViewRect(this->getSuperview()->getBounds());
         m_pContentContainer->viewOnEnterTransitionDidFinish();
     }
 }
@@ -1404,11 +1496,11 @@ CATransformation CAView::nodeToParentTransform(void)
         
         if (this->getSuperview())
         {
-            height= this->getSuperview()->getBounds().size.height;
+            height = this->getSuperview()->getBounds().size.height;
         }
         else
         {
-            height= CAApplication::getApplication()->getWinSize().height;
+            height = CAApplication::getApplication()->getWinSize().height;
         }
         
         
@@ -1504,9 +1596,10 @@ DPoint CAView::convertToNodeSpace(const DPoint& worldPoint)
     DPoint ret = worldPoint;//DPointApplyAffineTransform(p, worldToNodeTransform());
     for (CAView* v = this; v; v = v->m_pSuperview)
     {
-        ret.x -= v->getFrameOrigin().x;
-        ret.y -= v->getFrameOrigin().y;
+        ret.x -= (v->m_obPoint.x - v->m_obAnchorPointInPoints.x * v->m_fScaleX);
+        ret.y -= (v->m_obPoint.y - v->m_obAnchorPointInPoints.y * v->m_fScaleY);
     }
+    ret.x /= m_fScaleX, ret.y /= m_fScaleY;
     return ret;
 }
 
@@ -1515,10 +1608,12 @@ DPoint CAView::convertToWorldSpace(const DPoint& nodePoint)
     DPoint p = nodePoint;
     
     DPoint ret = p;//DPointApplyAffineTransform(p, nodeToWorldTransform());
+    ret.x *= m_fScaleX, ret.y *= m_fScaleY;
+    
     for (CAView* v = this; v; v = v->m_pSuperview)
     {
-        ret.x += v->getFrameOrigin().x;
-        ret.y += v->getFrameOrigin().y;
+        ret.x += (v->m_obPoint.x - v->m_obAnchorPointInPoints.x * v->m_fScaleX);
+        ret.y += (v->m_obPoint.y - v->m_obAnchorPointInPoints.y * v->m_fScaleY);
     }
     return ret;
 }
@@ -1528,8 +1623,8 @@ DPoint CAView::convertToNodeSize(const DSize& worldSize)
     DSize ret = worldSize;
     for (CAView* v = this; v; v = v->m_pSuperview)
     {
-        ret.width /= v->getScaleX();
-        ret.height /= v->getScaleY();
+        ret.width /= v->m_fScaleX;
+        ret.height /= v->m_fScaleY;
     }
     return ret;
 }
@@ -1539,8 +1634,8 @@ DPoint CAView::convertToWorldSize(const DSize& nodeSize)
     DSize ret = nodeSize;
     for (CAView* v = this; v; v = v->m_pSuperview)
     {
-        ret.width *= v->getScaleX();
-        ret.height *= v->getScaleY();
+        ret.width *= v->m_fScaleX;
+        ret.height *= v->m_fScaleY;
     }
     return ret;
 }
@@ -1909,7 +2004,7 @@ void CAView::updateColor(void)
     
     if (m_pobBatchView && m_pobImage)
     {
-        if (m_uAtlasIndex != 0xffffffff)
+        if (m_uAtlasIndex != UINT_NONE)
         {
             m_pobImageAtlas->updateQuad(&m_sQuad, m_uAtlasIndex);
         }
@@ -2044,7 +2139,7 @@ void CAView::setBatch(CABatchView *batchView)
     // self render
     if( ! m_pobBatchView )
     {
-        m_uAtlasIndex = 0xffffffff;
+        m_uAtlasIndex = UINT_NONE;
         setImageAtlas(NULL);
         m_bRecursiveDirty = false;
         setDirty(false);

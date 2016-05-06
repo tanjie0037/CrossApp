@@ -9,7 +9,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Locale;
 
-import org.CrossApp.lib.Cocos2dxGLSurfaceView;
+import org.CrossApp.lib.CrossAppGLSurfaceView;
 
 import android.R.integer;
 import android.R.string;
@@ -149,7 +149,7 @@ public class AndroidNativeTool
 	public static void setScreenBrightness( int value) 
 	{
 		 
-	   Cocos2dxActivity mActivity = (Cocos2dxActivity)s_pContext;
+	   CrossAppActivity mActivity = (CrossAppActivity)s_pContext;
 	   mActivity.mLightHandler.sendEmptyMessage(value);
 	}
 	
@@ -216,16 +216,13 @@ public class AndroidNativeTool
             switch (requestCode) 
             {  
             case 4:  // Photo
-            	Log.i("qiaoxin","requestCode:"+ requestCode);
 
             	final String uriStr = getPath(s_pContext, intent.getData());
-            	Log.i("qiaoxin", "String uriStr:"+uriStr);
             	
             	String fileStr = getRealFilePath(s_pContext, intent.getData());
             	
-            	Log.i("qiaoxin", "String fileStr:"+fileStr);
             	
-                Cocos2dxGLSurfaceView.getInstance().queueEvent(new Runnable() {
+                CrossAppGLSurfaceView.getInstance().queueEvent(new Runnable() {
 					@Override
 					public void run() {
 		                NativeReturn( uriStr , null );
@@ -233,7 +230,6 @@ public class AndroidNativeTool
 				});
                 break;  
             case 1:
-            	Log.i("qiaoxin","requestCode:"+ requestCode);
 
             	Uri originalUri1;
             	if (intent != null && intent.getData() != null) 
@@ -255,9 +251,8 @@ public class AndroidNativeTool
                 cursor1.moveToFirst();
 
                 final String path1 = cursor1.getString(column_index1);
-                Log.i("qiaoxin","qiaoxin2"+ path1);
 
-                Cocos2dxGLSurfaceView.getInstance().queueEvent(new Runnable() {
+                CrossAppGLSurfaceView.getInstance().queueEvent(new Runnable() {
 					@Override
 					public void run() {
 		                NativeReturn( path1 , null );
@@ -287,7 +282,7 @@ public class AndroidNativeTool
 
                 final String path = cursor.getString(column_index);
 
-                Cocos2dxGLSurfaceView.getInstance().queueEvent(new Runnable()
+                CrossAppGLSurfaceView.getInstance().queueEvent(new Runnable()
                 {
 					@Override
 					public void run() 
@@ -308,10 +303,8 @@ public class AndroidNativeTool
             	{
             		takePhoto= intent.getData();  
             		cropImageUri(takePhoto, 640, 640, 1);   
-            		Log.i("qiaoxin","qiaoxin3");
             	}else {
             		cropImageUri(photoUri, 640, 640, 1);   
-            		Log.i("qiaoxin","qiaoxin4");
 				}
 
             	 
@@ -327,7 +320,6 @@ public class AndroidNativeTool
     }
     
     public static String getPath(final Context context, final Uri uri) {  
-        Log.i("qiaoxin", "uri---:" + uri);
         final boolean isKitKat = Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT;  
       
         // DocumentProvider  
@@ -499,4 +491,15 @@ public class AndroidNativeTool
         }
         return versionName;
     }
+    
+    public static String getSaveImagePath(){
+    	String path = Environment.getExternalStorageDirectory().toString()  + "/DCIM/Camera/";  
+        return path;
+    }
+    
+    //����ͼ��
+    public static void UpdateCamera(final String url){ 
+    	s_pContext.sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.parse("file://" + url)));
+    } 
+    
 }

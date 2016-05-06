@@ -47,6 +47,8 @@ public:
     
     static CANavigationBar* createWithCenter(const DRect& rect, bool clearance = false);
     
+    static CANavigationBar* createWithLayout(const DLayout& layout, bool clearance = false);
+    
     virtual void onEnterTransitionDidFinish();
     
     virtual void onExitTransitionDidStart();
@@ -147,6 +149,8 @@ public:
     
     static CATabBar* createWithCenter(const DRect& rect, bool clearance = false);
     
+    static CATabBar* createWithLayout(const DLayout& layout, bool clearance = false);
+    
     virtual void onEnterTransitionDidFinish();
     
     virtual void onExitTransitionDidStart();
@@ -187,7 +191,7 @@ public:
     
     void replaceItemAtIndex(size_t index, CATabBarItem* item);
     
-    const DRect& getContentViewFrame();
+    DRect getContentViewFrame();
 
 protected:
     

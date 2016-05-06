@@ -103,6 +103,8 @@ public:
 
 	static CACollectionView* createWithCenter(const DRect& rect);
 
+    static CACollectionView* createWithLayout(const DLayout& layout);
+    
 	virtual bool init();
 
 	void clearData();
@@ -153,6 +155,8 @@ public:
     virtual void switchPCMode(bool var);
     
 protected:
+    
+    virtual void setContentSize(const DSize& var);
     
     inline virtual float maxSpeed(float dt);
 
@@ -303,8 +307,6 @@ protected:
     virtual void recoveryCollectionViewCell(){};
     
     void setControlState(const CAControlState& var);
-    
-    void setContentSize(const DSize& var);
     
 private:
     

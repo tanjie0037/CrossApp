@@ -58,7 +58,9 @@ public:
 class CC_DLL CAListView : public CAScrollView
 {
 public:
+    
 	CAListView();
+    
 	virtual ~CAListView();
 
 	virtual void onEnterTransitionDidFinish();
@@ -69,6 +71,8 @@ public:
 
 	static CAListView* createWithCenter(const DRect& rect);
 
+    static CAListView* createWithLayout(const DLayout& layout);
+    
 	virtual bool init();
 
 	void reloadViewSizeData();
@@ -120,15 +124,17 @@ public:
     
 protected:
     
+    virtual void setContentSize(const DSize& var);
+    
     inline virtual float maxSpeed(float dt);
     
     inline virtual float decelerationRatio(float dt);
     
     virtual void update(float dt);
 
-	void recoveryCollectionCell();
+	void recoveryCell();
 
-	void loadCollectionCell();
+	void loadCell();
     
     CAView* dequeueReusableLine();
     
@@ -256,8 +262,6 @@ protected:
     virtual void recoveryListViewCell(){};
     
     void setControlState(const CAControlState& var);
-    
-    void setContentSize(const DSize& var);
     
 private:
     

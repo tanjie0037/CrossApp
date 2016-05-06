@@ -130,6 +130,21 @@ CAButton* CAButton::createWithCenter(const DRect& rect, const CAButtonType& butt
     return NULL;
 }
 
+CAButton* CAButton::createWithLayout(const CrossApp::DLayout &layout, const CAButtonType &buttonType)
+{
+    
+    CAButton* btn = new CAButton(buttonType);
+    
+    if (btn && btn->initWithLayout(layout))
+    {
+        btn->autorelease();
+        return btn;
+    }
+    
+    CC_SAFE_DELETE(btn);
+    return NULL;
+}
+
 bool CAButton::init()
 {
     if (!CAControl::init())
@@ -226,17 +241,14 @@ void CAButton::setBackgroundViewForState(const CAControlState& controlState, CAV
         CC_SAFE_RETAIN(var);
         this->removeSubview(m_pBackgroundView[controlState]);
         CC_SAFE_RELEASE(m_pBackgroundView[controlState]);
+        if (var)
+        {
+            var->setLayout(DLayoutFill);
+        }
         m_pBackgroundView[controlState] = var;
         this->setControlState(m_eControlState);
     }
-    
-    CC_RETURN_IF(var == NULL);
-    
-    if (this->getBounds().equals(DRectZero))
-    {
-        this->setBounds(DRect(0, 0, var->getFrame().size.width, var->getFrame().size.height));
-    }
-    
+
     this->updateWithPreferredSize();
 }
 
@@ -355,14 +367,6 @@ void CAButton::setTitleFontName(const std::string& var)
 
 void CAButton::updateWithPreferredSize()
 {
-    for (int i=0; i<CAControlStateAll; i++)
-    {
-        CC_CONTINUE_IF(m_pBackgroundView[i] == NULL);
-        CC_CONTINUE_IF(this->getBounds().equals(m_pBackgroundView[i]->getBounds()));
-        
-        m_pBackgroundView[i]->setFrame(this->getBounds());
-    }
-    
     if (m_fTitleFontSize < FLT_EPSILON)
     {
         m_pLabel->setFontSize(this->getBounds().size.height * 0.667f);
@@ -503,12 +507,10 @@ void CAButton::setControlState(const CAControlState& var)
     
     if (m_pBackgroundView[m_eControlState] && m_eControlState != CAControlStateNormal)
     {
-        m_pBackgroundView[m_eControlState]->setFrame(this->getBounds());
         this->insertSubview(m_pBackgroundView[m_eControlState], -1);
     }
     else if (m_pBackgroundView[CAControlStateNormal])
     {
-        m_pBackgroundView[CAControlStateNormal]->setFrame(this->getBounds());
         this->insertSubview(m_pBackgroundView[CAControlStateNormal], -1);
     }
     
@@ -556,7 +558,7 @@ void CAButton::setControlState(const CAControlState& var)
     }
     else if (image && title.compare("") != 0)
     {
-        DSize size = this->getBounds().size;
+        DSize size = m_obContentSize;
         DSize iSize = image->getContentSize();
         float scaleX = size.width / iSize.width * 0.5f;
         float scaleY = size.height / iSize.height * 0.45f;
@@ -580,7 +582,7 @@ void CAButton::setControlState(const CAControlState& var)
     }
     if (m_bDefineImageOffset)
     {
-        imageViewCenter.origin = ccpMult(this->getBounds().size, 0.5f);
+        imageViewCenter.origin = ccpMult(m_obContentSize, 0.5f);
         imageViewCenter.origin = ccpAdd(imageViewCenter.origin, m_pImageOffset);
     }
     m_pImageView->setCenter(imageViewCenter);
@@ -600,7 +602,7 @@ void CAButton::setControlState(const CAControlState& var)
     
     if(m_bDefineTitleOffset)
     {
-        labelCenter.origin = ccpMult(this->getBounds().size, 0.5f);
+        labelCenter.origin = ccpMult(m_obContentSize, 0.5f);
         labelCenter.origin = ccpAdd(labelCenter.origin, m_pTitleOffset);
     }
     m_pLabel->setCenter(labelCenter);
@@ -695,11 +697,6 @@ void CAButton::setContentSize(const DSize & var)
 //        size.width = MAX(size.width, 60);
 //    }
     CAView::setContentSize(size);
-    for(int i=0; i<CAControlStateAll; i++)
-    {
-        CC_CONTINUE_IF(m_pBackgroundView[i] == NULL);
-        m_pBackgroundView[i]->setFrame(this->getBounds());
-    }
     
     this->updateWithPreferredSize();
     this->setControlState(m_eControlState);

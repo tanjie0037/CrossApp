@@ -199,17 +199,19 @@ CATextView::CATextView()
 ,m_iFontSize(40)
 {
     this->setHaveNextResponder(false);
-    
+    this->setPoint(DPoint(-5000, -5000));
     CGPoint point = CGPointMake(-50000, -50000);
     m_pTextView = [[MacTextView alloc]initWithFrame:CGRectMake(point.x, point.y, 100, 40)];
     EAGLView * eaglview = [EAGLView sharedEGLView];
     [eaglview addSubview:textView_Mac];
     textView_Mac.textView = this;
+    [textView_Mac setBackgroundColor:[NSColor clearColor]];
     [textView_Mac setText:@""];
     [textView_Mac release];
     
     textView_Mac.font = [NSFont systemFontOfSize:s_dip_to_px(m_iFontSize) / MAC_SCALE];
 }
+
 CATextView::~CATextView()
 {
     [textView_Mac removeFromSuperview];
@@ -226,9 +228,10 @@ CATextView* CATextView::createWithFrame(const DRect& frame)
     CC_SAFE_RELEASE_NULL(textView);
     return NULL;
 }
-CATextView* CATextView::createWithCenter(const CrossApp::DRect &rect){
+
+CATextView* CATextView::createWithCenter(const CrossApp::DRect &rect)
+{
     CATextView* textView = new CATextView();
-    
     if (textView && textView->initWithCenter(rect))
     {
         textView->autorelease();
@@ -238,25 +241,42 @@ CATextView* CATextView::createWithCenter(const CrossApp::DRect &rect){
     CC_SAFE_DELETE(textView);
     return NULL;
 }
+
+CATextView* CATextView::createWithLayout(const DLayout& layout)
+{
+    CATextView* textView = new CATextView();
+    if (textView && textView->initWithLayout(layout))
+    {
+        textView->autorelease();
+        return textView;
+    }
+    
+    CC_SAFE_DELETE(textView);
+    return NULL;
+}
+
 bool CATextView::init()
 {
     CAImage* image = CAImage::create("source_material/textField_bg.png");
     DRect capInsets = DRect(image->getPixelsWide()/2 ,image->getPixelsHigh()/2 , 1, 1);
     m_pBackgroundView = CAScale9ImageView::createWithImage(image);
+    m_pBackgroundView->setLayout(DLayoutFill);
     m_pBackgroundView->setCapInsets(capInsets);
     this->insertSubview(m_pBackgroundView, -1);
     
-    m_pShowImageView = CAImageView::createWithFrame(DRect(0, 0, 1, 1));
+    m_pShowImageView = CAImageView::createWithLayout(DLayoutFill);
     this->addSubview(m_pShowImageView);
     m_pShowImageView->setTextTag("textView");
     return true;
 }
+
 void CATextView::onEnterTransitionDidFinish()
 {
     CAView::onEnterTransitionDidFinish();
     
     this->delayShowImage();
 }
+
 void CATextView::onExitTransitionDidStart()
 {
     CAView::onExitTransitionDidStart();
@@ -266,6 +286,7 @@ void CATextView::onExitTransitionDidStart()
         this->resignFirstResponder();
     }
 }
+
 bool CATextView::resignFirstResponder()
 {
     if (m_pDelegate && (!m_pDelegate->textViewShouldEndEditing(this)))
@@ -286,6 +307,7 @@ bool CATextView::resignFirstResponder()
     return result;
 
 }
+
 bool CATextView::becomeFirstResponder()
 {
     if (m_pDelegate &&( !m_pDelegate->textViewShouldBeginEditing(this)))
@@ -303,6 +325,7 @@ bool CATextView::becomeFirstResponder()
     
     return result;
 }
+
 const DRect CATextView::convertRect(const CrossApp::DRect &rect)
 {
     DRect cnvRect;
@@ -311,6 +334,7 @@ const DRect CATextView::convertRect(const CrossApp::DRect &rect)
     
     return cnvRect;
 }
+
 void CATextView::update(float t)
 {
     do
@@ -328,16 +352,18 @@ void CATextView::update(float t)
     }
     while (0);
 }
+
 void CATextView::delayShowImage()
 {
     CC_RETURN_IF(CAScheduler::isScheduled(schedule_selector(CATextView::showImage), this));
     CAScheduler::schedule(schedule_selector(CATextView::showImage), this, 0, 0, 0);
 }
+
 void CATextView::showImage()
 {
     NSImage* image_MAC = [[[NSImage alloc]initWithData:[textView_Mac dataWithPDFInsideRect:[textView_Mac bounds]]]autorelease];
     
-    NSData* data_MAC = [image_MAC TIFFRepresentation];
+    NSData* data_MAC = [image_MAC TIFFRepresentationUsingCompression:NSTIFFCompressionNone factor:MAC_SCALE];
     
     unsigned char* data = (unsigned char*)malloc([data_MAC length]);
     [data_MAC getBytes:data];
@@ -346,9 +372,9 @@ void CATextView::showImage()
     free(data);
     m_pShowImageView->setImage(image);
     
-    this->updateDraw();
     CAScheduler::unschedule(schedule_selector(CATextView::showImage), this);
 }
+
 void CATextView::showTextView()
 {
     m_pShowImageView->setVisible(true);
@@ -357,17 +383,20 @@ void CATextView::hideTextView()
 {
     m_pShowImageView->setVisible(false);
 }
+
 void CATextView::showNativeTextView()
 {
     [textView_Mac show];
     CAScheduler::schedule(schedule_selector(CATextView::update), this, 1/60.0f);
 }
+
 void CATextView::hideNativeTextView()
 {
     CAScheduler::unschedule(schedule_selector(CATextView::update), this);
     
     [textView_Mac hide];
 }
+
 void CATextView::setContentSize(const DSize& contentSize)
 {
     CAView::setContentSize(contentSize);
@@ -382,11 +411,23 @@ void CATextView::setContentSize(const DSize& contentSize)
     rect.size = size;
     textView_Mac.frame = rect;
     
-    m_pBackgroundView->setFrame(this->getBounds());
     m_pShowImageView->setFrame(this->getBounds());
+    
+    this->showImage();
 }
+
 bool CATextView::ccTouchBegan(CATouch *pTouch, CAEvent *pEvent)
 {
+    DPoint point = this->convertTouchToNodeSpace(pTouch);
+    
+    if (this->getBounds().containsPoint(point))
+    {
+        becomeFirstResponder();
+    }
+    else
+    {
+        resignFirstResponder();
+    }
     return true;
 }
 
@@ -402,16 +443,6 @@ void CATextView::ccTouchCancelled(CATouch *pTouch, CAEvent *pEvent)
 
 void CATextView::ccTouchEnded(CATouch *pTouch, CAEvent *pEvent)
 {
-    DPoint point = this->convertTouchToNodeSpace(pTouch);
-    
-    if (this->getBounds().containsPoint(point))
-    {
-        becomeFirstResponder();
-    }
-    else
-    {
-        resignFirstResponder();
-    }
     
 }
 
@@ -424,11 +455,13 @@ void CATextView::setText(const std::string &var)
     
     delayShowImage();
 }
+
 const std::string& CATextView::getText()
 {
     m_sText = [textView_Mac.stringValue UTF8String];
     return m_sText;
 }
+
 void CATextView::setTextColor(const CAColor4B &var)
 {
     m_sTextColor = var;
@@ -437,10 +470,12 @@ void CATextView::setTextColor(const CAColor4B &var)
     
     delayShowImage();
 }
+
 const CAColor4B& CATextView::getTextColor()
 {
     return m_sTextColor;
 }
+
 void CATextView::setTextFontSize(const int &var)
 {
     m_iFontSize = var;
@@ -465,7 +500,6 @@ void CATextView::setBackgroundImage(CAImage* image)
     m_pBackgroundView->setImage(image);
 }
 
-
 void CATextView::setTextViewAlign(const TextViewAlign &var)
 {
     m_eAlign = var;
@@ -487,16 +521,17 @@ void CATextView::setTextViewAlign(const TextViewAlign &var)
     
     delayShowImage();
 }
+
 const CATextView::TextViewAlign& CATextView::getTextViewAlign()
 {
     return m_eAlign;
 }
+
 void CATextView::setReturnType(const ReturnType &var)
 {
     m_eReturnType = var;
-    
-    
 }
+
 const CATextView::ReturnType& CATextView::getReturnType()
 {
     return m_eReturnType;

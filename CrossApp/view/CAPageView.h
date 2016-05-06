@@ -50,6 +50,8 @@ public:
     
     static CAPageView* createWithCenter(const DRect& rect, const CAPageViewDirection& type);
     
+    static CAPageView* createWithLayout(const DLayout& layout, const CAPageViewDirection& type);
+    
     bool init();
     
     CC_SYNTHESIZE_READONLY_PASS_BY_REF(CAPageViewDirection, m_ePageViewDirection, PageViewDirection);
@@ -81,6 +83,8 @@ protected:
     virtual void ccTouchEnded(CATouch *pTouch, CAEvent *pEvent);
     
     virtual void contentOffsetFinish(float dt);
+    
+    virtual void setContentSize(const DSize& contentSize);
     
     void runAnimation(bool animated);
     

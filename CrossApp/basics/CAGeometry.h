@@ -6,6 +6,7 @@
 #include "platform/CCPlatformMacros.h"
 #include "CAObject.h"
 #include <math.h>
+#include <float.h>
 
 NS_CC_BEGIN
 
@@ -306,9 +307,14 @@ public:
     void InflateRect(float v);
 	void InflateRect(float l, float t, float r, float b);
     
-    CC_SYNTHESIZE_IS(bool, m_bCenter, Center);
+    typedef enum
+    {
+        Frame,
+        Center
+    }Type;
+    
+    CC_SYNTHESIZE_IS(Type, m_eType, Type);
 };
-
 
 const DPoint DPointZero = DPoint();
 const DSize DSizeZero = DSize();

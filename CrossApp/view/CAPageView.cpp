@@ -8,6 +8,7 @@
 
 #include "CAPageView.h"
 #include "basics/CAScheduler.h"
+#include "animation/CAAnimation.h"
 
 CAPageView::CAPageView(const CAPageViewDirection& type)
 :m_ePageViewDirection(type)
@@ -15,7 +16,7 @@ CAPageView::CAPageView(const CAPageViewDirection& type)
 ,m_nCurrPage(0)
 ,m_pPageViewDelegate(NULL)
 ,m_bListener(false)
-,m_fSpacing(40)
+,m_fSpacing(0)
 {
 
 }
@@ -41,6 +42,18 @@ CAPageView* CAPageView::createWithCenter(const DRect& rect, const CAPageViewDire
 {
     CAPageView* view = new CAPageView(type);
     if (view && view->initWithCenter(rect))
+    {
+        view->autorelease();
+        return view;
+    }
+    CC_SAFE_DELETE(view);
+    return NULL;
+}
+
+CAPageView* CAPageView::createWithLayout(const CrossApp::DLayout &layout, const CAPageViewDirection &type)
+{
+    CAPageView* view = new CAPageView(type);
+    if (view && view->initWithLayout(layout))
     {
         view->autorelease();
         return view;
@@ -95,11 +108,11 @@ void CAPageView::setViews(const CADeque<CAView*>& vec)
     
     if (m_ePageViewDirection == CAPageViewDirectionHorizontal)
     {
-        this->setViewSize(DSize(this->getBounds().size.width * m_pViews.size() + m_fSpacing * (m_pViews.size() - 1), m_obViewSize.height));
+        this->setViewSize(DSize(m_obContentSize.width * m_pViews.size() + m_fSpacing * (m_pViews.size() - 1), 0));
     }
     else
     {
-        this->setViewSize(DSize(m_obViewSize.width, this->getBounds().size.height * m_pViews.size() + m_fSpacing * (m_pViews.size() - 1)));
+        this->setViewSize(DSize(0, m_obContentSize.height * m_pViews.size() + m_fSpacing * (m_pViews.size() - 1)));
     }
     
     for (size_t i=0; i<m_pViews.size(); i++)
@@ -115,6 +128,39 @@ void CAPageView::setViews(const CADeque<CAView*>& vec)
         }
         m_pContainer->addSubview(m_pViews.at(i));
         m_pViews.at(i)->setFrame(rect);
+    }
+}
+
+void CAPageView::setContentSize(const DSize& contentSize)
+{
+    CAScrollView::setContentSize(contentSize);
+    
+    if (!m_pViews.empty())
+    {
+        if (m_ePageViewDirection == CAPageViewDirectionHorizontal)
+        {
+            this->setViewSize(DSize(m_obContentSize.width * m_pViews.size() + m_fSpacing * (m_pViews.size() - 1), 0));
+        }
+        else
+        {
+            this->setViewSize(DSize(0, m_obContentSize.height * m_pViews.size() + m_fSpacing * (m_pViews.size() - 1)));
+        }
+        
+        for (size_t i=0; i<m_pViews.size(); i++)
+        {
+            DRect rect = this->getBounds();
+            if (m_ePageViewDirection == CAPageViewDirectionHorizontal)
+            {
+                rect.origin.x = (rect.size.width + m_fSpacing) * i;
+            }
+            else
+            {
+                rect.origin.y = (rect.size.height + m_fSpacing) * i;
+            }
+            m_pViews.at(i)->setFrame(rect);
+        }
+        
+        this->runAnimation(false);
     }
 }
 
@@ -172,11 +218,11 @@ void CAPageView::runAnimation(bool animated)
 {
     if (m_ePageViewDirection == CAPageViewDirectionHorizontal)
     {
-        this->setContentOffset(DPoint(m_nCurrPage * (this->getBounds().size.width + m_fSpacing), 0), animated);
+        this->setContentOffset(DPoint(m_nCurrPage * (m_obContentSize.width + m_fSpacing), 0), animated);
     }
     else
     {
-        this->setContentOffset(DPoint(0, m_nCurrPage * (this->getBounds().size.height + m_fSpacing)), animated);
+        this->setContentOffset(DPoint(0, m_nCurrPage * (m_obContentSize.height + m_fSpacing)), animated);
     }
 }
 
@@ -210,6 +256,11 @@ void CAPageView::contentOffsetFinish(float dt)
 
 bool CAPageView::ccTouchBegan(CATouch *pTouch, CAEvent *pEvent)
 {
+    if (CAAnimation::isSchedule(CAAnimation_selector(CAPageView::closeToPoint), this))
+    {
+        return false;
+    }
+    
     return CAScrollView::ccTouchBegan(pTouch, pEvent);
 }
 

@@ -73,6 +73,18 @@ CAWaterfallView* CAWaterfallView::createWithCenter(const DRect& rect)
 	return NULL;
 }
 
+CAWaterfallView* CAWaterfallView::createWithLayout(const CrossApp::DLayout &layout)
+{
+    CAWaterfallView* pWaterfallView = new CAWaterfallView();
+    if (pWaterfallView && pWaterfallView->initWithLayout(layout))
+    {
+        pWaterfallView->autorelease();
+        return pWaterfallView;
+    }
+    CC_SAFE_DELETE(pWaterfallView);
+    return NULL;
+}
+
 bool CAWaterfallView::init()
 {
 	if (!CAScrollView::init())
@@ -86,6 +98,15 @@ bool CAWaterfallView::init()
 	return true;
 }
 
+void CAWaterfallView::setContentSize(const CrossApp::DSize &var)
+{
+    CAScrollView::setContentSize(var);
+    
+    if (!m_mpUsedWaterfallCells.empty())
+    {
+        this->reloadData();
+    }
+}
 
 void CAWaterfallView::setAllowsSelection(bool var)
 {
@@ -237,13 +258,13 @@ void CAWaterfallView::ccTouchEnded(CATouch *pTouch, CAEvent *pEvent)
 	{
 		CAViewAnimation::removeAnimations(m_s__StrID);
 
-		int deselectedIndex = 0;
+		int deselectedIndex = -1;
 		int selectedIndex = m_pHighlightedWaterfallCells->getItemIndex();
 
 		if (m_pSelectedWaterfallCells.count(selectedIndex) > 0 && m_bAllowsMultipleSelection)
 		{
 			deselectedIndex = selectedIndex;
-			selectedIndex = 0;
+			selectedIndex = -1;
 			m_pSelectedWaterfallCells.erase(deselectedIndex);
 		}
 		else
@@ -256,7 +277,7 @@ void CAWaterfallView::ccTouchEnded(CATouch *pTouch, CAEvent *pEvent)
 			m_pSelectedWaterfallCells.insert(selectedIndex);
 		}
 
-		if (deselectedIndex != 0)
+		if (deselectedIndex != -1)
 		{
 			if (CAWaterfallViewCell* cell = m_mpUsedWaterfallCells[deselectedIndex])
 			{
@@ -268,7 +289,7 @@ void CAWaterfallView::ccTouchEnded(CATouch *pTouch, CAEvent *pEvent)
 			}
 		}
 
-		if (selectedIndex != 0)
+		if (selectedIndex != -1)
 		{
 			if (CAWaterfallViewCell* cell = m_mpUsedWaterfallCells[selectedIndex])
 			{
@@ -370,38 +391,41 @@ void CAWaterfallView::reloadViewSizeData()
 	
 	unsigned int viewHeight = 0;
 
-	int iHeaderHeight = m_pWaterfallViewDataSource->waterfallViewHeightForHeader(this);
-	if (iHeaderHeight > 0)
+	m_nWaterfallHeaderHeight = m_pWaterfallViewDataSource->waterfallViewHeightForHeader(this);
+	if (m_nWaterfallHeaderHeight > 0)
 	{
-		viewHeight += iHeaderHeight;
+		setWaterfallHeaderView(m_pWaterfallViewDataSource->waterfallViewSectionViewForHeader(this, CCSizeMake(nColumnWidth, m_nWaterfallHeaderHeight)));
+		viewHeight += m_nWaterfallHeaderHeight;
 		viewHeight += m_nItemMargin;
 	}
 
 	int nItemCount = m_pWaterfallViewDataSource->numberOfItems(this);
 	for (int i = 0; i < nItemCount; i++)
 	{
-		unsigned int index = getCurColumnIndex();
-
-		int x = index*(nColumnWidth + m_nColumnMargin) + m_nColumnMargin;
-		int y = m_nColumnHeightVect[index];
-
 		unsigned int nColumnHeight = m_pWaterfallViewDataSource->waterfallViewHeightForItemAtIndex(this, i);
 
-		m_rUsedWaterfallCellRects[i] = DRect(x, y + viewHeight, nColumnWidth, nColumnHeight);
-		m_mpUsedWaterfallCells[i] = NULL;
+		unsigned int index = getCurColumnIndex();
 
 		if (m_nColumnHeightVect[index] != 0)
 		{
 			m_nColumnHeightVect[index] += m_nItemMargin;
 		}
+
+		int x = index*(nColumnWidth + m_nColumnMargin) + m_nColumnMargin;
+		int y = m_nColumnHeightVect[index];
+
+		m_rUsedWaterfallCellRects[i] = DRect(x, y + viewHeight, nColumnWidth, nColumnHeight);
+		m_mpUsedWaterfallCells[i] = NULL;
+
 		m_nColumnHeightVect[index] += nColumnHeight;
 	}
 	viewHeight += getMaxColumnValue();
 
-	int iFooterHeight = m_pWaterfallViewDataSource->waterfallViewHeightForFooter(this);
-	if (iFooterHeight > 0)
+	m_nWaterfallFooterHeight = m_pWaterfallViewDataSource->waterfallViewHeightForFooter(this);
+	if (m_nWaterfallFooterHeight > 0)
 	{
-		viewHeight += iFooterHeight;
+		setWaterfallFooterView(m_pWaterfallViewDataSource->waterfallViewSectionViewForFooter(this, CCSizeMake(nColumnWidth, m_nWaterfallFooterHeight)));
+		viewHeight += m_nWaterfallFooterHeight;
 		viewHeight += m_nItemMargin;
 	}
 
@@ -642,8 +666,8 @@ CAWaterfallViewCell* CAWaterfallView::getHighlightWaterfallCell()
 #pragma CAWaterfallViewCell
 
 CAWaterfallViewCell::CAWaterfallViewCell()
-:m_pBackgroundView(NULL)
-, m_nItemIndex(0xffffffff)
+: m_pBackgroundView(NULL)
+, m_nItemIndex(UINT_NONE)
 , m_bControlStateEffect(true)
 , m_bAllowsSelected(true)
 {
@@ -674,6 +698,7 @@ CAWaterfallViewCell* CAWaterfallViewCell::create(const std::string& reuseIdentif
 bool CAWaterfallViewCell::initWithReuseIdentifier(const std::string& reuseIdentifier)
 {
 	m_pContentView = new CAView();
+    m_pContentView->setLayout(DLayoutFill);
 	this->addSubview(m_pContentView);
 
 	this->setBackgroundView(CAView::create());
@@ -685,29 +710,19 @@ bool CAWaterfallViewCell::initWithReuseIdentifier(const std::string& reuseIdenti
 
 void CAWaterfallViewCell::setBackgroundView(CrossApp::CAView *var)
 {
-	CC_SAFE_RETAIN(var);
-	this->removeSubview(m_pBackgroundView);
-	CC_SAFE_RELEASE(m_pBackgroundView);
+    CC_RETURN_IF(var == m_pBackgroundView);
+    m_pContentView->removeSubview(m_pBackgroundView);
+    CC_SAFE_RETAIN(var);
+    CC_SAFE_RELEASE(m_pBackgroundView);
 	m_pBackgroundView = var;
 	CC_RETURN_IF(m_pBackgroundView == NULL);
-	m_pBackgroundView->setFrame(this->getBounds());
-	this->insertSubview(m_pBackgroundView, -1);
+    m_pBackgroundView->setLayout(DLayoutFill);
+	m_pContentView->insertSubview(m_pBackgroundView, -1);
 }
 
 CAView* CAWaterfallViewCell::getBackgroundView()
 {
 	return m_pBackgroundView;
-}
-
-void CAWaterfallViewCell::setContentSize(const CrossApp::DSize &var)
-{
-	CAView::setContentSize(var);
-
-	m_pContentView->setFrame(this->getBounds());
-	if (m_pBackgroundView)
-	{
-		m_pBackgroundView->setFrame(m_pContentView->getBounds());
-	}
 }
 
 void CAWaterfallViewCell::setControlState(const CAControlState& var)
@@ -772,8 +787,8 @@ void CAWaterfallViewCell::resetWaterfallViewCell()
 	this->setVisible(true);
 	this->normalWaterfallViewCell();
 	this->recoveryWaterfallViewCell();
+    m_pContentView->setLayout(DLayoutFill);
 	m_pContentView->setScale(1.0f);
-	m_pContentView->setFrame(this->getBounds());
 	m_pContentView->setRotation(0);
 }
 

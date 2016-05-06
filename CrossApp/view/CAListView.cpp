@@ -80,6 +80,18 @@ CAListView* CAListView::createWithCenter(const DRect& rect)
 	return NULL;
 }
 
+CAListView* CAListView::createWithLayout(const CrossApp::DLayout &layout)
+{
+    CAListView* listView = new CAListView();
+    if (listView && listView->initWithLayout(layout))
+    {
+        listView->autorelease();
+        return listView;
+    }
+    CC_SAFE_DELETE(listView);
+    return NULL;
+}
+
 bool CAListView::init()
 {
 	if (!CAScrollView::init())
@@ -90,6 +102,16 @@ bool CAListView::init()
 	this->setShowsHorizontalScrollIndicator(false);
     this->setBounceHorizontal(false);
 	return true;
+}
+
+void CAListView::setContentSize(const CrossApp::DSize &var)
+{
+    CAScrollView::setContentSize(var);
+    
+    if (!m_mpUsedListCells.empty())
+    {
+        this->reloadData();
+    }
 }
 
 void CAListView::setAllowsSelection(bool var)
@@ -440,11 +462,11 @@ void CAListView::reloadViewSizeData()
     
     if (m_pListViewOrientation == CAListViewOrientationVertical)
     {
-        this->setViewSize(DSize(width, iStartPosition));
+        this->setViewSize(DSize(0, iStartPosition));
     }
     else
     {
-        this->setViewSize(DSize(iStartPosition, height));
+        this->setViewSize(DSize(iStartPosition, 0));
     }
 }
 
@@ -516,7 +538,7 @@ void CAListView::reloadData()
             addSubview(m_pListFooterView);
         }
     }
-	loadCollectionCell();
+	loadCell();
     this->layoutPullToRefreshView();
     this->startDeaccelerateScroll();
 }
@@ -527,7 +549,7 @@ void CAListView::firstReloadData()
     this->reloadData();
 }
 
-void CAListView::recoveryCollectionCell()
+void CAListView::recoveryCell()
 {
 	DRect rect = this->getBounds();
 	rect.origin = getContentOffset();
@@ -557,7 +579,7 @@ void CAListView::recoveryCollectionCell()
 	}
 }
 
-void CAListView::loadCollectionCell()
+void CAListView::loadCell()
 {
 	DRect rect = this->getBounds();
 	rect.origin = getContentOffset();
@@ -610,9 +632,9 @@ void CAListView::update(float dt)
 {
     CAScrollView::update(dt);
 
-    recoveryCollectionCell();
+    recoveryCell();
     
-    loadCollectionCell();
+    loadCell();
 }
 
 float CAListView::maxSpeed(float dt)
@@ -657,7 +679,7 @@ CAView* CAListView::dequeueReusableLine()
 CAListViewCell::CAListViewCell()
 :m_pBackgroundView(NULL)
 ,m_pContentView(NULL)
-,m_nIndex(0xffffffff)
+,m_nIndex(UINT_NONE)
 ,m_bControlStateEffect(true)
 ,m_bAllowsSelected(true)
 {
@@ -688,6 +710,7 @@ CAListViewCell* CAListViewCell::create(const std::string& reuseIdentifier)
 bool CAListViewCell::initWithReuseIdentifier(const std::string& reuseIdentifier)
 {
     m_pContentView = new CAView();
+    m_pContentView->setLayout(DLayoutFill);
     this->addSubview(m_pContentView);
     
     this->setBackgroundView(CAView::create());
@@ -699,29 +722,19 @@ bool CAListViewCell::initWithReuseIdentifier(const std::string& reuseIdentifier)
 
 void CAListViewCell::setBackgroundView(CrossApp::CAView *var)
 {
+    CC_RETURN_IF(var == m_pBackgroundView);
+    m_pContentView->removeSubview(m_pBackgroundView);
     CC_SAFE_RETAIN(var);
-    this->removeSubview(m_pBackgroundView);
     CC_SAFE_RELEASE(m_pBackgroundView);
     m_pBackgroundView = var;
     CC_RETURN_IF(m_pBackgroundView == NULL);
-    m_pBackgroundView->setFrame(this->getBounds());
+    m_pBackgroundView->setLayout(DLayoutFill);
     m_pContentView->insertSubview(m_pBackgroundView, -1);
 }
 
 CAView* CAListViewCell::getBackgroundView()
 {
     return m_pBackgroundView;
-}
-
-void CAListViewCell::setContentSize(const CrossApp::DSize &var)
-{
-    CAView::setContentSize(var);
-    
-    m_pContentView->setFrame(this->getBounds());
-    if (m_pBackgroundView)
-    {
-        m_pBackgroundView->setFrame(m_pContentView->getBounds());
-    }
 }
 
 void CAListViewCell::setControlState(const CAControlState& var)
@@ -786,8 +799,8 @@ void CAListViewCell::resetListViewCell()
     this->setVisible(true);
     this->normalListViewCell();
     this->recoveryListViewCell();
+    m_pContentView->setLayout(DLayoutFill);
     m_pContentView->setScale(1.0f);
-    m_pContentView->setFrame(this->getBounds());
     m_pContentView->setRotation(0);
 }
 

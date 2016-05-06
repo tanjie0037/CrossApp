@@ -207,8 +207,7 @@ extern "C"
         CAImageView* imageView = (CAImageView*)(s_map[(int)key]->getSubviewByTextTag("textView"));
         imageView->setImage(image);
         imageView->setVisible(true);
-        s_map[(int)key]->reViewlayout();
-        CAApplication::getApplication()->updateDraw();
+        free(data);
     }
     
 	JNIEXPORT void JNICALL Java_org_CrossApp_lib_CrossAppTextView_hideImageView(JNIEnv *env, jclass cls, jint key)
@@ -400,8 +399,6 @@ void CATextView::delayShowImage()
 void CATextView::showImage()
 {
     textViewGetTextViewImageJNI(m_u__ID);
-    
-    m_pShowImageView->setFrame(this->getBounds());
 }
 
 CATextView* CATextView::createWithFrame(const DRect& frame)
@@ -430,16 +427,30 @@ CATextView* CATextView::createWithCenter(const DRect& rect)
     return NULL;
 }
 
+CATextView* CATextView::createWithLayout(const DLayout& layout)
+{
+    CATextView* textView = new CATextView();
+    if (textView&&textView->initWithLayout(layout))
+    {
+        textView->autorelease();
+        return textView;
+    }
+    
+    CC_SAFE_RELEASE_NULL(textView);
+    return NULL;
+}
+
 bool CATextView::init()
 {
     CAImage* image = CAImage::create("source_material/textField_bg.png");
     DRect capInsets = DRect(image->getPixelsWide()/2 ,image->getPixelsHigh()/2 , 1, 1);
 
 	m_pBackgroundView = CAScale9ImageView::createWithImage(image);
+    m_pBackgroundView->setLayout(DLayoutFill);
 	m_pBackgroundView->setCapInsets(capInsets);
 	this->insertSubview(m_pBackgroundView, -1);
     
-	m_pShowImageView = CAImageView::createWithFrame(DRect(0, 0, 1, 1));
+	m_pShowImageView = CAImageView::createWithLayout(DLayoutFill);
 	m_pShowImageView->setTextTag("textView");
 	this->addSubview(m_pShowImageView);
 	
@@ -470,9 +481,8 @@ void CATextView::setContentSize(const DSize& contentSize)
     size.width = s_dip_to_px(worldContentSize.width);
     size.height =  s_dip_to_px(worldContentSize.height);
     textViewSetTextViewSizeJNI(m_u__ID, size.width, size.height);
-
-	m_pBackgroundView->setFrame(this->getBounds());
-    m_pShowImageView->setFrame(this->getBounds());
+    
+    this->showImage();
 }
 
 bool CATextView::ccTouchBegan(CATouch *pTouch, CAEvent *pEvent)

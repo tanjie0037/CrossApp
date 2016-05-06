@@ -38,7 +38,7 @@ import android.widget.TextView.OnEditorActionListener;
 {
 	private EditText textField = null; 
 	private static FrameLayout layout = null;
-	private static Cocos2dxActivity context = null;
+	private static CrossAppActivity context = null;
 	private static Handler handler = null;
 	private static HashMap<Integer, CrossAppTextField> dict = null;
 	private int mykey = -1;
@@ -69,7 +69,6 @@ import android.widget.TextView.OnEditorActionListener;
 	private String  beforeTextString = "";
 	private int selection = 0;
 
-	//是否弹出键盘
 	private boolean isShowKey = false;
 	private boolean isKeyAction = false;
 	
@@ -87,20 +86,32 @@ import android.widget.TextView.OnEditorActionListener;
 		
 		if (context == null)
     	{
-    		context =  (Cocos2dxActivity)Cocos2dxActivity.getContext();
+    		context =  (CrossAppActivity)CrossAppActivity.getContext();
     	}
 		
 		if (layout == null)
     	{
-    		layout = Cocos2dxActivity.getFrameLayout();
+    		layout = CrossAppActivity.getFrameLayout();
     	}
+	}
+	
+	public static void updateImage()
+	{
+		Set<Integer> keys = (Set<Integer>) dict.keySet() ; 
+		Iterator<Integer> iterator = keys.iterator() ; 
+		while (iterator.hasNext())
+		{
+			Integer key = iterator.next();
+			CrossAppTextField textField = dict.get(key);
+			textField.getImage();
+		}
 	}
 	
 	public static void reload()
 	{
 		handler = new Handler(Looper.myLooper());
-		context =  (Cocos2dxActivity)Cocos2dxActivity.getContext();
-		layout = Cocos2dxActivity.getFrameLayout();
+		context =  (CrossAppActivity)CrossAppActivity.getContext();
+		layout = CrossAppActivity.getFrameLayout();
 		
 		Set<Integer> keys = (Set<Integer>) dict.keySet() ; 
 		Iterator<Integer> iterator = keys.iterator() ; 
@@ -542,7 +553,6 @@ import android.widget.TextView.OnEditorActionListener;
                 	{
                 		textField.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
                 	}
-                	
                 }
             });
     	}
@@ -580,7 +590,7 @@ import android.widget.TextView.OnEditorActionListener;
     
     public void becomeFirstResponder()
     {
-    	Cocos2dxActivity.setSingleTextField(this);
+    	CrossAppActivity.setSingleTextField(this);
     	context.runOnUiThread(new Runnable() 
     	{
             @Override
@@ -615,7 +625,7 @@ import android.widget.TextView.OnEditorActionListener;
     
     public void resignFirstResponder()
     {
-    	Cocos2dxActivity.setSingleTextField(null);
+    	CrossAppActivity.setSingleTextField(null);
     	context.runOnUiThread(new Runnable() 
     	{
             @Override
@@ -635,8 +645,8 @@ import android.widget.TextView.OnEditorActionListener;
         		textField.clearFocus();
         		
         		FrameLayout.LayoutParams params = (FrameLayout.LayoutParams)textField.getLayoutParams(); 
-            	params.leftMargin = -1000; 
-            	params.topMargin = -1000;
+            	params.leftMargin = -10000; 
+            	params.topMargin = 0;
             	textField.setLayoutParams(params);
         		
             	TimerTask task = new TimerTask()
@@ -741,9 +751,9 @@ import android.widget.TextView.OnEditorActionListener;
 		textField.setTextColor(textFieldTextColor);
 		textField.setImeOptions(keyBoardReturnType);
 		
-    	FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT) ; 
-    	params.leftMargin = -1000; 
-    	params.topMargin = -1000;
+    	FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT) ; 
+    	params.leftMargin = -10000; 
+    	params.topMargin = 0;
     	params.width = contentSizeW;
     	params.height = contentSizeH;
     	layout.addView(textField, params) ;
@@ -765,48 +775,39 @@ import android.widget.TextView.OnEditorActionListener;
 			@Override
 			public void onTextChanged(CharSequence arg0, int arg1, int arg2, int arg3)
 			{
-				//起始位置， 删除长度，增加长度
 				// TODO Auto-generated method stub
-				if (isSetText)
-				{
-					return;
-				}
 
 				String string = arg0.toString();
 				
 				String  changedText = "";
 				if (arg3 > 0) 
 				{
-					//只是添加
 					changedText = string.substring(arg1, arg1 + arg3);
 				}
 				else 
 				{
-					//只是删除
 					changedText = "";
 				}
 
 				if (!textChange(mykey, beforeTextString, changedText, arg1, arg2))
 				{
-					isSetText = true;
-					textField.setText(beforeTextString);
-					textField.setSelection(selection);
-					isSetText = false;
+					if (isSetText == false)
+					{
+						isSetText = true;
+						textField.setText(beforeTextString);
+						textField.setSelection(selection);
+						isSetText = false;
+					}
+					
 				}
 				else
 				{
-					isSetText = true;
-					textField.setText(string);
-					textField.setSelection(selection - arg2 + arg3);
-//					context.runOnGLThread(new Runnable() 
-//	            	{
-//	                    @Override
-//	                    public void run()
-//	                    {
-//	                    	ByteBuffer textBuffer = ByteBuffer.wrap(textField.getText().toString().getBytes());
-//	    					text(mykey, textBuffer.array(), textBuffer.array().length);
-//	                    }
-//	                });
+					if (isSetText == false)
+					{
+						isSetText = true;
+						textField.setText(string);
+						textField.setSelection(selection - arg2 + arg3);
+					}
 					ByteBuffer textBuffer = ByteBuffer.wrap(textField.getText().toString().getBytes());
 					text(mykey, textBuffer.array(), textBuffer.array().length);
 					isSetText = false;

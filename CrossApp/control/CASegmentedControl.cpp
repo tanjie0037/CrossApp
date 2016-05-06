@@ -19,8 +19,7 @@ using namespace std;
 NS_CC_BEGIN
 
 CASegmentedControl::CASegmentedControl(unsigned int itemsCount)
-    : CAControl()
-    , m_nItemsCount(itemsCount)
+    : m_nItemsCount(itemsCount)
     , m_pBackgroundView(NULL)
     , m_pNewSegmentItemBackgroundImage(NULL)
     , m_pSegmentItemBackgroundImage(NULL)
@@ -113,6 +112,18 @@ CASegmentedControl* CASegmentedControl::createWithCenter(const DRect& rect, unsi
 {
     CASegmentedControl* segmentedControl = new CASegmentedControl(itemsCount);
     if (segmentedControl && segmentedControl->initWithCenter(rect))
+    {
+        segmentedControl->autorelease();
+        return segmentedControl;
+    }
+    CC_SAFE_DELETE(segmentedControl);
+    return NULL;
+}
+
+CASegmentedControl* CASegmentedControl::createWithLayout(const CrossApp::DLayout &layout, unsigned int itemsCount)
+{
+    CASegmentedControl* segmentedControl = new CASegmentedControl(itemsCount);
+    if (segmentedControl && segmentedControl->initWithLayout(layout))
     {
         segmentedControl->autorelease();
         return segmentedControl;

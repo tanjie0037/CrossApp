@@ -75,6 +75,18 @@ CACollectionView* CACollectionView::createWithCenter(const DRect& rect)
 	return NULL;
 }
 
+CACollectionView* CACollectionView::createWithLayout(const CrossApp::DLayout &layout)
+{
+    CACollectionView* collectionView = new CACollectionView();
+    if (collectionView && collectionView->initWithLayout(layout))
+    {
+        collectionView->autorelease();
+        return collectionView;
+    }
+    CC_SAFE_DELETE(collectionView);
+    return NULL;
+}
+
 bool CACollectionView::init()
 {
 	if (!CAScrollView::init())
@@ -86,6 +98,16 @@ bool CACollectionView::init()
 	this->setBounceHorizontal(false);
     this->setHorizontalScrollEnabled(false);
 	return true;
+}
+
+void CACollectionView::setContentSize(const CrossApp::DSize &var)
+{
+    CAScrollView::setContentSize(var);
+    
+    if (!m_mpUsedCollectionCells.empty())
+    {
+        this->reloadData();
+    }
 }
 
 void CACollectionView::setAllowsSelection(bool var)
@@ -740,9 +762,9 @@ CACollectionViewCell* CACollectionView::getHighlightCollectionCell()
 
 CACollectionViewCell::CACollectionViewCell()
 :m_pBackgroundView(NULL)
-, m_nSection(0xffffffff)
-, m_nRow(0xffffffff)
-, m_nItem(0xffffffff)
+, m_nSection(UINT_NONE)
+, m_nRow(UINT_NONE)
+, m_nItem(UINT_NONE)
 , m_bControlStateEffect(true)
 , m_bAllowsSelected(true)
 {
@@ -773,6 +795,7 @@ CACollectionViewCell* CACollectionViewCell::create(const std::string& reuseIdent
 bool CACollectionViewCell::initWithReuseIdentifier(const std::string& reuseIdentifier)
 {
     m_pContentView = new CAView();
+    m_pContentView->setLayout(DLayoutFill);
     this->addSubview(m_pContentView);
     
 	this->setBackgroundView(CAView::create());
@@ -784,29 +807,19 @@ bool CACollectionViewCell::initWithReuseIdentifier(const std::string& reuseIdent
 
 void CACollectionViewCell::setBackgroundView(CrossApp::CAView *var)
 {
+    CC_RETURN_IF(var == m_pBackgroundView);
+    m_pContentView->removeSubview(m_pBackgroundView);
 	CC_SAFE_RETAIN(var);
-	this->removeSubview(m_pBackgroundView);
 	CC_SAFE_RELEASE(m_pBackgroundView);
 	m_pBackgroundView = var;
 	CC_RETURN_IF(m_pBackgroundView == NULL);
-	m_pBackgroundView->setFrame(this->getBounds());
-	this->insertSubview(m_pBackgroundView, -1);
+    m_pBackgroundView->setLayout(DLayoutFill);
+	m_pContentView->insertSubview(m_pBackgroundView, -1);
 }
 
 CAView* CACollectionViewCell::getBackgroundView()
 {
 	return m_pBackgroundView;
-}
-
-void CACollectionViewCell::setContentSize(const CrossApp::DSize &var)
-{
-	CAView::setContentSize(var);
-    
-    m_pContentView->setFrame(this->getBounds());
-    if (m_pBackgroundView)
-    {
-        m_pBackgroundView->setFrame(m_pContentView->getBounds());
-    }
 }
 
 void CACollectionViewCell::setControlState(const CAControlState& var)
@@ -871,8 +884,8 @@ void CACollectionViewCell::resetCollectionViewCell()
 	this->setVisible(true);
 	this->normalCollectionViewCell();
 	this->recoveryCollectionViewCell();
+    m_pContentView->setLayout(DLayoutFill);
     m_pContentView->setScale(1.0f);
-    m_pContentView->setFrame(this->getBounds());
     m_pContentView->setRotation(0);
 }
 

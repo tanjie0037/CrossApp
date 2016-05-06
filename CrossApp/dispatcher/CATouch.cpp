@@ -6,6 +6,17 @@
 
 NS_CC_BEGIN
 
+CATouch::CATouch()
+: m_nId(0)
+,m_startPointCaptured(false)
+,m_bDelta(false)
+,m_startPoint(DPoint(FLOAT_NONE, FLOAT_NONE))
+,m_point(DPoint(FLOAT_NONE, FLOAT_NONE))
+,m_prevPoint(DPoint(FLOAT_NONE, FLOAT_NONE))
+{
+
+}
+
 // returns the current touch location in OpenGL coordinates
 DPoint CATouch::getLocation() const
 { 
@@ -43,7 +54,7 @@ bool CATouch::isDelta() const
 void CATouch::setTouchInfo(int id, float x, float y)
 {
     m_nId = id;
-    m_prevPoint = m_point.equals(DPoint(0xffffffff, 0xffffffff)) ? DPoint(x, y) : m_point;
+    m_prevPoint = m_point.equals(DPoint(FLOAT_NONE, FLOAT_NONE)) ? DPoint(x, y) : m_point;
     m_point.x   = x;
     m_point.y   = y;
     if (!m_startPointCaptured)

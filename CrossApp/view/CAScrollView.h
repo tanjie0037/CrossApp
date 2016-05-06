@@ -71,6 +71,8 @@ public:
     
     static CAScrollView* createWithCenter(const DRect& rect);
     
+    static CAScrollView* createWithLayout(const DLayout& layout);
+    
     virtual bool init();
 
     virtual void addSubview(CAView* subview);
@@ -193,7 +195,7 @@ protected:
     
     void closeToPoint(float dt, float now, float total);
     
-    void updateIndicator();
+    void initIndicator();
     
     void showIndicator();
     
@@ -209,7 +211,7 @@ protected:
     
     bool isFooterRefreshing();
     
-    void setContainerFrame(const DPoint& point, const DSize& size = DSizeZero);
+    void setContainerPoint(const DPoint& point, const DSize& size = DSizeZero);
     
     virtual void setContentSize(const DSize& var);
     
@@ -271,7 +273,7 @@ public:
     
     typedef enum
     {
-        CAIndicatorTypeHorizontal,
+        CAIndicatorTypeHorizontal = 0,
         CAIndicatorTypeVertical
     }
     CAIndicatorType;

@@ -14,6 +14,7 @@ basics/CAApplication.cpp \
 basics/CAAutoreleasePool.cpp \
 basics/CACamera.cpp \
 basics/CAGeometry.cpp \
+basics/CALayout.cpp \
 basics/CAObject.cpp \
 basics/CAResponder.cpp \
 basics/CAScheduler.cpp \
@@ -36,6 +37,7 @@ control/CAStepper.cpp \
 controller/CABarItem.cpp \
 controller/CAViewController.cpp \
 controller/CADrawerController.cpp \
+controller/CAFont.cpp \
 dispatcher/CAKeypadDelegate.cpp \
 dispatcher/CAKeypadDispatcher.cpp \
 dispatcher/CATouchDispatcher.cpp \
@@ -105,11 +107,11 @@ view/CADatePickerView.cpp \
 view/CAActivityIndicatorView.cpp \
 view/CAPullToRefreshView.cpp \
 view/CATextEditHelper.cpp \
-view/CALabelStyle.cpp \
 view/CAWebView.cpp \
 view/CADrawView.cpp \
 view/CADrawingPrimitives.cpp \
 view/CAGifView.cpp \
+view/CARichLabel.cpp \
 kazmath/src/aabb.c \
 kazmath/src/mat3.c \
 kazmath/src/mat4.c \
@@ -127,6 +129,7 @@ platform/CCSAXParser.cpp \
 platform/CCFileUtils.cpp \
 platform/platform.cpp \
 platform/CAFreeTypeFont.cpp \
+platform/CAFTRichFont.cpp \
 platform/CAEmojiFont.cpp \
 platform/CAFTFontCache.cpp \
 platform/CCEGLViewProtocol.cpp \
@@ -141,12 +144,12 @@ platform/android/CAWebViewImpl.cpp \
 platform/android/CATextField.cpp \
 platform/android/CATextView.cpp \
 platform/android/CAClipboard.cpp \
-platform/android/jni/Java_org_cocos2dx_lib_Cocos2dxHelper.cpp \
-platform/android/jni/Java_org_cocos2dx_lib_Cocos2dxRenderer.cpp \
-platform/android/jni/Java_org_cocos2dx_lib_Cocos2dxAccelerometer.cpp \
+platform/android/jni/Java_org_CrossApp_lib_CrossAppHelper.cpp \
+platform/android/jni/Java_org_CrossApp_lib_CrossAppRenderer.cpp \
+platform/android/jni/Java_org_CrossApp_lib_CrossAppAccelerometer.cpp \
 platform/android/jni/JniHelper.cpp \
 platform/android/jni/TouchesJni.cpp \
-platform/android/jni/Java_org_cocos2dx_lib_Cocos2dxSDL.cpp \
+platform/android/jni/Java_org_CrossApp_lib_CrossAppSDL.cpp \
 script_support/JSViewController.cpp \
 script_support/CCScriptSupport.cpp \
 

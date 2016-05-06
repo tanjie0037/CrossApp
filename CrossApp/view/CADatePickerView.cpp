@@ -64,6 +64,16 @@ CADatePickerView* CADatePickerView::createWithCenter(const DRect& rect,const CAD
     return view;
 }
 
+CADatePickerView* CADatePickerView::createWithLayout(const CrossApp::DLayout &layout, const CADatePickerMode &m_mode)
+{
+    CADatePickerView* view = new CADatePickerView(m_mode);
+    if (view && view->initWithLayout(layout)) {
+        view->autorelease();
+    } else {
+        CC_SAFE_DELETE(view);
+    }
+    return view;
+}
 
 bool CADatePickerView::init()
 {
@@ -71,12 +81,10 @@ bool CADatePickerView::init()
         return false;
     }
     m_pPickerView = new CAPickerView();
-    m_pPickerView->initWithFrame(this->getBounds());
-    m_pPickerView->setPickerViewDelegate(this);
-    m_pPickerView->setPickerViewDataSource(this);
+    m_pPickerView->initWithLayout(DLayoutFill);
     m_pPickerView->setFontSizeNormal(40);
     m_pPickerView->setFontSizeSelected(40);
-    addSubview(m_pPickerView);
+    this->addSubview(m_pPickerView);
     
     struct timeval tp = {0};
     gettimeofday(&tp,  NULL);
@@ -97,34 +105,6 @@ void CADatePickerView::onEnter()
 void CADatePickerView::onExit()
 {
     CAControl::onExit();
-}
-
-void CADatePickerView::visit()
-{
-    CAControl::visit();
-}
-
-
-bool CADatePickerView::initWithFrame(const DRect& rect)
-{
-    if (CAControl::initWithFrame(rect) && m_pPickerView)
-    {
-        m_pPickerView->initWithFrame(this->getBounds());
-        return true;
-    }
-    
-    return false;
-}
-
-bool CADatePickerView::initWithCenter(const DRect& rect)
-{
-    if (CAControl::initWithCenter(rect) && m_pPickerView)
-    {
-        m_pPickerView->initWithFrame(this->getBounds());
-        return true;
-    }
-    
-    return false;
 }
 
 void CADatePickerView::setDate(int year, int month, int day, bool animated)
@@ -156,6 +136,8 @@ void CADatePickerView::setDate(int year, int month, int day, bool animated)
 
     if (m_pPickerView)
     {
+        m_pPickerView->setPickerViewDelegate(this);
+        m_pPickerView->setPickerViewDataSource(this);
         m_pPickerView->reloadAllComponents();
         switch (m_eMode)
         {
@@ -456,8 +438,10 @@ void CADatePickerView::didSelectRow(CAPickerView* pickerView, unsigned int row, 
 void CADatePickerView::setMode(CADatePickerMode mode)
 {
     m_eMode = mode;
-    CCLog("setMode m_tTM.tm_mon==%d",m_tTM.tm_mon);
+
     if (m_pPickerView) {
+        m_pPickerView->setPickerViewDelegate(this);
+        m_pPickerView->setPickerViewDataSource(this);
         m_pPickerView->reloadAllComponents();
         switch (m_eMode)
         {

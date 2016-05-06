@@ -400,7 +400,7 @@ CATextField::CATextField()
 , m_obLastPoint(DPoint(-0xffff, -0xffff))
 {
     this->setHaveNextResponder(false);
-    
+    this->setPoint(DPoint(-5000, -5000));
     CGPoint point = CGPointMake(-50000, -50000);
     m_pTextField = [[MACTextField alloc]initWithFrame:CGRectMake(point.x, point.y, 100, 40)];
     EAGLView * eaglview = [EAGLView sharedEGLView];
@@ -513,8 +513,7 @@ void CATextField::showImage()
     CAImage *image = CAImage::createWithImageDataNoCache(data, data_MAC.length);
     free(data);
     m_pImgeView->setImage(image);
-    
-    this->updateDraw();
+
     CAScheduler::unschedule(schedule_selector(CATextField::showImage), this);
 }
 
@@ -544,11 +543,26 @@ CATextField* CATextField::createWithCenter(const DRect& rect)
     return NULL;
 }
 
+CATextField* CATextField::createWithLayout(const DLayout& layout)
+{
+    CATextField* textField = new CATextField();
+    
+    if (textField && textField->initWithLayout(layout))
+    {
+        textField->autorelease();
+        return textField;
+    }
+    
+    CC_SAFE_DELETE(textField);
+    return NULL;
+}
+
 bool CATextField::init()
 {
     CAImage* image = CAImage::create("source_material/textField_bg.png");
     DRect capInsets = DRect(image->getPixelsWide()/2 ,image->getPixelsHigh()/2 , 1, 1);
     m_pBackgroundView = CAScale9ImageView::createWithImage(image);
+    m_pBackgroundView->setLayout(DLayoutFill);
     m_pBackgroundView->setCapInsets(capInsets);
     this->insertSubview(m_pBackgroundView, -1);
     
@@ -592,22 +606,12 @@ void CATextField::setContentSize(const DSize& contentSize)
     size.height =  s_dip_to_px(worldContentSize.height) / scale;
     [textField_MAC setContentSize:size];
 
-    m_pBackgroundView->setFrame(this->getBounds());
     m_pImgeView->setFrame([textField_MAC getDRect]);
+    
+    this->showImage();
 }
 
 bool CATextField::ccTouchBegan(CATouch *pTouch, CAEvent *pEvent)
-{
-    
-    return true;
-}
-
-void CATextField::ccTouchMoved(CATouch *pTouch, CAEvent *pEvent)
-{
-    
-}
-
-void CATextField::ccTouchEnded(CATouch *pTouch, CAEvent *pEvent)
 {
     DPoint point = this->convertTouchToNodeSpace(pTouch);
     
@@ -619,7 +623,17 @@ void CATextField::ccTouchEnded(CATouch *pTouch, CAEvent *pEvent)
     {
         resignFirstResponder();
     }
+    return true;
+}
+
+void CATextField::ccTouchMoved(CATouch *pTouch, CAEvent *pEvent)
+{
     
+}
+
+void CATextField::ccTouchEnded(CATouch *pTouch, CAEvent *pEvent)
+{
+   
 }
 
 void CATextField::ccTouchCancelled(CATouch *pTouch, CAEvent *pEvent)
@@ -677,7 +691,7 @@ void CATextField::setPlaceHolderColor(const CAColor4B &var)
     
     m_cPlaceHdolderColor = var;
     
-    NSColor* color = [NSColor colorWithRed:var.r/255.f green:var.g/255.f blue:var.b/255.f alpha:var.a];
+//    NSColor* color = [NSColor colorWithRed:var.r/255.f green:var.g/255.f blue:var.b/255.f alpha:var.a];
 //    [textField_MAC setValue:color forKeyPath:@"_placeholderLabel.textColor"];
     CGFloat scale = MAC_SCALE;
     textField_MAC.font = [NSFont systemFontOfSize:s_dip_to_px(m_iFontSize) / scale];
@@ -783,15 +797,20 @@ void CATextField::setMarginImageLeft(const DSize& imgSize,const std::string& fil
     setMarginLeft(imgSize.width);
     
     //setimage
-    CAImageView* ima = (CAImageView*)this->getSubviewByTag(1010);
-    if (!ima)
+    CAImageView* leftMarginView = (CAImageView*)this->getSubviewByTag(1010);
+    if (!leftMarginView)
     {
-        ima = CAImageView::create();
-        ima->setTag(1010);
-        this->addSubview(ima);
+        leftMarginView = CAImageView::create();
+        leftMarginView->setTag(1010);
+        this->addSubview(leftMarginView);
     }
-    ima->setCenter(DRect(imgSize.width / 2, m_obContentSize.height / 2, imgSize.width, imgSize.height));
-    ima->setImage(CAImage::create(filePath));
+    DLayout layout;
+    layout.horizontal.left = 0;
+    layout.horizontal.width = imgSize.width;
+    layout.vertical.height = imgSize.height;
+    layout.vertical.center = 0.5f;
+    leftMarginView->setLayout(layout);
+    leftMarginView->setImage(CAImage::create(filePath));
 }
 
 void CATextField::setMarginImageRight(const DSize& imgSize,const std::string& filePath)
@@ -808,8 +827,13 @@ void CATextField::setMarginImageRight(const DSize& imgSize,const std::string& fi
         rightMarginView->setTag(1011);
         this->addSubview(rightMarginView);
     }
-    rightMarginView->setCenter(DRect(m_obContentSize.width - imgSize.width / 2, m_obContentSize.height / 2, imgSize.width, imgSize.height));
-    rightMarginView->setImageSize(rightMarginView->getBounds().size);
+    DLayout layout;
+    layout.horizontal.right = 0;
+    layout.horizontal.width = imgSize.width;
+    layout.vertical.height = imgSize.height;
+    layout.vertical.center = 0.5f;
+    rightMarginView->setLayout(layout);
+    rightMarginView->setImageSize(imgSize);
     rightMarginView->setImageForState(CAControlStateAll, CAImage::create(filePath));
 }
 

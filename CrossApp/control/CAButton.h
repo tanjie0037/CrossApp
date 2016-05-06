@@ -43,6 +43,8 @@ public:
     
     static CAButton* createWithCenter(const DRect& rect, const CAButtonType& buttonType);
     
+    static CAButton* createWithLayout(const DLayout& layout, const CAButtonType& buttonType);
+    
 public:
     
     virtual bool init();

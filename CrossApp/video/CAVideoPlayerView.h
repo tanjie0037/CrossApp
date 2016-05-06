@@ -40,9 +40,12 @@ public:
 	static CAVideoPlayerView* create();
 	static CAVideoPlayerView* createWithFrame(const DRect& rect);
 	static CAVideoPlayerView* createWithCenter(const DRect& rect);
-
-	void initWithPath(const std::string& szPath, bool showFirstFrame = true);
-	void initWithUrl(const std::string& szUrl, bool showFirstFrame = true);
+    static CAVideoPlayerView* createWithLayout(const DLayout& layout);
+    
+	void setFullPath(const std::string& szPath, bool showFirstFrame = true);
+	void setUrl(const std::string& szUrl, bool showFirstFrame = true);
+	bool isDecoderInited() { return (m_iDecoderInited==1); }
+	bool isWaitSetPos() { return m_isSetPosWaiting; }
 	void play();
 	void pause();
 	bool isPlaying();
@@ -51,6 +54,7 @@ public:
 	float getPosition();
 	void setPosition(float position);
 	void setFirstVideoFrame();
+	
 
 	CC_SYNTHESIZE(CAVideoPlayerViewDelegate*, m_pPlayerViewDelegate, PlayerViewDelegate);
 
@@ -58,11 +62,13 @@ private:
 	virtual bool init();
 	virtual void visit();
 	virtual void draw();
+	virtual void update(float fDelta);
 	virtual void setContentSize(const DSize& size);
 	virtual void setImageCoords(DRect rect);
 	virtual void updateImageRect();
 
 	void showLoadingView(bool on);
+	void createDecoderSync();
 	bool createDecoder();
 	static bool decodeProcessThread(void* param);
 	void setVPPosition(float p);
@@ -87,8 +93,11 @@ private:
 
 	std::string m_cszPath;
 
+	int m_iDecoderInited;
+	bool m_isShowFirstFrame;
 	bool m_isPlaying;
 	bool m_isBuffered;
+	bool m_isSetPosWaiting;
 
 	float m_fMinBufferedDuration;
 	float m_fMaxBufferedDuration;

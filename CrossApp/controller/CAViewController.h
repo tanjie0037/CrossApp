@@ -36,7 +36,7 @@ public:
     
     virtual bool init();
     
-    const char* getNibName();
+    std::string getNibName();
     
     CC_SYNTHESIZE_PASS_BY_REF(std::string, m_sTitle, Title);
     
@@ -94,8 +94,6 @@ public:
     
     virtual void viewDidDisappear() {};
     
-    virtual void reshapeViewRectDidFinish() {};
-    
     virtual void keyBackClicked() {};
     
     virtual void keyMenuClicked() {};
@@ -105,8 +103,6 @@ public:
     virtual void removeViewFromSuperview();
     
 private:
-    
-    void getSuperViewRect(const DRect& rect);
     
     void viewOnEnterTransitionDidFinish();
     
@@ -200,13 +196,9 @@ protected:
     
     virtual void viewDidDisappear();
     
-    virtual void reshapeViewRectDidFinish();
-    
 protected:
     
-    void createWithContainer(CAViewController* viewController);
-    
-    void layoutNewContainer();
+    void createWithContainer(CAViewController* viewController, const DLayout& layout);
     
     void popBack();
     
@@ -226,11 +218,7 @@ protected:
 
     void update(float dt);
     
-    DPoint getNavigationBarOpenPoint();
-    
-    DPoint getNavigationBarTakeBackPoint();
-    
-    DPoint getNavigationBarNowPoint(CAViewController* viewController);
+    int getNavigationBarNowY(CAViewController* viewController);
     
 protected:
 
@@ -246,7 +234,7 @@ protected:
     
     bool m_bPopViewController;
 
-    DSize m_tNavigationBarSize;
+    int m_iNavigationBarHeight;
     
     bool m_bClearance;
 };
@@ -315,8 +303,6 @@ protected:
     
     virtual void viewDidDisappear();
     
-    virtual void reshapeViewRectDidFinish();
-    
 protected:
     
     virtual void tabBarSelectedItem(CATabBar* tabBar, CATabBarItem* item, unsigned int index);
@@ -331,11 +317,7 @@ protected:
     
     void tabBarHiddenAnimation(float delay, float now, float total);
     
-    DPoint getTabBarOpenPoint();
-    
-    DPoint getTabBarTakeBackPoint();
-    
-    DPoint getTabBarNowPoint();
+    int getTabBarNowY();
     
 protected:
     

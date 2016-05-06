@@ -11,8 +11,9 @@
 
 #include <iostream>
 #include "ccMacros.h"
-#include "shaders/CATransformation.h"
 #include "CCGL.h"
+#include "shaders/CATransformation.h"
+#include "basics/CALayout.h"
 #include "shaders/ccGLStateCache.h"
 #include "shaders/CAGLProgram.h"
 #include "kazmath/kazmath.h"
@@ -20,6 +21,7 @@
 #include "platform/CCAccelerometerDelegate.h"
 #include "basics/CAResponder.h"
 #include "images/CAImageCache.h"
+
 
 #ifdef EMSCRIPTEN
 #include "base_nodes/CCGLBufferedNode.h"
@@ -35,6 +37,7 @@ class CCComponent;
 class CAImage;
 class CAContentContainer;
 class CABatchView;
+class CAScrollView;
 class CAViewAnimation;
 struct transformValues_;
 
@@ -79,6 +82,10 @@ public:
     
     static CAView* createWithCenter(const DRect& rect, const CAColor4B& color4B);
     
+    static CAView* createWithLayout(const DLayout& layout);
+    
+    static CAView* createWithLayout(const DLayout& layout, const CAColor4B& color4B);
+    
     static CAView* createWithColor(const CAColor4B& color4B);
     
     CAView();
@@ -89,11 +96,9 @@ public:
 
     virtual bool initWithFrame(const DRect& rect);
     
-    virtual bool initWithFrame(const DRect& rect, const CAColor4B& color4B);
-    
     virtual bool initWithCenter(const DRect& rect);
     
-    virtual bool initWithCenter(const DRect& rect, const CAColor4B& color4B);
+    virtual bool initWithLayout(const DLayout& layout);
     
     virtual bool initWithColor(const CAColor4B& color4B);
 
@@ -141,11 +146,11 @@ public:
     
     virtual void setFrame(const DRect& rect);
     
-    virtual const DRect& getFrame() const;
+    virtual DRect getFrame() const;
     
     virtual void setFrameOrigin(const DPoint& point);
     
-    virtual const DPoint& getFrameOrigin();
+    virtual DPoint getFrameOrigin();
     
     virtual void setCenter(const DRect& rect);
     
@@ -159,6 +164,10 @@ public:
     
     virtual DPoint getCenterOrigin();
 
+    virtual void setLayout(const DLayout& layout);
+    
+    const DLayout& getLayout();
+    
     virtual void setVisible(bool visible);
 
     virtual bool isVisible();
@@ -289,7 +298,7 @@ public:
 
     virtual void update(float fDelta);
     
-    void reViewlayout();
+    virtual void reViewlayout(const DSize& contentSize, bool allowAnimation = false);
     
     inline void setBlendFunc(ccBlendFunc blendFunc) { m_sBlendFunc = blendFunc; }
     
@@ -360,10 +369,10 @@ protected:
     virtual void updateImageRect();
     
 protected:
-
+ 
     CC_SYNTHESIZE(CAContentContainer*, m_pContentContainer, ContentContainer);
     
-    CC_SYNTHESIZE_IS_READONLY(bool, m_bFrame, Frame);
+    CC_SYNTHESIZE_READONLY(int, m_eLayoutType, LayoutType);
     
     CC_SYNTHESIZE_READONLY(CABatchView*, m_pobBatchView, Batch);
     
@@ -387,7 +396,7 @@ protected:
     
     DSize m_obContentSize;             ///< untransformed size of the node
     
-    DRect m_obFrameRect;
+    DLayout m_obLayout;
     
     CATransformation m_sAdditionalTransform; ///< transform
     CATransformation m_sTransform;     ///< transform
@@ -447,6 +456,8 @@ protected:
     
     CAImage*       m_pobImage;            /// CAImage object that is used to render the sprite
     
+    friend class CAScrollView;
+    
     friend class CAViewAnimation;
 };
 
@@ -455,8 +466,6 @@ class CC_DLL CAContentContainer: public CAResponder
 public:
     
     virtual ~CAContentContainer(){};
-    
-    virtual void getSuperViewRect(const DRect& rect) = 0;
     
     virtual void viewOnEnterTransitionDidFinish() = 0;
     

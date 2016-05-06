@@ -29,11 +29,8 @@
     [self.view setBackgroundColor:[UIColor whiteColor]];
     
     CGRect rect = [[UIScreen mainScreen] bounds];
-    //CGFloat scale = [[UIScreen mainScreen] scale];
-    
-    NSLog(@"%f", rect.size.width);
 
-        EAGLView *__glView = [EAGLView viewWithFrame: rect
+    __glView = [EAGLView viewWithFrame: rect
                                      pixelFormat: kEAGLColorFormatRGB565
                                      depthFormat: GL_DEPTH24_STENCIL8_OES
                               preserveBackbuffer: NO
@@ -42,7 +39,7 @@
                                  numberOfSamples: 0];
     [__glView setMultipleTouchEnabled:YES];
     [self.view addSubview:__glView];
-
+    
 
 //    NSString *path=@"System/Library/Fonts"; // 要列出来的目录
 //    
@@ -67,11 +64,10 @@
 //    }
 }
 
-
 // Override to allow orientations other than the default portrait orientation.
 // This method is deprecated on ios6
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation {
-    return UIInterfaceOrientationIsPortrait( interfaceOrientation );
+    return ((interfaceOrientation) == UIInterfaceOrientationPortrait || (interfaceOrientation) == UIInterfaceOrientationPortraitUpsideDown  ||  (interfaceOrientation) == UIInterfaceOrientationLandscapeLeft || (interfaceOrientation) == UIInterfaceOrientationLandscapeRight);
     //return UIInterfaceOrientationIsLandscape( interfaceOrientation );
 }
 
@@ -79,14 +75,14 @@
 - (NSUInteger) supportedInterfaceOrientations{
     
 #ifdef __IPHONE_6_0
-    return UIInterfaceOrientationMaskPortrait;
+    return UIInterfaceOrientationMaskAll;
     //return UIInterfaceOrientationMaskLandscapeRight;
 #endif
 }
 
 - (UIInterfaceOrientation)preferredInterfaceOrientationForPresentation
 {
-    return UIInterfaceOrientationPortrait;
+    return UIInterfaceOrientationUnknown;
     //return UIInterfaceOrientationLandscapeRight;
 }
 

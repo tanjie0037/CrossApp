@@ -4,6 +4,7 @@
 #include "basics/CAApplication.h"
 #include "cocoa/CCSet.h"
 #include "platform/CADensityDpi.h"
+#include "support/CANotificationCenter.h"
 
 NS_CC_BEGIN
 
@@ -45,6 +46,7 @@ static void removeUsedIndexBit(int index)
 CCEGLViewProtocol::CCEGLViewProtocol()
 : m_pDelegate(NULL)
 , m_fScale(1.0f)
+, m_eOrientation(CAInterfaceOrientationUnknown)
 {
 }
 
@@ -73,6 +75,8 @@ void CCEGLViewProtocol::setFrameSize(float width, float height)
     m_fScale = s_dip_to_px(1.0f);
     
     m_obViewPortRect.setRect(0, 0, m_obScreenSize.width, m_obScreenSize.height);
+    
+    CAApplication::getApplication()->reshapeProjection(m_obDesignResolutionSize);
 }
 
 DSize  CCEGLViewProtocol::getVisibleSize() const
@@ -339,5 +343,23 @@ float CCEGLViewProtocol::getScale() const
     return m_fScale;
 }
 
+void CCEGLViewProtocol::setStatusBarOrientation(const CAInterfaceOrientation& var)
+{
+    CC_RETURN_IF(m_eOrientation == var);
+    if (m_eOrientation == CAInterfaceOrientationUnknown)
+    {
+        m_eOrientation = var;
+    }
+    else
+    {
+        m_eOrientation = var;
+        CANotificationCenter::sharedNotificationCenter()->postNotification(CAApplicationDidChangeStatusBarOrientationNotification, NULL);
+    }
+}
+
+const CAInterfaceOrientation& CCEGLViewProtocol::getStatusBarOrientation()
+{
+    return m_eOrientation;
+}
 
 NS_CC_END

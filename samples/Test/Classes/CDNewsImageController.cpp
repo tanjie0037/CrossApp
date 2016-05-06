@@ -20,12 +20,11 @@ CDNewsImageTableCell::~CDNewsImageTableCell()
     
 }
 
-CDNewsImageTableCell* CDNewsImageTableCell::create(const std::string& identifier, const DRect& _rect)
+CDNewsImageTableCell* CDNewsImageTableCell::create(const std::string& identifier)
 {
     CDNewsImageTableCell* tableViewCell = new CDNewsImageTableCell();
     if(tableViewCell&&tableViewCell->initWithReuseIdentifier(identifier))
     {
-        tableViewCell->setFrame(_rect);
         tableViewCell->autorelease();
         return tableViewCell;
     }
@@ -45,23 +44,16 @@ void CDNewsImageTableCell::selectedTableViewCell()
 void CDNewsImageTableCell::initWithCell(int num)
 {
     cell_tag = CCRANDOM_0_1()*4+1;
-    DSize _size = this->getFrame().size;
-    CALabel* test = CALabel::createWithFrame(DRect(40,
-                                                       _size.height-150,
-                                                       _size.width-90,
-                                                       40));
+    CALabel* test = CALabel::createWithLayout(DLayout(DHorizontalLayout_L_R(40, 90), DVerticalLayout_B_H(100, 40)));
 	test->setColor(CAColor_black);
     test->setTextAlignment(CATextAlignmentLeft);
     test->setVerticalTextAlignmet(CAVerticalTextAlignmentTop);
     test->setFontSize(32);
     test->setBold(true);
     test->setTag(100);
-    this->addSubview(test);
+    this->getContentView()->addSubview(test);
     
-    CALabel* dsc = CALabel::createWithFrame(DRect(40,
-                                                      _size.height-90,
-                                                      _size.width-90,
-                                                      70));
+    CALabel* dsc = CALabel::createWithLayout(DLayout(DHorizontalLayout_L_R(40, 40), DVerticalLayout_B_H(15, 80)));
 	dsc->setColor(CAColor_black);
     dsc->setTextAlignment(CATextAlignmentLeft);
     dsc->setVerticalTextAlignmet(CAVerticalTextAlignmentTop);
@@ -69,28 +61,26 @@ void CDNewsImageTableCell::initWithCell(int num)
 
     dsc->setTag(101);
 	dsc->setColor(ccc4(200, 200, 200, 255));
-    this->addSubview(dsc);
+    this->getContentView()->addSubview(dsc);
     
-    CommonUrlImageView* temImage = CommonUrlImageView::createWithFrame(DRect(0,5,_size.width,_size.height-180));
-    temImage->setTag(200);
-    temImage->setImageViewScaleType(CAImageViewScaleTypeFitImageCrop);
+    m_pImage1 = CommonUrlImageView::createWithLayout(DLayout(DHorizontalLayout_L_R(0, 0), DVerticalLayout_T_B(5, 150)));
+    m_pImage1->setImageViewScaleType(CAImageViewScaleTypeFitImageCrop);
     
-    CommonUrlImageView* temImage1 = CommonUrlImageView::createWithFrame(DRect(0,5,_size.width,_size.height-180));
-    temImage1->setTag(201);
-    temImage1->setImageViewScaleType(CAImageViewScaleTypeFitImageCrop);
+    m_pImage2 = CommonUrlImageView::createWithLayout(DLayout(DHorizontalLayout_L_R(0, 0), DVerticalLayout_T_B(5, 150)));
+    m_pImage2->setImageViewScaleType(CAImageViewScaleTypeFitImageCrop);
     
-    CommonUrlImageView* temImage2 = CommonUrlImageView::createWithFrame(DRect(0,5,_size.width,_size.height-180));
-    temImage2->setTag(202);
-    temImage2->setImageViewScaleType(CAImageViewScaleTypeFitImageCrop);
+    m_pImage3 = CommonUrlImageView::createWithLayout(DLayout(DHorizontalLayout_L_R(0, 0), DVerticalLayout_T_B(5, 150)));
+    m_pImage3->setImageViewScaleType(CAImageViewScaleTypeFitImageCrop);
     
-    CommonUrlImageView* temImage3 = CommonUrlImageView::createWithFrame(DRect(0,5,_size.width,_size.height-180));
-    temImage3->setTag(203);
-    temImage3->setImageViewScaleType(CAImageViewScaleTypeFitImageCrop);
+    m_pImage4 = CommonUrlImageView::createWithLayout(DLayout(DHorizontalLayout_L_R(0, 0), DVerticalLayout_T_B(5, 150)));
+    m_pImage4->setImageViewScaleType(CAImageViewScaleTypeFitImageCrop);
     
-    this->addSubview(temImage);
-    this->addSubview(temImage1);
-    this->addSubview(temImage2);
-    this->addSubview(temImage3);
+    CAView* view = CAView::createWithLayout(DLayout(DHorizontalLayoutFill, DVerticalLayout_T_B(3, 148)), CAColor_clear);
+    view->addSubview(m_pImage1);
+    view->addSubview(m_pImage2);
+    view->addSubview(m_pImage3);
+    view->addSubview(m_pImage4);
+    this->getContentView()->addSubview(view);
 }
 
 CDNewsImageController::CDNewsImageController(int index)
@@ -129,6 +119,7 @@ string CDNewsImageController::getSign(std::map<std::string,std::string> key_valu
 
 void CDNewsImageController::viewDidLoad()
 {
+    CCLog("NewsImageController");
     winSize = this->getView()->getBounds().size;
     m_ImageMsg.clear();
     m_ImageNum.clear();
@@ -146,13 +137,13 @@ void CDNewsImageController::viewDidLoad()
         key_value["appid"]="10000";
         key_value["sign_method"]="md5";
         string tempSign = getSign(key_value);
-        CCLog("sign===%s",tempSign.c_str());
+        CCLog("sign===%s",tempSign.c_str()); 
         key_value["sign"] = tempSign;
         string tempUrl = "http://api.9miao.com/newsgirlpic/";
         CommonHttpManager::getInstance()->send_get(tempUrl, key_value, this,
                                                    CommonHttpJson_selector(CDNewsImageController::onRequestFinished));
         {
-            p_pLoading = CAActivityIndicatorView::createWithCenter(DRect(winSize.width/2,winSize.height/2,50,50));
+            p_pLoading = CAActivityIndicatorView::createWithLayout(DLayout(DHorizontalLayout_W_C(50, 0.5), DVerticalLayout_H_C(0, 0.5)));
             this->getView()->insertSubview(p_pLoading, CAWindowZOderTop);
             p_pLoading->setLoadingMinTime(0.5f);
             p_pLoading->setTargetOnCancel(this, callfunc_selector(CDNewsImageController::initImageTableView));
@@ -175,13 +166,13 @@ void CDNewsImageController::initImageTableView()
         this->getView()->removeSubview(p_TableView);
         p_TableView = NULL;
     }
-    p_TableView= CATableView::createWithFrame(DRect(0, 0, winSize.width, winSize.height));
+    p_TableView= CATableView::createWithLayout(DLayoutFill);
     p_TableView->setTableViewDataSource(this);
     p_TableView->setTableViewDelegate(this);
     p_TableView->setAllowsSelection(true);
     p_TableView->setScrollViewDelegate(this);
     p_TableView->setAllowsMultipleSelection(false);
-    p_TableView->setSeparatorViewHeight(40);
+    p_TableView->setSeparatorViewHeight(10);
     p_TableView->setSeparatorColor(ccc4(240,240,240,255));
     this->getView()->addSubview(p_TableView);
     CAPullToRefreshView *refreshDiscount = CAPullToRefreshView::create(CAPullToRefreshView::CAPullToRefreshTypeFooter);
@@ -197,23 +188,20 @@ void CDNewsImageController::showAlert()
     p_alertView = CAView::createWithFrame(this->getView()->getBounds());
     this->getView()->addSubview(p_alertView);
     
-    CAImageView* bg = CAImageView::createWithFrame(DRect(0,0,winSize.width,winSize.height));
+    CAImageView* bg = CAImageView::createWithLayout(DLayoutFill);
     bg->setImageViewScaleType(CAImageViewScaleTypeFitImageCrop);
     bg->setImage(CAImage::create("image/HelloWorld.png"));
     
     CAButton* btn5 = CAButton::create(CAButtonTypeSquareRect);
     btn5->setTag(100);
-    btn5->setCenter(DRect(winSize.width/2, winSize.height/2, winSize.width, winSize.height));
+    btn5->setLayout(DLayout(DHorizontalLayout_L_R(0, 0), DVerticalLayout_T_B(0, 0)));
     btn5->setTitleColorForState(CAControlStateNormal,CAColor_white);
     btn5->setBackgroundViewForState(CAControlStateNormal, bg);
     btn5->setBackgroundViewForState(CAControlStateHighlighted, bg);
     btn5->addTarget(this, CAControl_selector(CDNewsImageController::buttonCallBack), CAControlEventTouchUpInSide);
     p_alertView->addSubview(btn5);
     
-    CALabel* test = CALabel::createWithCenter(DRect(winSize.width/2,
-                                                        winSize.height-100,
-                                                        winSize.width,
-                                                        40));
+    CALabel* test = CALabel::createWithLayout(DLayout(DHorizontalLayout_L_C(0, 0.5), DVerticalLayout_H_C(40, 0.1)));
 	test->setColor(CAColor_gray);
     test->setTextAlignment(CATextAlignmentCenter);
     test->setVerticalTextAlignmet(CAVerticalTextAlignmentTop);
@@ -238,13 +226,13 @@ void CDNewsImageController::buttonCallBack(CAControl* btn,DPoint point)
     key_value["appid"]="10000";
     key_value["sign_method"]="md5";
     string tempSign = getSign(key_value);
-    CCLog("sign===%s",tempSign.c_str());
+    CCLog("sign===%s",tempSign.c_str()); 
     key_value["sign"] = tempSign;
     string tempUrl = "http://api.9miao.com/newsgirlpic/";
     CommonHttpManager::getInstance()->send_get(tempUrl, key_value, this,
                                                CommonHttpJson_selector(CDNewsImageController::onRequestFinished));
     {
-        p_pLoading = CAActivityIndicatorView::createWithCenter(DRect(winSize.width/2,winSize.height/2,50,50));
+        p_pLoading = CAActivityIndicatorView::createWithLayout(DLayout(DHorizontalLayout_W_C(50, 0.5), DVerticalLayout_T_H(50, 0.5)));
         this->getView()->insertSubview(p_pLoading, CAWindowZOderTop);
         p_pLoading->setLoadingMinTime(0.5f);
         p_pLoading->setTargetOnCancel(this, callfunc_selector(CDNewsImageController::initImageTableView));
@@ -260,7 +248,7 @@ void CDNewsImageController::scrollViewHeaderBeginRefreshing(CrossApp::CAScrollVi
     key_value["appid"]="10000";
     key_value["sign_method"]="md5";
     string tempSign = getSign(key_value);
-    CCLog("sign===%s",tempSign.c_str());
+    CCLog("sign===%s",tempSign.c_str()); 
     key_value["sign"] = tempSign;
     string tempUrl = "http://api.9miao.com/newsgirlpic/";
     CommonHttpManager::getInstance()->send_get(tempUrl, key_value, this,
@@ -296,7 +284,7 @@ void CDNewsImageController::scrollViewStopMoved(CrossApp::CAScrollView *view)
         
         for (int i=0; i<img_num; i++)
         {
-            CommonUrlImageView* temImage = dynamic_cast<CommonUrlImageView*>(cell->getSubviewByTag(200 + i));
+            CommonUrlImageView* temImage = dynamic_cast<CommonUrlImageView*>(cell->getContentView()->getSubviewByTag(200 + i));
             if (temImage)
             {
                 temImage->setUrl(m_ImageMsg[row].m_imageUrl[1 + i]);
@@ -392,7 +380,7 @@ void CDNewsImageController::viewDidUnload()
 
 void CDNewsImageController::tableViewDidSelectRowAtIndexPath(CATableView* table, unsigned int section, unsigned int row)
 {
-    //CCLog("title====%d",(int)getRandNum());
+    CCLog("title====%d",(int)getRandNum());
     CDShowNewsImage* _controller = new CDShowNewsImage();
     _controller->init();
     _controller->setTitle(" ");
@@ -410,130 +398,87 @@ void CDNewsImageController::tableViewDidDeselectRowAtIndexPath(CATableView* tabl
 
 CATableViewCell* CDNewsImageController::tableCellAtIndex(CATableView* table, const DSize& cellSize, unsigned int section, unsigned int row)
 {
-    
-    DSize _size = cellSize;
     CDNewsImageTableCell* cell = dynamic_cast<CDNewsImageTableCell*>(table->dequeueReusableCellWithIdentifier("CrossApp"));
     if (cell == NULL)
     {
-        cell = CDNewsImageTableCell::create("CrossApp", DRect(0, 0, _size.width, _size.height));
+        cell = CDNewsImageTableCell::create("CrossApp");
         cell->initWithCell(1);
+
     }
-    CALabel* cellText = (CALabel*)cell->getSubviewByTag(100);
+    CALabel* cellText = (CALabel*)cell->getContentView()->getSubviewByTag(100);
     cellText->setText(m_ImageMsg[row].m_title);
     
-    CALabel* cellTextdsc = (CALabel*)cell->getSubviewByTag(101);
+    CALabel* cellTextdsc = (CALabel*)cell->getContentView()->getSubviewByTag(101);
     cellTextdsc->setText(m_ImageMsg[row].m_imageDesc[1]);
     
     int img_num = m_ImageNum[row];
     
     if (img_num==1)
     {
-        CommonUrlImageView* temImage = dynamic_cast<CommonUrlImageView*>(cell->getSubviewByTag(200));
-        if (temImage)
-        {
-            temImage->setVisible(true);
-            temImage->setFrame(DRect(0,5,_size.width,_size.height-180));
-            temImage->setImage(CAImage::create("image/HelloWorld.png"));
-            //temImage->setUrl(m_ImageMsg[row].m_imageUrl[1]);
-        }
-        CommonUrlImageView* temImage1 = dynamic_cast<CommonUrlImageView*>(cell->getSubviewByTag(201));
-        CommonUrlImageView* temImage2 = dynamic_cast<CommonUrlImageView*>(cell->getSubviewByTag(202));
-        CommonUrlImageView* temImage3 = dynamic_cast<CommonUrlImageView*>(cell->getSubviewByTag(203));
-        temImage1->setVisible(false);
-        temImage2->setVisible(false);
-        temImage3->setVisible(false);
+        cell->getImage1()->setVisible(true);
+        cell->getImage1()->setLayout(DLayout(DHorizontalLayout_L_C(1, 0.5), DVerticalLayout_T_C(1, 0.5)));
+        cell->getImage1()->setImage(CAImage::create("image/HelloWorld.png"));
+        cell->getImage1()->setUrl(m_ImageMsg[row].m_imageUrl[1]);
+        
+        cell->getImage2()->setVisible(false);
+        cell->getImage3()->setVisible(false);
+        cell->getImage4()->setVisible(false);
     }
     else if(img_num==2)
     {
-        CommonUrlImageView* temImage = dynamic_cast<CommonUrlImageView*>(cell->getSubviewByTag(200));
-        if (temImage)
-        {
-            temImage->setVisible(true);
-            temImage->setFrame(DRect(0,5,_size.width/2-1,_size.height-180));
-            temImage->setImage(CAImage::create("image/HelloWorld.png"));
-            //temImage->setUrl(m_ImageMsg[row].m_imageUrl[1]);
-        }
-        CommonUrlImageView* temImage1 = dynamic_cast<CommonUrlImageView*>(cell->getSubviewByTag(201));
-        if (temImage1)
-        {
-            temImage1->setVisible(true);
-            temImage1->setFrame(DRect(_size.width/2+1,5,_size.width/2,_size.height-180));
-            temImage1->setImage(CAImage::create("image/HelloWorld.png"));
-            //temImage1->setUrl(m_ImageMsg[row].m_imageUrl[2]);
-        }
-
-        CommonUrlImageView* temImage2 = dynamic_cast<CommonUrlImageView*>(cell->getSubviewByTag(202));
-        CommonUrlImageView* temImage3 = dynamic_cast<CommonUrlImageView*>(cell->getSubviewByTag(203));;
-        temImage2->setVisible(false);
-        temImage3->setVisible(false);
+        cell->getImage1()->setVisible(true);
+        cell->getImage1()->setLayout(DLayout(DHorizontalLayout_L_C(1, 0.25), DVerticalLayout_T_C(1, 0.5)));
+        cell->getImage1()->setImage(CAImage::create("image/HelloWorld.png"));
+        cell->getImage1()->setUrl(m_ImageMsg[row].m_imageUrl[1]);
+        
+        cell->getImage2()->setVisible(true);
+        cell->getImage2()->setLayout(DLayout(DHorizontalLayout_R_C(1, 0.75), DVerticalLayout_T_C(1, 0.5)));
+        cell->getImage2()->setImage(CAImage::create("image/HelloWorld.png"));
+        cell->getImage2()->setUrl(m_ImageMsg[row].m_imageUrl[2]);
+        
+        cell->getImage3()->setVisible(false);
+        cell->getImage4()->setVisible(false);
     }
     else if(img_num==3)
     {
-        CommonUrlImageView* temImage = dynamic_cast<CommonUrlImageView*>(cell->getSubviewByTag(200));
-        if (temImage)
-        {
-            temImage->setVisible(true);
-            temImage->setFrame(DRect(0,5,_size.width/2-1,_size.height-180));
-            temImage->setImage(CAImage::create("image/HelloWorld.png"));
-            //temImage->setUrl(m_ImageMsg[row].m_imageUrl[1]);
-        }
-        CommonUrlImageView* temImage1 = dynamic_cast<CommonUrlImageView*>(cell->getSubviewByTag(201));
-        if (temImage1)
-        {
-            temImage1->setVisible(true);
-            temImage1->setFrame(DRect(_size.width/2+1,5,_size.width/2,(_size.height-180)/2-1));
-            temImage1->setImage(CAImage::create("image/HelloWorld.png"));
-            //temImage1->setUrl(m_ImageMsg[row].m_imageUrl[2]);
-        }
+        cell->getImage1()->setVisible(true);
+        cell->getImage1()->setLayout(DLayout(DHorizontalLayout_L_C(1, 0.25), DVerticalLayout_T_C(1, 0.5)));
+        cell->getImage1()->setImage(CAImage::create("image/HelloWorld.png"));
+        cell->getImage1()->setUrl(m_ImageMsg[row].m_imageUrl[1]);
         
-        CommonUrlImageView* temImage2 = dynamic_cast<CommonUrlImageView*>(cell->getSubviewByTag(202));
-        if (temImage2)
-        {
-            temImage2->setVisible(true);
-            temImage2->setFrame(DRect(_size.width/2+1,5+(_size.height-180)/2+2,_size.width/2,(_size.height-180)/2));
-            temImage2->setImage(CAImage::create("image/HelloWorld.png"));
-            //temImage2->setUrl(m_ImageMsg[row].m_imageUrl[3]);
-        }
-        CommonUrlImageView* temImage3 = dynamic_cast<CommonUrlImageView*>(cell->getSubviewByTag(203));;
-        temImage3->setVisible(false);
+        cell->getImage2()->setVisible(true);
+        cell->getImage2()->setLayout(DLayout(DHorizontalLayout_R_C(1, 0.75), DVerticalLayout_T_C(1, 0.25)));
+        cell->getImage2()->setImage(CAImage::create("image/HelloWorld.png"));
+        cell->getImage2()->setUrl(m_ImageMsg[row].m_imageUrl[2]);
 
+        cell->getImage3()->setVisible(true);
+        cell->getImage3()->setLayout(DLayout(DHorizontalLayout_R_C(1, 0.75), DVerticalLayout_B_C(1, 0.75)));
+        cell->getImage3()->setImage(CAImage::create("image/HelloWorld.png"));
+        cell->getImage3()->setUrl(m_ImageMsg[row].m_imageUrl[3]);
+
+        cell->getImage4()->setVisible(false);
     }
     else if(img_num==4)
     {
-        CommonUrlImageView* temImage = dynamic_cast<CommonUrlImageView*>(cell->getSubviewByTag(200));
-        if (temImage)
-        {
-            temImage->setVisible(true);
-            temImage->setFrame(DRect(0,5,_size.width/2-1,(_size.height-180)/2-1));
-            temImage->setImage(CAImage::create("image/HelloWorld.png"));
-            //temImage->setUrl(m_ImageMsg[row].m_imageUrl[1]);
-        }
-        CommonUrlImageView* temImage1 = dynamic_cast<CommonUrlImageView*>(cell->getSubviewByTag(201));
-        if (temImage1)
-        {
-            temImage1->setVisible(true);
-            temImage1->setFrame(DRect(_size.width/2+1,5,_size.width/2,(_size.height-180)/2-1));
-            temImage1->setImage(CAImage::create("image/HelloWorld.png"));
-            //temImage1->setUrl(m_ImageMsg[row].m_imageUrl[2]);
-        }
+        cell->getImage1()->setVisible(true);
+        cell->getImage1()->setLayout(DLayout(DHorizontalLayout_L_C(1, 0.25), DVerticalLayout_T_C(1, 0.25)));
+        cell->getImage1()->setImage(CAImage::create("image/HelloWorld.png"));
+        cell->getImage1()->setUrl(m_ImageMsg[row].m_imageUrl[1]);
         
-        CommonUrlImageView* temImage2 = dynamic_cast<CommonUrlImageView*>(cell->getSubviewByTag(202));
-        if (temImage2)
-        {
-            temImage2->setVisible(true);
-            temImage2->setFrame(DRect(0,5+(_size.height-180)/2+2,_size.width/2-1,(_size.height-180)/2));
-            temImage2->setImage(CAImage::create("image/HelloWorld.png"));
-            //temImage2->setUrl(m_ImageMsg[row].m_imageUrl[3]);
-        }
-        
-        CommonUrlImageView* temImage3 = dynamic_cast<CommonUrlImageView*>(cell->getSubviewByTag(203));
-        if (temImage3)
-        {
-            temImage3->setVisible(true);
-            temImage3->setFrame(DRect(_size.width/2+1,5+(_size.height-180)/2+2,_size.width/2,(_size.height-180)/2));
-            temImage3->setImage(CAImage::create("image/HelloWorld.png"));
-            //temImage3->setUrl(m_ImageMsg[row].m_imageUrl[4]);
-        }
+        cell->getImage2()->setVisible(true);
+        cell->getImage2()->setLayout(DLayout(DHorizontalLayout_R_C(1, 0.75), DVerticalLayout_T_C(1, 0.25)));
+        cell->getImage2()->setImage(CAImage::create("image/HelloWorld.png"));
+        cell->getImage2()->setUrl(m_ImageMsg[row].m_imageUrl[2]);
+
+        cell->getImage3()->setVisible(true);
+        cell->getImage3()->setLayout(DLayout(DHorizontalLayout_R_C(1, 0.75), DVerticalLayout_B_C(1, 0.75)));
+        cell->getImage3()->setImage(CAImage::create("image/HelloWorld.png"));
+        cell->getImage3()->setUrl(m_ImageMsg[row].m_imageUrl[3]);
+
+        cell->getImage4()->setVisible(true);
+        cell->getImage4()->setLayout(DLayout(DHorizontalLayout_L_C(1, 0.25), DVerticalLayout_B_C(1, 0.75)));
+        cell->getImage4()->setImage(CAImage::create("image/HelloWorld.png"));
+        cell->getImage4()->setUrl(m_ImageMsg[row].m_imageUrl[4]);
     }
     return cell;
     

@@ -43,9 +43,7 @@ bool CAAlertView::init()
 	}
 
 	this->setColor(ccc4(127,127,127,127));
-    DRect rect = DRectZero;
-    rect.size = CAApplication::getApplication()->getRootWindow()->getBounds().size;
-    this->setFrame(rect);
+    this->setLayout(DLayoutFill);
 
 	return true;
 }
@@ -214,11 +212,11 @@ void CAAlertView::showAlertView() {
     this->addSubview(m_pBackView);
     m_pBackView->setAlphaThreshold(0.5f);
     
-    CAScale9ImageView *BackgroundImageView = CAScale9ImageView::createWithFrame(m_pBackView->getBounds());
-    BackgroundImageView->setImage(CAImage::create("source_material/alert_back.png"));
-    m_pBackView->addSubview(BackgroundImageView);
+    CAScale9ImageView *backgroundImageView = CAScale9ImageView::createWithFrame(m_pBackView->getBounds());
+    backgroundImageView->setImage(CAImage::create("source_material/alert_back.png"));
+    m_pBackView->addSubview(backgroundImageView);
     
-    m_pBackView->setStencil(BackgroundImageView->copy());
+    m_pBackView->setStencil(backgroundImageView->copy());
 	
 	float alertViewSpaceHeight = 40;
 
@@ -351,7 +349,7 @@ void CAAlertView::calcuAlerViewSize()
 	if (m_pTitleLabel && !m_pTitleLabel->getText().empty())
     {
 
-		m_fAlertViewTitleHeight = _dip(CAImage::getFontHeight("", ALERT_VIEW_TITLE_FONT));
+		m_fAlertViewTitleHeight = CAImage::getFontHeight("", ALERT_VIEW_TITLE_FONT);
 		
 		m_fAlertViewHeight += m_fAlertViewTitleHeight;
 	}
@@ -361,7 +359,7 @@ void CAAlertView::calcuAlerViewSize()
 	if (m_pContentLabel && !m_pContentLabel->getText().empty())
     {
 		
-		m_fAlertViewMessageHeight = _dip(CAImage::getStringHeight(m_sMsgFontName.c_str(), ALERT_VIEW_MESG_FONT, m_pContentLabel->getText(), ALERT_VIEW_MESG_WIDTH, 0, false));
+		m_fAlertViewMessageHeight = CAImage::getStringHeight(m_sMsgFontName.c_str(), ALERT_VIEW_MESG_FONT, m_pContentLabel->getText(), ALERT_VIEW_MESG_WIDTH, 0, false);
 
         m_fAlertViewHeight += MIN(m_fAlertViewMessageHeight, alertViewMessageHeight);
 	}
@@ -421,16 +419,15 @@ void CAAlertView::show()
 
 void CAAlertView::_show()
 {
-	if (getSuperview() != NULL)
-		return;
-
-	showAlertView();
+	CC_RETURN_IF(this->isRunning());
 
 	if (CAWindow *rootWindow = CAApplication::getApplication()->getRootWindow())
     {
 		rootWindow->insertSubview(this, CAWindowZOderTop);
         s_vAlertViewCaches.pushBack(this);
 	}
+    
+    showAlertView();
     
     this->setAlpha(0);
     m_pBackView->setScale(0.5f);
@@ -453,6 +450,17 @@ void CAAlertView::hide()
     this->setAlpha(0.0f);
     m_pBackView->setScale(0.5f);
     CAViewAnimation::commitAnimations();
+}
+
+void CAAlertView::setContentSize(const DSize& var)
+{
+    CAView::setContentSize(var);
+    if (this->isRunning())
+    {
+        this->removeAllSubviews();
+        m_fAlertViewHeight = 0;
+        this->showAlertView();
+    }
 }
 
 CATableViewCell* CAAlertView::tableCellAtIndex(CATableView* table, const DSize& cellSize, unsigned int section, unsigned int row)

@@ -94,6 +94,8 @@ public:
     
     static CATableView* createWithCenter(const DRect& rect);
     
+    static CATableView* createWithLayout(const DLayout& layout);
+    
     virtual bool init();
     
     void reloadData();
@@ -156,6 +158,8 @@ public:
 
 protected:
 
+    virtual void setContentSize(const DSize& var);
+    
     inline virtual float maxSpeed(float dt);
 
     inline virtual float decelerationRatio(float dt);
@@ -163,8 +167,6 @@ protected:
     void clearData();
     
     void reloadViewSizeData();
-    
-    virtual void setContentSize(const DSize& var);
     
     virtual void update(float dt);
     
@@ -317,8 +319,6 @@ protected:
     virtual void recoveryTableViewCell(){};
     
     void setControlState(const CAControlState& var);
-    
-    void setContentSize(const DSize& var);
     
 private:
     

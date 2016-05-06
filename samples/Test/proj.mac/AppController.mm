@@ -4,7 +4,7 @@
 #import "AppDelegate.h"
 
 #define Screen_Width 750
-#define Screen_Height 1344
+#define Screen_Height 1334
 
 @implementation AppController
 

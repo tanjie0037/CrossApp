@@ -13,6 +13,7 @@ NS_CC_BEGIN
 
 #define ThreadMsgType_SetPosition 1
 #define ThreadMsgType_DecodeFrame 2
+#define ThreadMsgType_InitDecoder 3
 
 typedef struct DecodeFramesMsg
 {
@@ -25,8 +26,11 @@ CAVideoPlayerView::CAVideoPlayerView()
 : m_pPlayerViewDelegate(NULL)
 , m_pRenderer(NULL)
 , m_pDecoder(NULL)
+, m_iDecoderInited(-1)
+, m_isShowFirstFrame(false)
 , m_isPlaying(false)
 , m_isBuffered(false)
+, m_isSetPosWaiting(false)
 , m_fMinBufferedDuration(0)
 , m_fMaxBufferedDuration(0)
 , m_fBufferedDuration(0)
@@ -68,7 +72,7 @@ CAVideoPlayerView* CAVideoPlayerView::create()
 
 CAVideoPlayerView* CAVideoPlayerView::createWithCenter(const DRect &rect)
 {
-    CAVideoPlayerView* view = new CAVideoPlayerView;
+    CAVideoPlayerView* view = new CAVideoPlayerView();
     if (view && view->initWithCenter(rect))
 	{
 		view->m_viewRect = rect;
@@ -82,7 +86,7 @@ CAVideoPlayerView* CAVideoPlayerView::createWithCenter(const DRect &rect)
 
 CAVideoPlayerView* CAVideoPlayerView::createWithFrame(const DRect &rect)
 {
-    CAVideoPlayerView* view = new CAVideoPlayerView;
+    CAVideoPlayerView* view = new CAVideoPlayerView();
     if (view && view->initWithFrame(rect)) 
 	{
 		view->m_viewRect = rect;
@@ -94,21 +98,32 @@ CAVideoPlayerView* CAVideoPlayerView::createWithFrame(const DRect &rect)
     return NULL;
 }
 
+CAVideoPlayerView* CAVideoPlayerView::createWithLayout(const DLayout& layout)
+{
+    CAVideoPlayerView* view = new CAVideoPlayerView();
+    if (view && view->initWithLayout(layout))
+    {
+        view->autorelease();
+        return view;
+    }
+    CC_SAFE_DELETE(view);
+    
+    return NULL;
+}
+
 bool CAVideoPlayerView::init()	
 {
-    if (!CAView::init()) {
-        return false;
-    }
-    
-	setColor(ccc4(0, 0, 0, 255));
+	CAThread::setMaxMsgCount(8);
+	CAThread::startAndWait(decodeProcessThread);
 
+	CAScheduler::schedule(schedule_selector(CAVideoPlayerView::update), this, 1 / 60.0f);
     return true;
 }
 
 
 void CAVideoPlayerView::setFirstVideoFrame()
 {
-	if (!createDecoder())
+	if (!isDecoderInited())
 		return;
 
 	VPVideoFrame* frame = NULL;
@@ -122,27 +137,69 @@ void CAVideoPlayerView::setFirstVideoFrame()
 	}
 }
 
-void CAVideoPlayerView::initWithPath(const std::string& szPath, bool showFirstFrame)
+void CAVideoPlayerView::setFullPath(const std::string& szPath, bool showFirstFrame)
 {
 	m_fMinBufferedDuration = LOCAL_MIN_BUFFERED_DURATION;
 	m_fMaxBufferedDuration = LOCAL_MAX_BUFFERED_DURATION;
 	m_cszPath = szPath;
+	m_isShowFirstFrame = showFirstFrame;
 
 	if (showFirstFrame)
 	{
-		setFirstVideoFrame();
+		createDecoderSync();
 	}
 }
 
-void CAVideoPlayerView::initWithUrl(const std::string& szUrl, bool showFirstFrame)
+void CAVideoPlayerView::setUrl(const std::string& szUrl, bool showFirstFrame)
 {
 	m_fMinBufferedDuration = NETWORK_MIN_BUFFERED_DURATION;
 	m_fMaxBufferedDuration = NETWORK_MAX_BUFFERED_DURATION;
 	m_cszPath = szUrl;
+	m_isShowFirstFrame = showFirstFrame;
 
 	if (showFirstFrame)
 	{
-		setFirstVideoFrame();
+		createDecoderSync();
+	}
+}
+
+void CAVideoPlayerView::update(float fDelta)
+{
+	if (isDecoderInited())
+	{
+		if (!m_pDecoder->isValidVideo())
+		{
+			m_fMinBufferedDuration *= 10.0; // increase for audio
+		}
+		m_pDecoder->setAudioCallback(this, decoder_audio_selector(CAVideoPlayerView::audioCallback));
+
+		if (m_pDecoder->setupVideoFrameFormat(kVideoFrameFormatYUV))
+		{
+			m_pRenderer = new VPFrameRenderYUV();
+		}
+		else
+		{
+			m_pRenderer = new VPFrameRenderRGB();
+		}
+
+        m_viewRect = m_pRenderer->updateVertices(m_pDecoder->getFrameWidth(),
+                                                 m_pDecoder->getFrameHeight(),
+                                                 m_obContentSize.width,
+                                                 m_obContentSize.height);
+        setImageRect(m_viewRect);
+        
+		if (!m_pRenderer->loadShaders())
+		{
+			CC_SAFE_DELETE(m_pRenderer);
+			CC_SAFE_DELETE(m_pDecoder);
+			m_iDecoderInited = -1;
+		}
+
+		if (m_isShowFirstFrame)
+		{
+			setFirstVideoFrame();
+		}
+		CAScheduler::unschedule(schedule_selector(CAVideoPlayerView::update), this);
 	}
 }
 
@@ -152,8 +209,10 @@ void CAVideoPlayerView::setContentSize(const DSize& size)
     
 	if (m_pRenderer)
 	{
-		m_viewRect = m_pRenderer->updateVertices(
-			m_pDecoder->getFrameWidth(), m_pDecoder->getFrameHeight(), getFrame().size.width, getFrame().size.height);
+		m_viewRect = m_pRenderer->updateVertices(m_pDecoder->getFrameWidth(),
+                                                 m_pDecoder->getFrameHeight(),
+                                                 m_obContentSize.width,
+                                                 m_obContentSize.height);
 	}
 	setImageRect(m_viewRect);
 }
@@ -249,8 +308,9 @@ void CAVideoPlayerView::setCurrentFrame(VPVideoFrame *frame)
 
 void CAVideoPlayerView::play()
 {
-	if (isPlaying())
-		return;
+	CC_RETURN_IF(!isDecoderInited());
+
+	CC_RETURN_IF(isPlaying());
 
 	showLoadingView(true);
 
@@ -258,19 +318,18 @@ void CAVideoPlayerView::play()
 	m_tickCorrectionTime.tv_usec = 0;
 
 	this->enableAudio(true);
-	asyncDecodeFrames();
 	CAScheduler::schedule(schedule_selector(CAVideoPlayerView::tick), this, 0);
 	m_isPlaying = true;
 }
 
 void CAVideoPlayerView::pause()
 {
-	if (!this->isPlaying())
-		return;
-	
-	showLoadingView(false);
-	m_isPlaying = false;
-	this->enableAudio(false);
+    if (this->isPlaying())
+    {
+        showLoadingView(false);
+        m_isPlaying = false;
+        this->enableAudio(false);
+    }
 }
 
 bool CAVideoPlayerView::isPlaying()
@@ -306,36 +365,50 @@ float CAVideoPlayerView::getPosition()
 
 void CAVideoPlayerView::setPosition(float position)
 {
-	if (m_pDecoder == NULL)
-		return;
-	
-	m_isBuffered = true;
-	pause();
-	CAThread::clear(true);
-	setDecodePosition(position);
+	if (m_pDecoder)
+    {
+        m_isBuffered = true;
+        pause();
+        CAThread::clear(true);
+        setDecodePosition(position);
+		m_isSetPosWaiting = true;
+    }
 }
 
 void CAVideoPlayerView::showLoadingView(bool on)
 {
 	if (m_pLoadingView == NULL && on)
 	{
-		m_pLoadingView = CAActivityIndicatorView::create();
+		m_pLoadingView = CAActivityIndicatorView::createWithLayout(DLayoutFill);
 		m_pLoadingView->setStyle(CAActivityIndicatorViewStyleWhite);
-		float x = m_viewRect.origin.x + m_viewRect.size.width / 2;
-		float y = m_viewRect.origin.y + m_viewRect.size.height / 2;
-		m_pLoadingView->setCenterOrigin(DPoint(x, y));
-		m_pLoadingView->resignFirstResponder();
 		this->addSubview(m_pLoadingView);
 	}
+    
 	if (m_pLoadingView)
 	{
 		m_pLoadingView->setVisible(on);
 	}
 }
 
+void CAVideoPlayerView::createDecoderSync()
+{
+	if (m_iDecoderInited != -1)
+		return;
+
+	DecodeFramesMsg* pMsg = (DecodeFramesMsg*)malloc(sizeof(DecodeFramesMsg));
+	if (pMsg)
+	{
+		pMsg->pAVGLView = this;
+		pMsg->param1 = ThreadMsgType_InitDecoder;
+	}
+	CAThread::notifyRun(pMsg);
+
+	m_iDecoderInited = 0;
+}
+
 bool CAVideoPlayerView::createDecoder()
 {
-	if (m_pDecoder)
+	if (isDecoderInited())
 		return true;
 	
 	m_pDecoder = new VPDecoder();
@@ -350,30 +423,7 @@ bool CAVideoPlayerView::createDecoder()
 		return false;
 	}
 
-	if (!m_pDecoder->isValidVideo())
-		m_fMinBufferedDuration *= 10.0; // increase for audio
-
-	m_pDecoder->setAudioCallback(this, decoder_audio_selector(CAVideoPlayerView::audioCallback));
-
-	if (m_pDecoder->setupVideoFrameFormat(kVideoFrameFormatYUV))
-	{
-		m_pRenderer = new VPFrameRenderYUV();
-	}
-	else
-	{
-		m_pRenderer = new VPFrameRenderRGB();
-	}
-
-	if (!m_pRenderer->loadShaders())
-	{
-		CC_SAFE_DELETE(m_pRenderer);
-		CC_SAFE_DELETE(m_pDecoder);
-		return false;
-	}
-	setFrame(getFrame());
-
-	CAThread::setMaxMsgCount(8);
-	CAThread::startAndWait(decodeProcessThread);
+	m_iDecoderInited = 1;
 	return true;
 }
 
@@ -420,10 +470,15 @@ bool CAVideoPlayerView::decodeProcessThread(void* param)
 		if (pMsg->param1 == ThreadMsgType_SetPosition)
 		{
 			pMsg->pAVGLView->setVPPosition(pMsg->param2);
+			pMsg->pAVGLView->m_isSetPosWaiting = false;
 		}
 		if (pMsg->param1 == ThreadMsgType_DecodeFrame)
 		{
 			pMsg->pAVGLView->decodeProcess();
+		}
+		if (pMsg->param1 == ThreadMsgType_InitDecoder)
+		{
+			pMsg->pAVGLView->createDecoder();
 		}
 	}
 	CC_SAFE_FREE(pMsg);
@@ -468,30 +523,30 @@ bool CAVideoPlayerView::addFrames(const std::vector<VPFrame*>& frames)
 		{
 			if (isValidVideo)
 			{
-				m_vVideoFrames.AddElement(frame);
-
 				m_aLock.Lock();
 				m_fBufferedDuration += frame->getDuration();
 				m_aLock.UnLock();
+
+				m_vVideoFrames.AddElement(frame);
 			}
 			else
 			{
 				CC_SAFE_DELETE(frame);
 			}
+			continue;
 		}
 
 		if (frame->getType() == kFrameTypeAudio)
 		{
 			if (isValidAudio)
 			{
-				m_vAudioFrames.AddElement(frame);
-
 				if (!isValidVideo)
 				{
 					m_aLock.Lock();
 					m_fBufferedDuration += frame->getDuration();
 					m_aLock.UnLock();
 				}
+				m_vAudioFrames.AddElement(frame);
 			}
 			else
 			{
@@ -544,7 +599,7 @@ float CAVideoPlayerView::presentFrame()
 
 void CAVideoPlayerView::tick(float dt)
 {
-	if (!createDecoder())
+	if (!isDecoderInited())
 		return;
 
 	if (m_pDecoder == NULL || m_pRenderer == NULL)

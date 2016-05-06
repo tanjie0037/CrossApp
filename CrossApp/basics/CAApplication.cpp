@@ -25,7 +25,6 @@
 #include "support/CAProfiling.h"
 #include "CCEGLView.h"
 #include "platform/CADensityDpi.h"
-#include "view/CALabelStyle.h"
 
 
 
@@ -163,6 +162,11 @@ void CAApplication::drawScene(float dt)
     {
         --m_nDrawCount;
         
+        if (m_pRootWindow)
+        {
+            m_pRootWindow->visitEve();
+        }
+        
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_IOS)
         
         if (m_pobOpenGLView)
@@ -170,12 +174,7 @@ void CAApplication::drawScene(float dt)
             m_pobOpenGLView->checkContext();
         }
 #endif
-        
-        if (m_pRootWindow)
-        {
-            m_pRootWindow->visitEve();
-        }
-        
+
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         
         kmGLPushMatrix();
@@ -385,6 +384,12 @@ void CAApplication::reshapeProjection(const DSize& newWindowSize)
 		m_obWinSizeInPoints = DSize(newWindowSize.width, newWindowSize.height);
 		setProjection(m_eProjection);
 	}
+    if (m_pRootWindow)
+    {
+        DRect rect = DRectZero;
+        rect.size = newWindowSize;
+        m_pRootWindow->setFrame(rect);
+    }
 
 }
 
@@ -404,6 +409,11 @@ bool CAApplication::isStatusBarHidden()
 #else
     return false;
 #endif
+}
+
+const CAInterfaceOrientation& CAApplication::getStatusBarOrientation()
+{
+    return CCEGLView::sharedOpenGLView()->getStatusBarOrientation();
 }
 
 void CAApplication::setDepthTest(bool bOn)
@@ -559,7 +569,6 @@ void CAApplication::purgeDirector()
     CAImageCache::purgeSharedImageCache();
     CAShaderCache::purgeSharedShaderCache();
     CCFileUtils::purgeFileUtils();
-	CALabelStyleCache::purgeSharedStyleCache();
 
     // CrossApp specific data structures
     CAUserDefault::purgeSharedUserDefault();

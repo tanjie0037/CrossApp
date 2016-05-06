@@ -2,7 +2,7 @@
 
 #include "RootWindow.h"
 #include "MenuViewController.h"
-#include "CDUIShowCollectionView.h"
+#include "CDUIShowAutoCollectionView.h"
 #include "CDNewsViewController.h"
 #include "CDNewsImageController.h"
 #include "CDNewsAboutController.h"
@@ -44,7 +44,6 @@ bool RootWindow::init()
     {
         return false;
     }
-    DSize winSize = this->getBounds().size;
     
     CAApplication::getApplication()->setNotificationView(CAView::createWithFrame(this->getBounds(), CAColor_green));
     
@@ -53,8 +52,8 @@ bool RootWindow::init()
     MenuViewController* _menuview = MenuViewController::create();
     
     CADrawerController* drawer = new CADrawerController();
-    drawer->initWithController(_menuview, m_pRootNavigationController, this->getBounds().size.width/6*5);
-    drawer->setBackgroundView(CAImageView::createWithImage(CAImage::create("image/bg.jpg")));
+    drawer->initWithController(_menuview, m_pRootNavigationController);
+    drawer->setBackgroundImage(CAImage::create("image/bg.jpg"));
     drawer->setEffect3D(true);
     
     this->setRootViewController(drawer);
@@ -75,13 +74,11 @@ void RootWindow::initUIView()
 {
     do
     {
-        CAViewController* viewController =
-        m_pRootNavigationController
-        ? m_pRootNavigationController->getViewControllerAtIndex(0) : NULL;
+        CAViewController* viewController = m_pRootNavigationController ? m_pRootNavigationController->getViewControllerAtIndex(0) : NULL;
         
-        CC_BREAK_IF(dynamic_cast<CDUIShowCollectionView*>(viewController));
+        CC_BREAK_IF(dynamic_cast<CDUIShowAutoCollectionView*>(viewController));
 
-        CDUIShowCollectionView* tabBarController = new CDUIShowCollectionView();
+        CDUIShowAutoCollectionView* tabBarController = new CDUIShowAutoCollectionView();
         tabBarController->init();
         tabBarController->autorelease();
         
@@ -112,10 +109,12 @@ void RootWindow::initUIView()
     
     CAApplication::getApplication()->setStatusBarStyle(CAStatusBarStyleLightContent);
 }
+
 void RootWindow::buttonCallBack(CAControl* btn,DPoint point)
 {
     this->getDrawerController()->showLeftViewController(true);
 }
+
 void RootWindow::intNewsView()
 {
     do
@@ -123,7 +122,7 @@ void RootWindow::intNewsView()
         CAViewController* viewController = m_pRootNavigationController->getViewControllerAtIndex(0);
         CC_BREAK_IF(dynamic_cast<CATabBarController*>(viewController));
         
-        
+
         CAVector<CAViewController*> vec_news;
         
         CATabBarItem* item = CATabBarItem::create(unicode_to_utf8(newsTitle[0]), CAImage::create(""), CAImage::create(""));

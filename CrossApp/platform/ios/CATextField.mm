@@ -194,6 +194,7 @@ CATextField::CATextField()
 {
     this->setHaveNextResponder(false);
     
+    this->setPoint(DPoint(-5000, -5000));
     CGPoint point = CGPointMake(-5000, -5000);
     m_pTextField = [[IOSTextField alloc]initWithFrame:CGRectMake(point.x, point.y, 100, 40)];
     EAGLView * eaglview = [EAGLView sharedEGLView];
@@ -318,8 +319,6 @@ void CATextField::showImage()
     free(data);
 
     m_pImgeView->setImage(image);
-    m_pImgeView->setFrame(this->getBounds());
-    this->updateDraw();
 }
 
 CATextField* CATextField::createWithFrame(const DRect& frame)
@@ -337,13 +336,23 @@ CATextField* CATextField::createWithFrame(const DRect& frame)
 CATextField* CATextField::createWithCenter(const DRect& rect)
 {
     CATextField* textField = new CATextField();
-    
     if (textField && textField->initWithCenter(rect))
     {
         textField->autorelease();
         return textField;
     }
-    
+    CC_SAFE_DELETE(textField);
+    return NULL;
+}
+
+CATextField* CATextField::createWithLayout(const DLayout& layout)
+{
+    CATextField* textField = new CATextField();
+    if (textField && textField->initWithLayout(layout))
+    {
+        textField->autorelease();
+        return textField;
+    }
     CC_SAFE_DELETE(textField);
     return NULL;
 }
@@ -353,10 +362,11 @@ bool CATextField::init()
     CAImage* image = CAImage::create("source_material/textField_bg.png");
     DRect capInsets = DRect(image->getPixelsWide()/2 ,image->getPixelsHigh()/2 , 1, 1);
     m_pBackgroundView = CAScale9ImageView::createWithImage(image);
+    m_pBackgroundView->setLayout(DLayoutFill);
     m_pBackgroundView->setCapInsets(capInsets);
     this->insertSubview(m_pBackgroundView, -1);
     
-    m_pImgeView = CAImageView::createWithFrame(DRect(0, 0, 1, 1));
+    m_pImgeView = CAImageView::createWithLayout(DLayoutFill);
     this->addSubview(m_pImgeView);
     m_pImgeView->setTextTag("textField");
 
@@ -390,9 +400,11 @@ void CATextField::setContentSize(const DSize& contentSize)
     rect.size.width = s_dip_to_px(worldContentSize.width) / scale;
     rect.size.height =  s_dip_to_px(worldContentSize.height) / scale;
     textField_iOS.frame = rect;
-
-    m_pBackgroundView->setFrame(this->getBounds());
-    m_pImgeView->setFrame(this->getBounds());
+    
+    if (m_bRunning)
+    {
+        this->showImage();
+    }
 }
 
 bool CATextField::ccTouchBegan(CATouch *pTouch, CAEvent *pEvent)

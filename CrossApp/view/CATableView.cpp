@@ -96,6 +96,18 @@ CATableView* CATableView::createWithCenter(const DRect& rect)
     return NULL;
 }
 
+CATableView* CATableView::createWithLayout(const CrossApp::DLayout &layout)
+{
+    CATableView* tableView = new CATableView();
+    if (tableView && tableView->initWithLayout(layout))
+    {
+        tableView->autorelease();
+        return tableView;
+    }
+    CC_SAFE_DELETE(tableView);
+    return NULL;
+}
+
 bool CATableView::init()
 {
     if (!CAScrollView::init())
@@ -112,6 +124,11 @@ bool CATableView::init()
 void CATableView::setContentSize(const CrossApp::DSize &var)
 {
     CAScrollView::setContentSize(var);
+    
+    if (!m_mpUsedTableCells.empty())
+    {
+        this->reloadData();
+    }
 }
 
 bool CATableView::ccTouchBegan(CATouch *pTouch, CAEvent *pEvent)
@@ -814,8 +831,8 @@ float CATableView::getRowHeightInSectionInRow(unsigned int section, unsigned int
 CATableViewCell::CATableViewCell()
 :m_pBackgroundView(NULL)
 ,m_pContentView(NULL)
-,m_nSection(0xffffffff)
-,m_nRow(0xffffffff)
+,m_nSection(UINT_NONE)
+,m_nRow(UINT_NONE)
 ,m_bControlStateEffect(true)
 ,m_bAllowsSelected(true)
 {
@@ -845,6 +862,7 @@ CATableViewCell* CATableViewCell::create(const std::string& reuseIdentifier)
 bool CATableViewCell::initWithReuseIdentifier(const std::string& reuseIdentifier)
 {
     m_pContentView = new CAView();
+    m_pContentView->setLayout(DLayoutFill);
     this->addSubview(m_pContentView);
     
     this->setBackgroundView(CAView::create());
@@ -856,29 +874,19 @@ bool CATableViewCell::initWithReuseIdentifier(const std::string& reuseIdentifier
 
 void CATableViewCell::setBackgroundView(CrossApp::CAView *var)
 {
+    CC_RETURN_IF(var == m_pBackgroundView);
+    m_pContentView->removeSubview(m_pBackgroundView);
     CC_SAFE_RETAIN(var);
-    this->removeSubview(m_pBackgroundView);
     CC_SAFE_RELEASE(m_pBackgroundView);
     m_pBackgroundView = var;
     CC_RETURN_IF(m_pBackgroundView == NULL);
-    m_pBackgroundView->setFrame(this->getBounds());
+    m_pBackgroundView->setLayout(DLayoutFill);
     m_pContentView->insertSubview(m_pBackgroundView, -1);
 }
 
 CAView* CATableViewCell::getBackgroundView()
 {
     return m_pBackgroundView;
-}
-
-void CATableViewCell::setContentSize(const CrossApp::DSize &var)
-{
-    CAView::setContentSize(var);
-    
-    m_pContentView->setFrame(this->getBounds());
-    if (m_pBackgroundView)
-    {
-        m_pBackgroundView->setFrame(m_pContentView->getBounds());
-    }
 }
 
 void CATableViewCell::setControlState(const CAControlState& var)
@@ -943,8 +951,8 @@ void CATableViewCell::resetTableViewCell()
     this->setVisible(true);
     this->normalTableViewCell();
     this->recoveryTableViewCell();
+    m_pContentView->setLayout(DLayoutFill);
     m_pContentView->setScale(1.0f);
-    m_pContentView->setFrame(this->getBounds());
     m_pContentView->setRotation(0);
 }
 

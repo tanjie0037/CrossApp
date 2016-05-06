@@ -72,7 +72,12 @@ namespace CADevice
     }
     void OpenURL(const std::string &url)
     {
+#if CC_TARGET_PLATFORM == CC_PLATFORM_WIN32
+        ::ShellExecuteA(NULL, "open", url.c_str(), NULL, NULL, SW_SHOW);
+#else
         
+#endif
+		
     }
     
     float getBatteryLevel()
@@ -104,6 +109,11 @@ namespace CADevice
     {
         
     }
+	
+	CC_DLL void writeToSavedPhotosAlbum(CAImage* image, const std::string &imageName)
+	{
+		
+	}
 }
 
 NS_CC_END

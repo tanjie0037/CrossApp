@@ -130,7 +130,7 @@ CATextView::CATextView()
 , m_obLastPoint(DPoint(-0xffff, -0xffff))
 {
     this->setHaveNextResponder(false);
-
+    this->setPoint(DPoint(-5000, -5000));
     m_pTextView = [[IOSTextView alloc]initWithFrame:CGRectMake(-5000, -5000, 500, 200)];
     [textView_iOS addIosTextView];
     EAGLView * eaglview = [EAGLView sharedEGLView];
@@ -143,7 +143,7 @@ CATextView::CATextView()
 }
 CATextView::~CATextView()
 {
-    textView_iOS.removeTextView;
+    [textView_iOS removeTextView];
 }
 
 CATextView* CATextView::createWithFrame(const DRect& frame)
@@ -157,21 +157,43 @@ CATextView* CATextView::createWithFrame(const DRect& frame)
     CC_SAFE_RELEASE_NULL(textView);
     return NULL;
 }
-CATextView* CATextView::createWithCenter(const CrossApp::DRect &rect){
+
+CATextView* CATextView::createWithCenter(const CrossApp::DRect &rect)
+{
+    CATextView* textView = new CATextView();
+    if (textView&&textView->initWithCenter(rect))
+    {
+        textView->autorelease();
+        return textView;
+    }
+    
+    CC_SAFE_RELEASE_NULL(textView);
     return NULL;
 }
+
+CATextView* CATextView::createWithLayout(const DLayout& layout)
+{
+    CATextView* textView = new CATextView();
+    if (textView&&textView->initWithLayout(layout))
+    {
+        textView->autorelease();
+        return textView;
+    }
+    
+    CC_SAFE_RELEASE_NULL(textView);
+    return NULL;
+}
+
 bool CATextView::init()
 {
-    //bg
     CAImage* image = CAImage::create("source_material/textField_bg.png");
     DRect capInsets = DRect(image->getPixelsWide()/2 ,image->getPixelsHigh()/2 , 1, 1);
-    m_pBackgroundView = CAScale9ImageView::createWithFrame(DRectZero);
-    m_pBackgroundView->setImage(image);
+    m_pBackgroundView = CAScale9ImageView::createWithImage(image);
+    m_pBackgroundView->setLayout(DLayoutFill);
     m_pBackgroundView->setCapInsets(capInsets);
     this->insertSubview(m_pBackgroundView, -1);
 
-    //show
-    m_pShowImageView = CAImageView::createWithFrame(DRect(0,0,0,0));
+    m_pShowImageView = CAImageView::createWithLayout(DLayoutFill);
     this->addSubview(m_pShowImageView);
     m_pShowImageView->setTextTag("textView");
 
@@ -258,7 +280,6 @@ void CATextView::delayShowImage()
         CAViewAnimation::setAnimationDidStopSelector(this, CAViewAnimation0_selector(CATextView::showImage));
         CAViewAnimation::commitAnimations();
     }
-    this->updateDraw();
 }
 void CATextView::showImage()
 {
@@ -280,8 +301,6 @@ void CATextView::showImage()
     free(data);
     
     m_pShowImageView->setImage(image);
-    m_pShowImageView->setFrame(this->getBounds());
-    this->updateDraw();
 }
 void CATextView::showTextView()
 {
@@ -313,8 +332,10 @@ void CATextView::setContentSize(const DSize& contentSize)
     rect.size.height =  s_dip_to_px(worldContentSize.height) / scale;
     [textView_iOS setContentSize:rect.size];
     
-    m_pBackgroundView->setFrame(this->getBounds());
-    m_pShowImageView->setFrame(this->getBounds());
+    if (m_bRunning)
+    {
+        this->showImage();
+    }
 }
 bool CATextView::ccTouchBegan(CATouch *pTouch, CAEvent *pEvent)
 {

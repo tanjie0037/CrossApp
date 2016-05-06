@@ -304,7 +304,7 @@ public:
 	}
 	void setCursorPosition()
 	{
-		m_pCursorMark->setFrame(DRect(0, 0, 1.5f, m_iFontHeight));
+		m_pCursorMark->setFrame(DRect(0, 0, 2.5f, m_iFontHeight));
 		if (m_pTextFieldX->isSecureTextEntry())
 		{
 			m_pCursorMark->setCenterOrigin(DPoint((m_sText.empty() ? 0 : this->getImageRect().size.width), m_obContentSize.height / 2));
@@ -378,7 +378,7 @@ public:
 		{
 			*r = rr;
 		}
-		int y = (m_obFrameRect.size.height - m_obRect.size.height) / 2;
+		int y = (m_obContentSize.height - m_obRect.size.height) / 2;
 		return DRect((ll ? (l1 + m_iString_o_length) : 0) + ld, y, dd, m_iFontHeight);
 	}
 	void setText(const std::string &var)
@@ -562,7 +562,7 @@ public:
 			x1 = 0;
 		}
 
-		y1 = (m_obFrameRect.size.height - m_obRect.size.height) / 2;
+		y1 = (m_obContentSize.height - m_obRect.size.height) / 2;
 		x2 = x1 + m_obRect.size.width;
 		y2 = y1 + m_obRect.size.height;
 		m_sQuad.bl.vertices = vertex3(x1, y1, m_fVertexZ);
@@ -742,6 +742,18 @@ CATextField* CATextField::createWithCenter(const DRect& rect)
     return NULL;
 }
 
+CATextField* CATextField::createWithLayout(const DLayout& layout)
+{
+    CATextField* textField = new CATextField();
+    if (textField && textField->initWithLayout(layout))
+    {
+        textField->autorelease();
+        return textField;
+    }
+    CC_SAFE_DELETE(textField);
+    return NULL;
+}
+
 
 bool CATextField::init()
 {
@@ -753,12 +765,14 @@ bool CATextField::init()
 
 	CAImage* image = CAImage::create("source_material/textField_bg.png");
 	m_pBackgroundView = CAScale9ImageView::createWithFrame(DRect(0, 0, 1, 1));
+	m_pBackgroundView->setLayout(DLayoutFill);
 	m_pBackgroundView->setCapInsets(DRect(image->getPixelsWide() / 2, image->getPixelsHigh() / 2, 1, 1));
 	m_pBackgroundView->setImage(image);
 	this->addSubview(m_pBackgroundView);
 
 	CATextFieldWin32 *text = new CATextFieldWin32(this);
 	text->initWithFrame(DRect(0, 0, 1, 1));
+
 	this->addSubview(text);
 	text->release();
 
@@ -785,10 +799,6 @@ void CATextField::setContentSize(const DSize& contentSize)
 {
     CAView::setContentSize(contentSize);
 
-	if (m_pBackgroundView)
-	{
-		m_pBackgroundView->setFrame(this->getBounds());
-	}
 	if (m_pTextField)
 	{
 		DRect r = this->getBounds();

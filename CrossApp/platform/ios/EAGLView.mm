@@ -88,17 +88,22 @@ static EAGLView *view = 0;
 			view.contentScaleFactor = [[UIScreen mainScreen] scale];
 		}
         
-        CGFloat scale = [[UIScreen mainScreen] scale];
-        CGRect frameRect = frame;
-        frameRect.origin.x *= scale;
-        frameRect.origin.y *= scale;
-        frameRect.size.width *= scale;
-        frameRect.size.height *= scale;
-        
-        CrossApp::CCEGLView::sharedOpenGLView()->setFrameSize(frameRect.size.width, frameRect.size.height);
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(statusBarOrientationChange:) name:UIApplicationDidChangeStatusBarOrientationNotification object:nil];
     }
         
     return self;
+}
+
+-(void) setFrame:(CGRect)frame
+{
+    [super setFrame:frame];
+    
+    CGFloat scale = [[UIScreen mainScreen] scale];
+    CGSize size = frame.size;
+    size.width *= scale;
+    size.height *= scale;
+    
+    CrossApp::CCEGLView::sharedOpenGLView()->setFrameSize(size.width, size.height);
 }
 
 -(int) getWidth
@@ -113,6 +118,37 @@ static EAGLView *view = 0;
     return bound.height * self.contentScaleFactor;
 }
 
+- (void)statusBarOrientationChange:(NSNotification *)notification
+{
+    [self setFrame:[self.superview bounds]];
+    UIInterfaceOrientation orientation = [[UIApplication sharedApplication] statusBarOrientation];
+    
+    switch (orientation)
+    {
+        case UIInterfaceOrientationPortrait:
+        {
+            CrossApp::CCEGLView::sharedOpenGLView()->setStatusBarOrientation(CrossApp::CAInterfaceOrientationPortrait);
+        }
+            break;
+        case UIInterfaceOrientationPortraitUpsideDown:
+        {
+            CrossApp::CCEGLView::sharedOpenGLView()->setStatusBarOrientation(CrossApp::CAInterfaceOrientationPortrait);
+        }
+            break;
+        case UIInterfaceOrientationLandscapeRight:
+        {
+            CrossApp::CCEGLView::sharedOpenGLView()->setStatusBarOrientation(CrossApp::CAInterfaceOrientationLandscape);
+        }
+            break;
+        case UIInterfaceOrientationLandscapeLeft:
+        {
+            CrossApp::CCEGLView::sharedOpenGLView()->setStatusBarOrientation(CrossApp::CAInterfaceOrientationLandscape);
+        }
+            break;
+        default:
+            break;
+    }
+}
 
 -(BOOL) setupSurfaceWithSharegroup:(EAGLSharegroup*)sharegroup
 {

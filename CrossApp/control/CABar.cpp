@@ -38,9 +38,9 @@ CANavigationBar::~CANavigationBar()
     CC_SAFE_RELEASE(m_pBackgroundView);
 }
 
-static CANavigationBar* createWithFrame(const DRect& rect)
+CANavigationBar* CANavigationBar::createWithFrame(const DRect& rect, bool clearance)
 {
-    CANavigationBar* navigationBar = new CANavigationBar();
+    CANavigationBar* navigationBar = new CANavigationBar(clearance);
     if (navigationBar && navigationBar->initWithFrame(rect))
     {
         navigationBar->autorelease();
@@ -50,10 +50,22 @@ static CANavigationBar* createWithFrame(const DRect& rect)
     return NULL;
 }
 
-static CANavigationBar* createWithCenter(const DRect& rect)
+CANavigationBar* CANavigationBar::createWithCenter(const DRect& rect, bool clearance)
 {
-    CANavigationBar* navigationBar = new CANavigationBar();
+    CANavigationBar* navigationBar = new CANavigationBar(clearance);
     if (navigationBar && navigationBar->initWithFrame(rect))
+    {
+        navigationBar->autorelease();
+        return navigationBar;
+    }
+    CC_SAFE_DELETE(navigationBar);
+    return NULL;
+}
+
+CANavigationBar* CANavigationBar::createWithLayout(const CrossApp::DLayout &layout, bool clearance)
+{
+    CANavigationBar* navigationBar = new CANavigationBar(clearance);
+    if (navigationBar && navigationBar->initWithLayout(layout))
     {
         navigationBar->autorelease();
         return navigationBar;
@@ -65,33 +77,10 @@ static CANavigationBar* createWithCenter(const DRect& rect)
 bool CANavigationBar::init()
 {
     m_pContentView = new CAView();
+    m_pContentView->setLayout(DLayout(DHorizontalLayout_L_R(0, 0), DVerticalLayout_T_B(m_bClearance ? 40 : 0, 0)));
     this->addSubview(m_pContentView);
     m_pContentView->release();
     return true;
-}
-
-CANavigationBar* CANavigationBar::createWithFrame(const DRect& rect, bool clearance)
-{
-    CANavigationBar* nav = new CANavigationBar(clearance);
-    if (nav && nav->initWithFrame(rect))
-    {
-        nav->autorelease();
-        return nav;
-    }
-    CC_SAFE_DELETE(nav);
-    return NULL;
-}
-
-CANavigationBar* CANavigationBar::createWithCenter(const DRect& rect, bool clearance)
-{
-    CANavigationBar* nav = new CANavigationBar(clearance);
-    if (nav && nav->initWithCenter(rect))
-    {
-        nav->autorelease();
-        return nav;
-    }
-    CC_SAFE_DELETE(nav);
-    return NULL;
 }
 
 void CANavigationBar::onEnterTransitionDidFinish()
@@ -113,10 +102,6 @@ void CANavigationBar::onExitTransitionDidStart()
 void CANavigationBar::setContentSize(const DSize & var)
 {
     CAView::setContentSize(var);
-    DRect rect = this->getBounds();
-    rect.origin.y = m_bClearance ? 40 : 0;
-    rect.size.height = rect.size.height - rect.origin.y;
-    m_pContentView->setFrame(rect);
 }
 
 void CANavigationBar::setItem(CANavigationBarItem* item)
@@ -172,17 +157,12 @@ void CANavigationBar::showBackground()
         m_pBackgroundView = CAScale9ImageView::createWithImage(CAImage::create("source_material/navigation_bg.png"));
         CC_SAFE_RETAIN(m_pBackgroundView);
     }
-    m_pBackgroundView->setFrame(this->getBounds());
+    m_pBackgroundView->setLayout(DLayoutFill);
     this->insertSubview(m_pBackgroundView, -1);
 }
 
 void CANavigationBar::showTitle()
 {
-    DRect rect;
-    rect.size = m_pContentView->getBounds().size;
-    rect.origin = rect.size/2;
-    rect.size.width = rect.size.width - rect.size.height * 4;
-
     if (m_pTitle)
     {
         m_pContentView->removeSubview(m_pTitle);
@@ -191,6 +171,11 @@ void CANavigationBar::showTitle()
     
     if (CAView* titleView = m_pItem->getTitleView())
     {
+        DRect rect;
+        rect.size = m_pContentView->getBounds().size;
+        rect.origin = rect.size/2;
+        rect.size.width = rect.size.width - rect.size.height * 4;
+        
         float aspectRatio = 0;
         if (!titleView->getFrame().size.equals(DSizeZero))
         {
@@ -205,17 +190,14 @@ void CANavigationBar::showTitle()
     }
     else if (CAImage* image = m_pItem->getTitleViewImage())
     {
-        float height = MIN(image->getContentSize().height, rect.size.height * 0.75f);
-        float width =  height * image->getContentSize().width / image->getContentSize().height;
-        width = MIN(rect.size.width, width);
-        rect.size = DSize(width, height);
         m_pTitle = CAImageView::createWithImage(image);
-        m_pTitle->setCenter(rect);
+        m_pTitle->setLayout(DLayout(DHorizontalLayout_L_R(180, 180), DVerticalLayout_T_B(12, 12)));
+        ((CAImageView*)m_pTitle)->setImageViewScaleType(CAImageViewScaleTypeFitImageInside);
         m_pContentView->addSubview(m_pTitle);
     }
     else
     {
-        CALabel* title = CALabel::createWithCenter(rect);
+        CALabel* title = CALabel::createWithLayout(DLayout(DHorizontalLayout_L_R(180, 180), DVerticalLayoutFill));
         title->setTextAlignment(CATextAlignmentCenter);
         title->setVerticalTextAlignmet(CAVerticalTextAlignmentCenter);
         title->setNumberOfLine(1);
@@ -243,24 +225,20 @@ void CANavigationBar::showLeftButton()
     
     const CAVector<CAObject*>& buttonItems = m_pItem->getLeftButtonItems();
 
-    DRect rect;
-    rect.size.width = m_pContentView->getBounds().size.height;
-    rect.size.height = m_pContentView->getBounds().size.height;
-    rect.origin.x = 0;
-    rect.origin.y = 0;
+    DLayout layout = DLayout(DHorizontalLayout_L_W(0, 80), DVerticalLayoutFill);
 
     for (size_t i=0; i<buttonItems.size(); i++)
     {
         CABarButtonItem* item = dynamic_cast<CABarButtonItem*>(buttonItems.at(i));
         
-        rect.size.width = item ? item->getItemWidth() : 80;
+        layout.horizontal.width = item ? item->getItemWidth() : 80;
         
         if (i == 0)
         {
-            rect.origin.x = 10;
+            layout.horizontal.left = 10;
         }
         
-        CAButton* button = CAButton::createWithFrame(rect, CAButtonTypeCustom);
+        CAButton* button = CAButton::createWithLayout(layout, CAButtonTypeCustom);
         button->setImageSize(DSize(42, 42));
         button->setTitleFontSize(36);
         m_pContentView->addSubview(button);
@@ -297,7 +275,7 @@ void CANavigationBar::showLeftButton()
         }
         m_pLeftButtons.push_back(button);
         
-        rect.origin.x += rect.size.width;
+        layout.horizontal.left += layout.horizontal.width;
     }
 }
 
@@ -311,25 +289,21 @@ void CANavigationBar::showRightButton()
     m_pRightButtons.clear();
     
     const CAVector<CAObject*>& buttonItems = m_pItem->getRightButtonItems();
-    
-    DRect rect;
-    rect.size.width = this->getBounds().size.height * 0.9f;
-    rect.size.height = m_pContentView->getBounds().size.height;
-    rect.origin.x = this->getBounds().size.width - rect.size.width * 0.7f;
-    rect.origin.y = 0;
 
+    DLayout layout = DLayout(DHorizontalLayout_R_W(0, 80), DVerticalLayoutFill);
+    
     for (size_t i=0; i<buttonItems.size(); i++)
     {
         CABarButtonItem* item = dynamic_cast<CABarButtonItem*>(buttonItems.at(i));
         
-        rect.size.width = item ? item->getItemWidth() : 80;
+        layout.horizontal.width = item ? item->getItemWidth() : 80;
         
         if (i == 0)
         {
-            rect.origin.x = m_pContentView->getBounds().size.width - rect.size.width - 10;
+            layout.horizontal.right = 10;
         }
         
-        CAButton* button = CAButton::createWithFrame(rect, CAButtonTypeCustom);
+        CAButton* button = CAButton::createWithLayout(layout, CAButtonTypeCustom);
         button->setImageSize(DSize(42, 42));
         button->setTitleFontSize(36);
         m_pContentView->addSubview(button);
@@ -360,7 +334,7 @@ void CANavigationBar::showRightButton()
         }
         m_pRightButtons.push_back(button);
         
-        rect.origin.x -= rect.size.width;
+        layout.horizontal.right += layout.horizontal.width;
     }
 }
 
@@ -501,6 +475,18 @@ CATabBar* CATabBar::createWithCenter(const DRect& rect, bool clearance)
     return NULL;
 }
 
+CATabBar* CATabBar::createWithLayout(const CrossApp::DLayout &layout, bool clearance)
+{
+    CATabBar* tabBar = new CATabBar(clearance);
+    if (tabBar && tabBar->initWithLayout(layout))
+    {
+        tabBar->autorelease();
+        return tabBar;
+    }
+    CC_SAFE_DELETE(tabBar);
+    return NULL;
+}
+
 bool CATabBar::init()
 {
     m_pContentView = new CAView();
@@ -603,11 +589,6 @@ void CATabBar::setContentSize(const DSize & var)
     
     m_pContentView->setFrame(rect);
     
-    if (m_pBackgroundView)
-    {
-        m_pBackgroundView->setFrame(this->getBounds());
-    }
-    
     unsigned int count = (unsigned int)m_pItems.size();
     m_cItemSize = rect.size;
     m_cItemSize.width /= count;
@@ -657,7 +638,7 @@ void CATabBar::replaceItemAtIndex(size_t index, CATabBarItem* item)
     }
 }
 
-const DRect& CATabBar::getContentViewFrame()
+DRect CATabBar::getContentViewFrame()
 {
     return m_pContentView->getFrame();
 }
@@ -794,7 +775,7 @@ void CATabBar::showBackground()
     {
         m_pBackgroundView = CAView::createWithColor(m_sBackgroundColor);
     }
-    m_pBackgroundView->setFrame(this->getBounds());
+    m_pBackgroundView->setLayout(DLayout(DHorizontalLayout_L_R(0, 0), DVerticalLayout_T_B(0, 0)));
     this->insertSubview(m_pBackgroundView, -1);
 }
 

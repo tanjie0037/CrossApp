@@ -49,6 +49,8 @@ public:
 
 	static CAWebView *createWithCenter(const DRect& rect);
 
+    static CAWebView* createWithLayout(const DLayout& layout);
+    
     /**
     * Set javascript interface scheme.
     * @see #onJsCallback
@@ -132,10 +134,6 @@ public:
 
 	void setActivityView(CAActivityIndicatorView* loadingView);
 	void showLoadingActivity(bool show);
-   
-protected:
-    
-    virtual void setContentSize(const DSize &contentSize);
     
 private:
     

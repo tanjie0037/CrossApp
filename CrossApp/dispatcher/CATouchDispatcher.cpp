@@ -111,7 +111,7 @@ void CATouchController::passingTouchesViews(float dt)
 {
     CAView* view = dynamic_cast<CAView*>(CAApplication::getApplication()->getTouchDispatcher()->getFirstResponder());
     bool isContainsFirstPoint = view && view->convertRectToWorldSpace(view->getBounds()).containsPoint(m_tFirstPoint);
-    if (!isContainsFirstPoint && view)
+    if (!isContainsFirstPoint && view && view->isTouchEnabled() && view->isVisible())
     {
         this->touchBeganWithResponder(view);
     }
@@ -143,42 +143,54 @@ void CATouchController::touchBegan()
 {
     m_tFirstPoint = m_pTouch->getLocation();
     
-    std::vector<CAResponder*> vector;
+    CAView* responder = (CAView*)CAApplication::getApplication()->getTouchDispatcher()->getScrollRunningResponder();
     
-    CAView* view = dynamic_cast<CAView*>(CAApplication::getApplication()->getTouchDispatcher()->getFirstResponder());
-    bool isContainsFirstPoint = view && view->convertRectToWorldSpace(view->getBounds()).containsPoint(m_tFirstPoint);
-    if (isContainsFirstPoint)
+    if (responder && responder->isRunning() && responder->isVisible()
+        && responder->getBounds().containsPoint(responder->convertTouchToNodeSpace(m_pTouch)))
     {
-        vector = this->getEventListener(m_pTouch, view);
-    }
-    else
-    {
-        vector = this->getEventListener(m_pTouch, CAApplication::getApplication()->getRootWindow());
-    }
-    
-    std::vector<CAResponder*>::iterator itr;
-    for (itr=vector.begin(); itr!=vector.end(); itr++)
-    {
-        CC_CONTINUE_IF(!(*itr)->isPriorityScroll());
-        CC_CONTINUE_IF(!(*itr)->isScrollEnabled());
-        CC_CONTINUE_IF(!(*itr)->isHorizontalScrollEnabled() && !(*itr)->isVerticalScrollEnabled());
-        m_vTouchMovedsViewCache.pushBack((*itr));
-    }
-    m_vTouchesViews.pushBack(vector.back());
-    
-    if (!m_vTouchMovedsViewCache.empty())
-    {
-        CAScheduler::schedule(schedule_selector(CATouchController::passingTouchesViews), this, 0, 0, 0.05f);
-    }
-    else
-    {
+        m_vTouchesViews.pushBack(responder);
+        CAApplication::getApplication()->getTouchDispatcher()->removeScrollRunningResponder(responder);
         this->passingTouchesViews();
+    }
+    else
+    {
+        std::vector<CAResponder*> vector;
+        
+        CAView* view = dynamic_cast<CAView*>(CAApplication::getApplication()->getTouchDispatcher()->getFirstResponder());
+        bool isContainsFirstPoint = view && view->convertRectToWorldSpace(view->getBounds()).containsPoint(m_tFirstPoint);
+        if (isContainsFirstPoint)
+        {
+            vector = this->getEventListener(m_pTouch, view);
+        }
+        else
+        {
+            vector = this->getEventListener(m_pTouch, CAApplication::getApplication()->getRootWindow());
+        }
+        
+        std::vector<CAResponder*>::iterator itr;
+        for (itr=vector.begin(); itr!=vector.end(); itr++)
+        {
+            CC_CONTINUE_IF(!(*itr)->isPriorityScroll());
+            CC_CONTINUE_IF(!(*itr)->isScrollEnabled());
+            CC_CONTINUE_IF(!(*itr)->isHorizontalScrollEnabled() && !(*itr)->isVerticalScrollEnabled());
+            m_vTouchMovedsViewCache.pushBack((*itr));
+        }
+        m_vTouchesViews.pushBack(vector.back());
+        
+        if (!m_vTouchMovedsViewCache.empty())
+        {
+            CAScheduler::schedule(schedule_selector(CATouchController::passingTouchesViews), this, 0, 0, 0.05f);
+        }
+        else
+        {
+            this->passingTouchesViews();
+        }
     }
 }
 
 void CATouchController::touchMoved()
 {
-    CC_RETURN_IF(ccpDistance(m_tFirstPoint, m_pTouch->getLocation()) < 16);
+    CC_RETURN_IF(ccpDistance(m_tFirstPoint, m_pTouch->getLocation()) < 20);
     
     m_tFirstPoint = DPointZero;
 
@@ -368,7 +380,6 @@ void CATouchController::touchMoved()
                 }
             }
         }
-
     }
 
     CAView* view = dynamic_cast<CAView*>(CAApplication::getApplication()->getTouchDispatcher()->getFirstResponder());
@@ -463,6 +474,7 @@ CATouchDispatcher::CATouchDispatcher(void)
 :m_iDispatchEvents(0)
 ,m_bLocked(false)
 ,m_pFirstResponder(NULL)
+,m_pScrollRunningResponder(NULL)
 {
     
 }
@@ -760,6 +772,22 @@ void CATouchDispatcher::addMouseScrollWheel(CAResponder* responder)
 void CATouchDispatcher::removeMouseScrollWheel(CAResponder* responder)
 {
     m_pMouseScrollWheels.erase(responder);
+}
+
+void CATouchDispatcher::setScrollRunningResponder(CAResponder* var)
+{
+    if (m_pScrollRunningResponder == NULL)
+    {
+        m_pScrollRunningResponder = var;
+    }
+}
+
+void CATouchDispatcher::removeScrollRunningResponder(CAResponder* var)
+{
+    if (m_pScrollRunningResponder == var)
+    {
+        m_pScrollRunningResponder = NULL;
+    }
 }
 
 NS_CC_END
