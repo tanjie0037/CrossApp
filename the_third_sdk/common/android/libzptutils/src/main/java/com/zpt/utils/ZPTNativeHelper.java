@@ -6,7 +6,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Locale;
-import org.CrossApp.lib.Cocos2dxActivity;
+import org.CrossApp.lib.CrossAppActivity;
 import org.json.JSONException;
 import org.json.JSONObject;
 import android.content.ComponentName;
@@ -32,7 +32,7 @@ public class ZPTNativeHelper {
 	public static String _adid = null;
 
 	public static String getDeviceInfo() {
-		Context ctx = Cocos2dxActivity.getContext();
+		Context ctx = CrossAppActivity.getContext();
 		PackageManager packageManager = ctx.getPackageManager();
 		PackageInfo packageInfo;
 
@@ -55,11 +55,11 @@ public class ZPTNativeHelper {
 	public static void openUrl(String url) {
 		final Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
 
-		Cocos2dxActivity.getContext().runOnUiThread(new Runnable() {
+		CrossAppActivity.getContext().runOnUiThread(new Runnable() {
 
 			@Override
 			public void run() {
-				Cocos2dxActivity.getContext().startActivity(Intent.createChooser(intent, "Open With"));
+				CrossAppActivity.getContext().startActivity(Intent.createChooser(intent, "Open With"));
 
 			}
 		});
@@ -71,27 +71,27 @@ public class ZPTNativeHelper {
 		data.putExtra(Intent.EXTRA_SUBJECT, title);
 		data.putExtra(Intent.EXTRA_TEXT, extraDesc);
 
-		Cocos2dxActivity.getContext().runOnUiThread(new Runnable() {
+		CrossAppActivity.getContext().runOnUiThread(new Runnable() {
 
 			@Override
 			public void run() {
-				Cocos2dxActivity.getContext().startActivity(data);
+				CrossAppActivity.getContext().startActivity(data);
 			}
 		});
 	}
 
 	public static String getDeviceId() {
-		final TelephonyManager tm = (TelephonyManager) Cocos2dxActivity.getContext().getBaseContext()
+		final TelephonyManager tm = (TelephonyManager) CrossAppActivity.getContext().getBaseContext()
 				.getSystemService(Context.TELEPHONY_SERVICE);
 
 		String uId = tm.getDeviceId();
 
 		if (uId == null || uId.equals("")) {
-			uId = Settings.Secure.getString(Cocos2dxActivity.getContext().getContentResolver(), Settings.Secure.ANDROID_ID);
+			uId = Settings.Secure.getString(CrossAppActivity.getContext().getContentResolver(), Settings.Secure.ANDROID_ID);
 		}
 
 		if (uId == null || uId.equals("")) {
-			WifiManager wifiManager = (WifiManager) Cocos2dxActivity.getContext().getSystemService(Context.WIFI_SERVICE);
+			WifiManager wifiManager = (WifiManager) CrossAppActivity.getContext().getSystemService(Context.WIFI_SERVICE);
 			WifiInfo wifiInfo = wifiManager.getConnectionInfo();
 
 			if (wifiInfo.getMacAddress() != null) {
@@ -109,7 +109,7 @@ public class ZPTNativeHelper {
 	}
 
 	public static String getAppVersion() {
-		Context ctx = Cocos2dxActivity.getContext();
+		Context ctx = CrossAppActivity.getContext();
 		PackageManager packageManager = ctx.getPackageManager();
 		PackageInfo packageInfo;
 
@@ -127,7 +127,7 @@ public class ZPTNativeHelper {
 	}
 
 	public static int getAppBuild() {
-		Context ctx = Cocos2dxActivity.getContext();
+		Context ctx = CrossAppActivity.getContext();
 		PackageManager packageManager = ctx.getPackageManager();
 		PackageInfo packageInfo;
 		int appBuild = 0;
@@ -167,7 +167,7 @@ public class ZPTNativeHelper {
 	 * 获取手机信息
 	 */
 	public static String getPhoneInfo() {
-		Context ctx = Cocos2dxActivity.getContext();
+		Context ctx = CrossAppActivity.getContext();
 		TelephonyManager tm = (TelephonyManager) ctx.getSystemService(Context.TELEPHONY_SERVICE);
 		String deviceBrand = android.os.Build.BRAND; // 手机品牌
 		String deviceModel = android.os.Build.MODEL; // 手机型号
@@ -175,7 +175,7 @@ public class ZPTNativeHelper {
 		String imsi = tm.getSubscriberId();
 		String nubmer = tm.getLine1Number(); // 手机号码
 		String serviceName = tm.getSimOperatorName(); // 运营商
-		String androidId = Settings.Secure.getString(Cocos2dxActivity.getContext().getContentResolver(), Settings.Secure.ANDROID_ID);
+		String androidId = Settings.Secure.getString(CrossAppActivity.getContext().getContentResolver(), Settings.Secure.ANDROID_ID);
 
 		String macStr, time;
 		WifiManager wifiManager = (WifiManager) ctx.getSystemService(Context.WIFI_SERVICE);
@@ -216,7 +216,7 @@ public class ZPTNativeHelper {
 			@Override
 			protected Object doInBackground(Object[] params) {
 				AdvertisingIdClient.Info adInfo = null;
-				Context ctx = Cocos2dxActivity.getContext();
+				Context ctx = CrossAppActivity.getContext();
 
 				try {
 
@@ -239,7 +239,7 @@ public class ZPTNativeHelper {
 	}
 
 	public static void callGoldMine(final String packageName, final String activityName, final String intentName, final String params) {
-		final Cocos2dxActivity ctx = Cocos2dxActivity.getContext();
+		final CrossAppActivity ctx = CrossAppActivity.getContext();
 
 		ctx.runOnUiThread(new Runnable() {
 			@Override
@@ -297,7 +297,7 @@ public class ZPTNativeHelper {
 		if (packageName == null || "".equals(packageName))
 			return false;
 
-		PackageManager packageManager = Cocos2dxActivity.getContext().getPackageManager();
+		PackageManager packageManager = CrossAppActivity.getContext().getPackageManager();
 
 		try {
 			PackageInfo packageInfo = packageManager.getPackageInfo(packageName, 0);
@@ -312,7 +312,7 @@ public class ZPTNativeHelper {
 	}
 
 	public static void installApk(String apkName) {
-		Context ctx = Cocos2dxActivity.getContext();
+		Context ctx = CrossAppActivity.getContext();
 		String apkPath = getCacheDir(ctx) + "/" + apkName;
 
 		if (copyApkFromAssets(ctx, apkName, apkPath)) {

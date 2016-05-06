@@ -111,7 +111,7 @@ LOCAL_EXPORT_C_INCLUDES := $(LOCAL_PATH) \
                            $(LOCAL_PATH)/gameswf \
                            $(LOCAL_PATH)/gameswf/base \
                            $(LOCAL_PATH)/gameswf/gameswf/gameswf \
-                           $(LOCAL_PATH)/gameswf/gameswf/gameswf/gameswf_as_classes
+                           $(LOCAL_PATH)/gameswf/gameswf/gameswf/gameswf_as_classes \
 						   $(LOCAL_PATH)/crypto \
 						   $(LOCAL_PATH)/crypto/xxtea \
 						   $(LOCAL_PATH)/crypto/md5 \

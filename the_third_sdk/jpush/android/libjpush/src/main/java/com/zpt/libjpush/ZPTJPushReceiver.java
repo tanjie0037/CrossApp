@@ -1,6 +1,6 @@
 package com.zpt.libjpush;
 
-import org.CrossApp.lib.Cocos2dxHelper;
+import org.CrossApp.lib.CrossAppHelper;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -46,7 +46,7 @@ public class ZPTJPushReceiver extends BroadcastReceiver {
 			ZPTLog.v("[MyReceiver] 接收到推送下来的自定义消息: " + bundle.getString(JPushInterface.EXTRA_MESSAGE));
 
 			// 转发到native
-			Cocos2dxHelper.postNotification(Cocos2dxHelper.kNotiRemoteNotiRecived, bundleStr);
+			CrossAppHelper.postNotification(CrossAppHelper.kNotiRemoteNotiRecived, bundleStr);
 
 		} else if (JPushInterface.ACTION_NOTIFICATION_RECEIVED.equals(intent.getAction())) {
 			ZPTLog.v("[MyReceiver] 接收到推送下来的通知");
@@ -55,7 +55,7 @@ public class ZPTJPushReceiver extends BroadcastReceiver {
 
 			// 转发到native
 			if (_cls != null) {
-				Cocos2dxHelper.postNotification(Cocos2dxHelper.kNotiRemoteNotiRecived, bundleStr);
+				CrossAppHelper.postNotification(CrossAppHelper.kNotiRemoteNotiRecived, bundleStr);
 			}
 
 		} else if (JPushInterface.ACTION_NOTIFICATION_OPENED.equals(intent.getAction())) {

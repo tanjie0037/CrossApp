@@ -4,8 +4,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import org.CrossApp.lib.Cocos2dxActivity;
-import org.CrossApp.lib.Cocos2dxHelper;
+import org.CrossApp.lib.CrossAppActivity;
+import org.CrossApp.lib.CrossAppHelper;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -18,9 +18,9 @@ import com.umeng.fb.model.UserInfo;
 
 public class UmengHelper {
 	private static boolean _init = false;
-	private static Cocos2dxActivity _context = null;
+	private static CrossAppActivity _context = null;
 
-	public static void initWithContex(Cocos2dxActivity ctx) {
+	public static void initWithContex(CrossAppActivity ctx) {
 		_context = ctx;
 	}
 
@@ -36,7 +36,7 @@ public class UmengHelper {
 		MobclickAgent.setOnlineConfigureListener(new UmengOnlineConfigureListener() {
 			@Override
 			public void onDataReceived(JSONObject data) {
-				Cocos2dxHelper.postNotification(Cocos2dxHelper.kOnlineParamUpdated);
+				CrossAppHelper.postNotification(CrossAppHelper.kOnlineParamUpdated);
 			}
 		});
 		
@@ -47,7 +47,7 @@ public class UmengHelper {
 			public void run() {
 				try {
 					Thread.sleep(3000);
-					Cocos2dxHelper.postNotification(Cocos2dxHelper.kOnlineParamUpdated);
+					CrossAppHelper.postNotification(CrossAppHelper.kOnlineParamUpdated);
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
@@ -141,25 +141,25 @@ public class UmengHelper {
 
 	static void showFeedback(final String uId) {
 		// todo: need java 1.7
-		// _context.runOnUiThread(new Runnable() {
-		//
-		// @Override
-		// public void run() {
-		// FeedbackAgent agent = new FeedbackAgent(_context);
-		// agent.startFeedbackActivity();
-		//
-		// UserInfo info = agent.getUserInfo();
-		// if (info == null)
-		// info = new UserInfo();
-		// Map<String, String> contact = info.getContact();
-		// if (contact == null)
-		// contact = new HashMap<String, String>();
-		//
-		// contact.put("uId", uId);
-		// info.setContact(contact);
-		// agent.setUserInfo(info);
-		// }
-		// });
+		 _context.runOnUiThread(new Runnable() {
+
+		 @Override
+		 public void run() {
+		 FeedbackAgent agent = new FeedbackAgent(_context);
+		 agent.startFeedbackActivity();
+
+		 UserInfo info = agent.getUserInfo();
+		 if (info == null)
+		 info = new UserInfo();
+		 Map<String, String> contact = info.getContact();
+		 if (contact == null)
+		 contact = new HashMap<String, String>();
+
+		 contact.put("uId", uId);
+		 info.setContact(contact);
+		 agent.setUserInfo(info);
+		 }
+		 });
 	}
 
 	public static void onResume() {

@@ -23,6 +23,7 @@ basics/CAThread.cpp \
 cocoa/CCNS.cpp \
 cocoa/CCSet.cpp \
 cocoa/CACalendar.cpp \
+cocoa/CCString.cpp \
 control/CABar.cpp \
 control/CAButton.cpp \
 control/CAControl.cpp \

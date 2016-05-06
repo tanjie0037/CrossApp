@@ -133,13 +133,13 @@ public class NotificationHelper extends BroadcastReceiver {
 		} catch (NoClassDefFoundError e) {
 			e.printStackTrace();
 			// 老api
-			notification = new Notification(icon, alertBody, System.currentTimeMillis());
-			notification.setLatestEventInfo(context, alertTitle, alertBody, pt);
+//			notification = new Notification(icon, alertBody, System.currentTimeMillis());
+//			notification.setLatestEventInfo(context, alertTitle, alertBody, pt);
 		} catch (NoSuchMethodError e) {
 			e.printStackTrace();
 			// 老api
-			notification = new Notification(icon, alertBody, System.currentTimeMillis());
-			notification.setLatestEventInfo(context, alertTitle, alertBody, pt);
+//			notification = new Notification(icon, alertBody, System.currentTimeMillis());
+//			notification.setLatestEventInfo(context, alertTitle, alertBody, pt);
 		} catch (Exception e) {
 			e.printStackTrace();
 			return;

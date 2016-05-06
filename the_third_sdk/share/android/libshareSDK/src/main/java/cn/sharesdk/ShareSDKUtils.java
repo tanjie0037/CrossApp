@@ -3,7 +3,7 @@ package cn.sharesdk;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import org.CrossApp.lib.Cocos2dxActivity;
+import org.CrossApp.lib.CrossAppActivity;
 
 import android.content.Context;
 import android.os.Handler.Callback;
@@ -32,11 +32,11 @@ public class ShareSDKUtils {
 	}
 
 	public static void prepare() {
-		context = Cocos2dxActivity.getContext().getApplicationContext();
+		context = CrossAppActivity.getContext().getApplicationContext();
 		hashon = new Hashon();
 		final Callback cb = new Callback() {
 			public boolean handleMessage(final Message msg) {
-				Cocos2dxActivity.getContext().runOnGLThread(new Runnable() {
+				CrossAppActivity.getContext().runOnGLThread(new Runnable() {
 					public void run() {
 						onJavaCallback((String) msg.obj);
 					}
