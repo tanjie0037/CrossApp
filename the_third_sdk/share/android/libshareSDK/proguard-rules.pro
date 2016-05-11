@@ -19,3 +19,9 @@
 -keep class cn.sharesdk.onekeyshare.ShareSDKUtils {
     public *;
 }
+
+-keep class com.newrelic.** { *; }
+
+-dontwarn com.newrelic.**
+
+-keepattributes Exceptions, Signature, InnerClasses

@@ -58,7 +58,10 @@ protected:
     static const IntervalType IntervalTypeWeek;
     
     ZPTLocalNotification()
-    {}
+    {
+        _singleNoti.clear();
+        _repeatNoti.clear();
+    }
     virtual void setNoti(uint32_t alertId, uint64_t alertTime, const std::string &alertTitle, const std::string &alertBody, IntervalType interval) {}
     virtual void cancelNoti(uint32_t alertId) {}
     void loadData();

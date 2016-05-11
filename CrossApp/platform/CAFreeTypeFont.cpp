@@ -792,7 +792,13 @@ FT_Error CAFreeTypeFont::initGlyphs(const std::string& text)
     m_textWidth = 0;
     m_textHeight = 0;
     // the height of a line of text based on the max height of a glyph in the font size
-    m_lineHeight = (int)(((m_face->size->metrics.ascender) >> 6) - ((m_face->size->metrics.descender) >> 6));
+    // tanjie: avoid crash..
+    if (!m_face || !m_face->size) {
+        m_lineHeight = 25;
+    } else {
+        m_lineHeight = (int)(((m_face->size->metrics.ascender) >> 6) - ((m_face->size->metrics.descender) >> 6));
+    }
+    
 	m_lineSpacing += m_lineHeight / 4;
 	m_lineHeight += m_lineSpacing;
 

@@ -63,7 +63,9 @@ void ZPTLocalNotification::addNotification(uint32_t alertId, uint64_t alertTime,
 }
 
 void ZPTLocalNotification::removeNotification(uint32_t alertId) {
-    const char *alertIdString = crossapp_format_string("%d", alertId).c_str();
+    CCLOG("remove noti id: %u", alertId);
+    
+    string alertIdString = crossapp_format_string("%u", alertId).c_str();
     
     Value noti;
     noti = _singleNoti[alertIdString];

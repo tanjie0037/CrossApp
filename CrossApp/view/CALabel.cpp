@@ -98,6 +98,12 @@ void CALabel::updateImageDraw()
 void CALabel::updateImage()
 {
 	int fontHeight = CAImage::getFontHeight(m_obFont.fontName.c_str(), m_obFont.fontSize);
+    
+    // tanjie: 防止除0 crash
+    if (fontHeight == 0) {
+        fontHeight = 24;
+    }
+    
 	int defaultLineSpace = fontHeight / 4;
  
     unsigned int linenumber = (int)m_obContentSize.height / fontHeight;
