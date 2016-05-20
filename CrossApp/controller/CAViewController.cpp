@@ -409,6 +409,8 @@ void CANavigationController::viewDidLoad()
     if (atof(CADevice::getSystemVersionWithIOS()) >= 7.0f)
     {
         m_bClearance = this->getView()->convertToWorldSpace(DPointZero).y < 1;
+        //tanjie: navbar不需要变高
+        m_bClearance = false;
     }
 #endif
     
