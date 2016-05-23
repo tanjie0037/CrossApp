@@ -93,9 +93,9 @@ public:
     
     bool init(const std::string& title);
     
-    void addLeftButtonItem(CABarButtonItem* item);
+    void addLeftButtonItem(CABarButtonItem* item, const std::string& textTag = "");
     
-    void addRightButtonItem(CABarButtonItem* item);
+    void addRightButtonItem(CABarButtonItem* item, const std::string& textTag = "");
     
     CC_SYNTHESIZE_IS(bool, m_bNagigationBarHidden, NagigationBarHidden);
     
@@ -108,6 +108,8 @@ public:
     CC_SYNTHESIZE_READONLY_PASS_BY_REF(CAVector<CAObject*>, m_vRightButtonItems,RightButtonItems);
     
     CC_PROPERTY_IS(bool, m_bShowGoBackButton, ShowGoBackButton);
+    
+    CABarButtonItem* getButtonItemByTag(const std::string& itemTag);
 
 };
 

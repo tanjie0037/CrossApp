@@ -129,16 +129,53 @@ CANavigationBarItem* CANavigationBarItem::create(const std::string& title)
     return NULL;
 }
 
-void CANavigationBarItem::addLeftButtonItem(CrossApp::CABarButtonItem *item)
+void CANavigationBarItem::addLeftButtonItem(CrossApp::CABarButtonItem *item, const std::string& textTag)
 {
     CC_RETURN_IF(item == NULL);
     m_vLeftButtonItems.pushBack(item);
+    
+    if (textTag.length() > 0) {
+        item->setTextTag(textTag);
+    }
 }
 
-void CANavigationBarItem::addRightButtonItem(CrossApp::CABarButtonItem *item)
+void CANavigationBarItem::addRightButtonItem(CrossApp::CABarButtonItem *item, const std::string& textTag)
 {
     CC_RETURN_IF(item == NULL);
     m_vRightButtonItems.pushBack(item);
+    
+    if (textTag.length() > 0) {
+        item->setTextTag(textTag);
+    }
+}
+
+CABarButtonItem* CANavigationBarItem::getButtonItemByTag(const std::string& itemTag)
+{
+    CABarButtonItem* item = NULL;
+    
+    CAVector<CAObject*>::iterator it;
+    
+    for (it = m_vLeftButtonItems.begin(); it != m_vLeftButtonItems.end(); it++) {
+        if (itemTag == (*it)->getTextTag()) {
+            item = dynamic_cast<CABarButtonItem*>(*it);
+            break;
+        }
+    }
+    
+    if (!item) {
+        for (it = m_vRightButtonItems.begin(); it != m_vRightButtonItems.end(); it++) {
+            if (itemTag == (*it)->getTextTag()) {
+                item = dynamic_cast<CABarButtonItem*>(*it);
+                break;
+            }
+        }
+    }
+    
+    if (!item) {
+        CCLog("navbar item not found, tag:%s", itemTag.c_str());
+    }
+    
+    return item;
 }
 
 void CANavigationBarItem::setShowGoBackButton(bool var)
