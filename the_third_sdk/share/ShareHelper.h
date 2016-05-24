@@ -109,7 +109,7 @@ public:
      *  @param  direction   弹出分享菜单指向，仅用于设置iPad分享菜单弹出
      *	@param 	callback 	回调方法
      */
-    static void showShareMenu(const std::vector<cn::sharesdk::C2DXPlatType>& platTypes, CSJsonDictionary& content, CrossApp::CCPoint pt, cn::sharesdk::C2DXMenuArrowDirection direction, cn::sharesdk::C2DXShareResultEvent callback);
+    static void showShareMenu(const std::vector<cn::sharesdk::C2DXPlatType>& platTypes, CSJsonDictionary& content, CrossApp::DPoint pt, cn::sharesdk::C2DXMenuArrowDirection direction, cn::sharesdk::C2DXShareResultEvent callback);
     
     
     /**

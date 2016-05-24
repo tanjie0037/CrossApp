@@ -288,7 +288,7 @@ void ShareHelper::showShareMenu(const std::vector<cn::sharesdk::C2DXPlatType>& p
     //todo
 }
 
-void ShareHelper::showShareMenu(const std::vector<cn::sharesdk::C2DXPlatType>& platTypes, CSJsonDictionary& content, CrossApp::CCPoint pt, cn::sharesdk::C2DXMenuArrowDirection direction, cn::sharesdk::C2DXShareResultEvent callback) {
+void ShareHelper::showShareMenu(const std::vector<cn::sharesdk::C2DXPlatType>& platTypes, CSJsonDictionary& content, CrossApp::DPoint pt, cn::sharesdk::C2DXMenuArrowDirection direction, cn::sharesdk::C2DXShareResultEvent callback) {
     //todo
 }
 
