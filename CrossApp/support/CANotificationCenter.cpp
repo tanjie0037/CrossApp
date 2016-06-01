@@ -59,6 +59,19 @@ void CANotificationCenter::addObserver(CAObject *target, SEL_CallFuncOD selector
     if (this->observerExisted(target, name))
         return;
     
+    CANotificationObserver *observer = new CANotificationObserver(target, selector, name, obj, 0);
+    if (!observer)
+        return;
+    
+    observer->autorelease();
+    m_observers.pushBack(observer);
+}
+
+void CANotificationCenter::addObserver(CAObject *target, SEL_CallFuncO selector, const char *name, CAObject *obj)
+{
+    if (this->observerExisted(target, name))
+        return;
+    
     CANotificationObserver *observer = new CANotificationObserver(target, selector, name, obj);
     if (!observer)
         return;
@@ -199,10 +212,28 @@ int CANotificationCenter::getObserverHandlerByName(const char* name)
 /// CANotificationObserver
 ///
 ////////////////////////////////////////////////////////////////////////////////
-CANotificationObserver::CANotificationObserver(CAObject *target, SEL_CallFuncOD selector, const char *name, CAObject *obj)
+CANotificationObserver::CANotificationObserver(CAObject *target, SEL_CallFuncOD selector, const char *name, CAObject *obj, int size)
+: m_selectorO(NULL)
+, m_selectorOD(NULL)
 {
     m_target = target;
-    m_selector = selector;
+    m_selectorOD = selector;
+    m_object = obj;
+    
+    m_name = new char[strlen(name)+1];
+    memset(m_name,0,strlen(name)+1);
+    
+    string orig (name);
+    orig.copy(m_name,strlen(name),0);
+    m_nHandler = 0;
+}
+
+CANotificationObserver::CANotificationObserver(CAObject *target, SEL_CallFuncO selector, const char *name, CAObject *obj)
+: m_selectorO(NULL)
+, m_selectorOD(NULL)
+{
+    m_target = target;
+    m_selectorO = selector;
     m_object = obj;
     
     m_name = new char[strlen(name)+1];
@@ -224,11 +255,23 @@ void CANotificationObserver::performSelector(CAObject *obj, void *data)
     {
 		if (obj)
         {
-			(m_target->*m_selector)(obj, data);
+            if (m_selectorOD) {
+                (m_target->*m_selectorOD)(obj, data);
+            }
+			
+            if (m_selectorO) {
+                (m_target->*m_selectorO)(obj);
+            }
 		}
         else
         {
-			(m_target->*m_selector)(m_object, data);
+            if (m_selectorOD) {
+                (m_target->*m_selectorOD)(m_object, data);
+            }
+            
+            if (m_selectorO) {
+                (m_target->*m_selectorO)(m_object);
+            }
 		}
     }
 }
@@ -236,11 +279,6 @@ void CANotificationObserver::performSelector(CAObject *obj, void *data)
 CAObject *CANotificationObserver::getTarget()
 {
     return m_target;
-}
-
-SEL_CallFuncOD CANotificationObserver::getSelector()
-{
-    return m_selector;
 }
 
 char *CANotificationObserver::getName()

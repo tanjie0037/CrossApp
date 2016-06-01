@@ -24,6 +24,12 @@ public:
     CANotificationObserver(CAObject *target,
                            SEL_CallFuncOD selector,
                            const char *name,
+                           CAObject *obj,
+                           int size);
+    
+    CANotificationObserver(CAObject *target,
+                           SEL_CallFuncO selector,
+                           const char *name,
                            CAObject *obj);
     
     /** CANotificationObserver destructor function */
@@ -33,7 +39,8 @@ public:
     void performSelector(CAObject *obj, void *data);
 private:
     CC_PROPERTY_READONLY(CAObject *, m_target, Target);
-    CC_PROPERTY_READONLY(SEL_CallFuncOD, m_selector, Selector);
+    CC_SYNTHESIZE_READONLY(SEL_CallFuncOD, m_selectorOD, SelectorOD);
+    CC_SYNTHESIZE_READONLY(SEL_CallFuncO, m_selectorO, SelectorO);
     CC_PROPERTY_READONLY(char *, m_name, Name);
     CC_PROPERTY_READONLY(CAObject *, m_object, Object);
     CC_PROPERTY(int, m_nHandler,Handler);
@@ -65,6 +72,12 @@ public:
      */
     void addObserver(CAObject *target, 
                      SEL_CallFuncOD selector,
+                     const char *name,
+                     CAObject *obj);
+    
+    // 加这个兼容引擎
+    void addObserver(CAObject *target,
+                     SEL_CallFuncO selector,
                      const char *name,
                      CAObject *obj);
 
