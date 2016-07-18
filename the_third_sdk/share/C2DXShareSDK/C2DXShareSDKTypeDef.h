@@ -2,22 +2,22 @@
 //  C2DXShareSDKTypeDef.h
 //  C2DXShareSDKSample
 //
-//  Created by 冯 鸿杰 on 13-12-17.
-//
+//  Copyright © 2015年 mob.com. All rights reserved.
 //
 
 #ifndef C2DXShareSDKSample_C2DXShareSDKTypeDef_h
 #define C2DXShareSDKSample_C2DXShareSDKTypeDef_h
 
-#include "CrossApp.h"
-
-#ifdef __STDC_LIMIT_MACROS
 #include <stdint.h>
-#else
-#define UINT32_MAX 4294967295U
-#endif
+#include "CrossApp.h"
+#include "CrossAppExt.h"
 
 USING_NS_CC;
+
+#define C2DXDictionary CSJsonDictionary
+#define C2DXPoint DPoint
+#define C2DXPointMake(x,y) DPoint(x, y)
+#define C2DXObjectAtIndex(i) objectAtIndex(i)
 
 namespace cn
 {
@@ -28,9 +28,9 @@ namespace cn
          */
         enum C2DXPlatType
         {
+        	C2DXPlatTypeUnknown = 0,
             C2DXPlatTypeSinaWeibo = 1,         /**< 新浪微博 */
             C2DXPlatTypeTencentWeibo = 2,      /**< 腾讯微博 */
-            C2DXPlatTypeSohuWeibo = 3,         /**< 搜狐微博 */
             C2DXPlatTypeDouBan = 5,            /**< 豆瓣社区 */
             C2DXPlatTypeQZone = 6,             /**< QQ空间 */
             C2DXPlatTypeRenren = 7,            /**< 人人网 */
@@ -48,8 +48,8 @@ namespace cn
             C2DXPlatTypeSMS = 19,              /**< 短信分享 */
             C2DXPlatTypeAirPrint = 20,         /**< 打印 */
             C2DXPlatTypeCopy = 21,             /**< 拷贝 */
-            C2DXPlatTypeWeixiSession = 22,     /**< 微信好友 */
-            C2DXPlatTypeWeixiTimeline = 23,    /**< 微信朋友圈 */
+            C2DXPlatTypeWeChat = 22,           /**< 微信好友 */
+            C2DXPlatTypeWeChatMoments = 23,    /**< 微信朋友圈 */
             C2DXPlatTypeQQ = 24,               /**< QQ */
             C2DXPlatTypeInstapaper = 25,       /**< Instapaper */
             C2DXPlatTypePocket = 26,           /**< Pocket */
@@ -59,32 +59,37 @@ namespace cn
             C2DXPlatTypeFlickr = 34,           /**< Flickr */
             C2DXPlatTypeDropbox = 35,          /**< Dropbox */
             C2DXPlatTypeVKontakte = 36,        /**< VKontakte */
-            C2DXPlatTypeWeixiFav = 37,         /**< 微信收藏 */
+            C2DXPlatTypeWeChatFavorites = 37,  /**< 微信收藏 */
             C2DXPlatTypeYiXinSession = 38,     /**< 易信好友 */
             C2DXPlatTypeYiXinTimeline = 39,    /**< 易信朋友圈 */
             C2DXPlatTypeYiXinFav = 40,         /**< 易信收藏 */
             C2DXPlatTypeMingDao = 41,          /**< 明道 */
-            C2DXPlatTypeLine = 42,             /**< Line */
-            C2DXPlatTypeWhatsApp = 43,         /**< Whats App */
-            C2DXPlatTypeKaKaoTalk = 44,        /**< KaKao Talk */
-            C2DXPlatTypeKaKaoStory = 45,       /**< KaKao Story */
-            C2DXPlatTypeAny = 99               /**< 任意平台 */
+    		C2DXPlatTypeLine = 42,             /**< Line */
+    		C2DXPlatTypeWhatsApp = 43,         /**< Whats App */
+    		C2DXPlatTypeKakaoTalk = 44,        /**< KakaoTalk */
+    		C2DXPlatTypeKakaoStory = 45,       /**< KakaoStory */ 
+    		C2DXPlatTypeFacebookMessenger = 46,/**< FacebookMessenger */
+    		C2DXPlatTypeBluetooth = 48,        /**< Bluetooth */
+    		C2DXPlatTypeAlipay = 50,           /**< Alipay */
+    		C2DXPlatTypeWechatPlatform = 997,  /**< Wechat Series */
+    		C2DXPlatTypeQQPlatform = 998,	   /**< QQ Series */
+    		C2DXPlatTypeAny = 999 			   /**< 任意平台 */
         };
-        
+
         /**
          *	@brief	内容类型
          */
         enum C2DXContentType
         {
-            C2DXContentTypeText = 0, /**< 文本 */
-            C2DXContentTypeImage = 1, /**< 图片 */
-            C2DXContentTypeNews = 2, /**< 新闻 */
-            C2DXContentTypeMusic = 3, /**< 音乐 */
-            C2DXContentTypeVideo = 4, /**< 视频 */
-            C2DXContentTypeApp = 5, /**< 应用,仅供微信使用 */
-            C2DXContentTypeNonGif = 6, /**< 非Gif消息,仅供微信使用 */
-            C2DXContentTypeGif = 7, /**< Gif消息,仅供微信使用 */
-            C2DXContentTypeFile = 8 /**< 文件消息,仅供微信使用 */
+            C2DXContentTypeAuto = 0,  /**< 自动判断发送类型，避免部分平台不支持某些类型，仅供iOS端使用 */
+            C2DXContentTypeText = 1, /**< 文本 */
+            C2DXContentTypeImage = 2, /**< 图片 */
+            C2DXContentTypeWebPage = 4, /**< 网页 */
+            C2DXContentTypeMusic = 5, /**< 音乐 */
+            C2DXContentTypeVideo = 6, /**< 视频 */
+            C2DXContentTypeApp = 7, /**< 应用,仅供微信使用 */
+            C2DXContentTypeFile = 8, /**< 文件消息,仅供微信使用 */
+            C2DXContentTypeEmoji = 9 /**< 表情消息,仅供微信使用 */
         };
         
         /**
@@ -97,34 +102,33 @@ namespace cn
             C2DXResponseStateFail = 2, /**< 失败 */
             C2DXResponseStateCancel = 3 /**< 取消 */
         };
+                
+        /**
+         *	@brief	授权回调事件
+         */
+        typedef void(*C2DXAuthResultEvent) (int reqID, C2DXResponseState state, C2DXPlatType platType, C2DXDictionary *res);
+        
+        /** 
+         *	@brief	获取用户信息回调事件
+         */
+        typedef void(*C2DXGetUserInfoResultEvent) (int reqID, C2DXResponseState state, C2DXPlatType platType, C2DXDictionary *res);
         
         /**
-         *	@brief	分享菜单指向
+         *	@brief	分享回调事件
          */
-        enum C2DXMenuArrowDirection
-        {
-            C2DXMenuArrowDirectionUp = 1UL << 0, /**< 向上 */
-            C2DXMenuArrowDirectionDown = 1UL << 1, /**< 向下 */
-            C2DXMenuArrowDirectionLeft = 1UL << 2, /**< 向左 */
-            C2DXMenuArrowDirectionRight = 1UL << 3, /**< 向右 */
-            C2DXMenuArrowDirectionAny = C2DXMenuArrowDirectionUp | C2DXMenuArrowDirectionDown | C2DXMenuArrowDirectionLeft | C2DXMenuArrowDirectionRight, /**< 任意 */
-            C2DXMenuArrowDirectionUnknown = UINT32_MAX /**< 未知 */
-        };
-        
+        typedef void(*C2DXShareResultEvent) (int reqID, C2DXResponseState state, C2DXPlatType platType, C2DXDictionary *res);
+
         /**
-         *	@brief	授权返回回调事件
+         *	@brief	关注好友回调事件
          */
-        typedef void(*C2DXAuthResultEvent) (C2DXResponseState state, C2DXPlatType platType, CCDictionary *error);
-        
+        typedef void(*C2DXAddFriendResultEvent) (int reqID, C2DXResponseState state, C2DXPlatType platType,  C2DXDictionary *res);
+		
         /**
-         *	@brief	获取用户信息返回回调事件
+         *	@brief	获取好友列表回调事件
          */
-        typedef void(*C2DXGetUserInfoResultEvent) (C2DXResponseState state, C2DXPlatType platType, CCDictionary *userInfo, CCDictionary *error);
+        typedef void(*C2DXGetFriendsResultEvent) (int reqID, C2DXResponseState state, C2DXPlatType platType,  C2DXDictionary *res);
         
-        /**
-         *	@brief	分享返回回调事件
-         */
-        typedef void(*C2DXShareResultEvent) (C2DXResponseState state, C2DXPlatType platType, CCDictionary *shareInfo, CCDictionary *error);
+        typedef std::vector<C2DXPlatType> C2DXPlatforms;
     }
 }
 

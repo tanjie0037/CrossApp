@@ -95,6 +95,7 @@ public class RR {
 			isDebug = true;
 		}
 
+		System.out.println("Debug: " + isDebug);
 		return isDebug;
 	}
 

@@ -1,50 +1,28 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.zpt.libadxmi">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.zpt.libadxmi"
+          xmlns:tools="http://schemas.android.com/tools">
 
-    <!--<application android:allowBackup="true" android:label="@string/app_name">-->
-        <!--<activity-->
-            <!--android:name="net.adxmi.android.AdBrowser"-->
-            <!--android:configChanges="keyboard|keyboardHidden|orientation|screenSize"-->
-            <!--android:theme="@android:style/Theme.Light.NoTitleBar" >-->
-        <!--</activity>-->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
 
-        <!--<service-->
-            <!--android:name="net.adxmi.android.AdService"-->
-            <!--android:exported="false" >-->
-        <!--</service>-->
+    <application android:allowBackup="true">
+        <activity
+            android:name="net.adxmi.android.AdBrowser"
+            android:configChanges="keyboard|keyboardHidden|orientation|screenSize"
+            android:theme="@android:style/Theme.Light.NoTitleBar" >
+        </activity>
+        <service
+            android:name="net.adxmi.android.AdService"
+            android:exported="false" >
+        </service>
 
-        <!--&lt;!&ndash; 获取积分必须组件 &ndash;&gt;-->
-        <!--<service-->
-            <!--android:name="net.adxmi.android.ExpService"-->
-            <!--android:exported="false" >-->
-        <!--</service>-->
-
-        <!--&lt;!&ndash; 视频广告必须组件 &ndash;&gt;-->
-        <!--<activity-->
-            <!--android:name="net.adxmi.android.video.VideoActivity"-->
-            <!--android:configChanges="keyboard|keyboardHidden|screenSize|orientation"-->
-            <!--android:screenOrientation="landscape"-->
-            <!--android:theme="@android:style/Theme.NoTitleBar" >-->
-        <!--</activity>-->
-
-        <!--&lt;!&ndash; 可选配置 &ndash;&gt;-->
-        <!--<receiver android:name="net.adxmi.android.AdReceiver" >-->
-            <!--<intent-filter>-->
-                <!--<action android:name="android.intent.action.PACKAGE_ADDED" />-->
-
-                <!--<data android:scheme="package" />-->
-            <!--</intent-filter>-->
-        <!--</receiver>-->
-    <!--</application>-->
-
-    <!--<uses-permission android:name="android.permission.INTERNET" />-->
-    <!--<uses-permission android:name="android.permission.READ_PHONE_STATE" />-->
-    <!--<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />-->
-    <!--<uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />-->
-    <!--<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />-->
-    <!--<uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />-->
-    <!--<uses-permission android:name="android.permission.GET_TASKS" />-->
-    <!--&lt;!&ndash; 以下为可选权限 &ndash;&gt;-->
-    <!--<uses-permission android:name="com.android.launcher.permission.INSTALL_SHORTCUT" />-->
-    <!--<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />-->
-
+        <!-- 获取积分必须组件 -->
+        <service
+            android:name="net.adxmi.android.ExpService"
+            android:exported="false" >
+        </service>
+    </application>
 </manifest>

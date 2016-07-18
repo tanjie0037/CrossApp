@@ -8,7 +8,8 @@ LOCAL_MODULE_FILENAME := libthe_third_sdk
 LOCAL_WHOLE_STATIC_LIBRARIES := CrossApp_static
 LOCAL_WHOLE_STATIC_LIBRARIES += CrossApp_extension_static
 
-LOCAL_SRC_FILES := share/ShareHelper.cpp \
+LOCAL_SRC_FILES := share/C2DXShareSDK/Android/ShareSDKUtils.cpp \
+				share/C2DXShareSDK/C2DXShareSDK.cpp \
 				ads/AdHelper.cpp \
 				umeng/UMHelper.cpp \
 				common/ZPTNativeHelper.cpp \
@@ -16,7 +17,8 @@ LOCAL_SRC_FILES := share/ShareHelper.cpp \
 				localNotification/ZPTLocalNotification.cpp \
 				localNotification/android/ZPTLocalNotification_Android.cpp
 
-LOCAL_C_INCLUDES := $(LOCAL_PATH)/share \
+LOCAL_C_INCLUDES := $(LOCAL_PATH)/share/C2DXShareSDK \
+				$(LOCAL_PATH)/share/C2DXShareSDK/Android \
 				$(LOCAL_PATH)/ads \
 				$(LOCAL_PATH)/umeng \
 				$(LOCAL_PATH)/common \

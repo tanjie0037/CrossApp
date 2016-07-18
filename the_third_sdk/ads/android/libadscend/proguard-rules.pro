@@ -16,17 +16,14 @@
 #   public *;
 #}
 
--dontwarn retrofit.**
 -dontwarn java.nio.file.*
+-dontwarn com.squareup.okhttp.**
 -dontwarn org.codehaus.mojo.animal_sniffer.IgnoreJRERequirement
 
 -keepattributes Signature
 -keepattributes Exceptions
 
--keep class retrofit.** { *; }
--keep class com.squareup.okhttp.** { *; }
 -keep class sun.misc.Unsafe { *; }
 -keep class com.google.gson.stream.** { *; }
 -keep class com.adscendmedia.sdk.rest.model.** { *; }
 -keep class com.adscendmedia.sdk.rest.response.** { *; }
--keep interface com.squareup.okhttp.** { *; }

@@ -30,6 +30,7 @@ public:
     
 public:
     static CSJsonDictionary *create(const char *pszDescription);
+    static CSJsonDictionary *create();
     void    initWithDescription(const char *pszDescription);
     void	initWithValue(CSJson::Value& value);
     

@@ -10,8 +10,6 @@ import com.nativex.monetization.listeners.OnAdEventV2;
 import com.nativex.monetization.listeners.RewardListener;
 import com.nativex.monetization.listeners.SessionListener;
 import com.nativex.monetization.mraid.AdInfo;
-import com.sponsorpay.SponsorPay;
-import com.sponsorpay.publisher.SponsorPayPublisher;
 import com.supersonic.mediationsdk.logger.SupersonicError;
 import com.supersonic.mediationsdk.sdk.OfferwallListener;
 import com.supersonic.mediationsdk.sdk.Supersonic;
@@ -299,7 +297,7 @@ public class AdHelper {
 			public void run() {
 				switch (type) {
 					case AdType.AdFyber:
-						SponsorPay.start(appkey, uId, token, _activity);
+//						SponsorPay.start(appkey, uId, token, _activity);
 						break;
 					case AdType.AdSupersonic:
 						_mMediationAgent = SupersonicFactory.getInstance();
@@ -390,9 +388,9 @@ public class AdHelper {
 			public void run() {
 				switch (type) {
 					case AdType.AdFyber:
-						_activity.startActivityForResult(
-								SponsorPayPublisher.getIntentForOfferWallActivity(_activity, true),
-								OFFERWALL_REQUEST_CODE);
+//						_activity.startActivityForResult(
+//								SponsorPayPublisher.getIntentForOfferWallActivity(_activity, true),
+//								OFFERWALL_REQUEST_CODE);
 						break;
 					case AdType.AdSupersonic:
 						if (_mMediationAgent != null && _mMediationAgent.isOfferwallAvailable()) {

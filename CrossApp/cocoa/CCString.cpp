@@ -1,6 +1,7 @@
 #include "CCString.h"
 #include "platform/CCFileUtils.h"
 #include "ccMacros.h"
+#include "CCDataVisitor.h"
 #include <stdlib.h>
 #include <stdio.h>
 
@@ -9,23 +10,23 @@ NS_CC_BEGIN
 #define kMaxStringLen (1024*100)
 
 CCString::CCString()
-:m_sString("")
+    :m_sString("")
 {}
 
 CCString::CCString(const char * str)
-:m_sString(str)
+    :m_sString(str)
 {}
 
 CCString::CCString(const std::string& str)
-:m_sString(str)
+    :m_sString(str)
 {}
 
 CCString::CCString(const CCString& str)
-:m_sString(str.getCString())
+    :m_sString(str.getCString())
 {}
 
 CCString::~CCString()
-{
+{ 
     m_sString.clear();
 }
 
@@ -53,14 +54,14 @@ bool CCString::initWithFormat(const char* format, ...)
 {
     bool bRet = false;
     m_sString.clear();
-    
+
     va_list ap;
     va_start(ap, format);
-    
+
     bRet = initWithFormatAndValist(format, ap);
-    
+
     va_end(ap);
-    
+
     return bRet;
 }
 
@@ -106,7 +107,7 @@ bool CCString::boolValue() const
     {
         return false;
     }
-    
+
     if (0 == strcmp(m_sString.c_str(), "0") || 0 == strcmp(m_sString.c_str(), "false"))
     {
         return false;
@@ -129,7 +130,7 @@ int CCString::compare(const char * pStr) const
     return strcmp(getCString(), pStr);
 }
 
-CAObject* CCString::copyWithZone(CAZone* pZone)
+CAObject* CCString::copyWithZone(CCZone* pZone)
 {
     CCAssert(pZone == NULL, "CCString should not be inherited.");
     CCString* pStr = new CCString(m_sString.c_str());
@@ -185,7 +186,7 @@ CCString* CCString::createWithFormat(const char* format, ...)
     va_start(ap, format);
     pRet->initWithFormatAndValist(format, ap);
     va_end(ap);
-    
+
     return pRet;
 }
 
@@ -198,6 +199,11 @@ CCString* CCString::createWithContentsOfFile(const char* pszFileName)
     pRet = CCString::createWithData(pData, size);
     CC_SAFE_DELETE_ARRAY(pData);
     return pRet;
+}
+
+void CCString::acceptVisitor(CCDataVisitor &visitor)
+{
+    visitor.visit(this);
 }
 
 NS_CC_END

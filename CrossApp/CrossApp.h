@@ -111,6 +111,14 @@
 #include "cocoa/CCNS.h"
 #include "cocoa/CACalendar.h"
 #include "cocoa/CCString.h"
+#include "cocoa/CCZone.h"
+#include "cocoa/CCDataVisitor.h"
+#include "cocoa/CCArray.h"
+#include "cocoa/CCBool.h"
+#include "cocoa/CCDictionary.h"
+#include "cocoa/CCDouble.h"
+#include "cocoa/CCFloat.h"
+#include "cocoa/CCInteger.h"
 
 // kazmath
 #include "kazmath/include/kazmath/kazmath.h"
