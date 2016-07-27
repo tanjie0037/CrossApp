@@ -92,15 +92,15 @@ C2DXDictionary* convertNSDictToCCDict(NSDictionary *dict)
 
 NSMutableDictionary * convertC2DXDictionaryToNSDictionary(C2DXDictionary * Dictionary)
 {
-    const char* dicStr = Dictionary->getDescription().c_str();
+    string dicStr = Dictionary->getDescription();
     
-    if (!dicStr) {
+    if (dicStr.length() == 0) {
         NSLog(@"json解析失败");
         return nil;
     }
     
-    NSData *jsonData = [nsstr(dicStr) dataUsingEncoding:NSUTF8StringEncoding];
-    NSError *err;
+    NSData *jsonData = [nsstr(dicStr.c_str()) dataUsingEncoding:NSUTF8StringEncoding];
+    NSError *err = nil;
     NSMutableDictionary *nsDict = [NSJSONSerialization JSONObjectWithData:jsonData
                                                         options:NSJSONReadingMutableContainers
                                                           error:&err];
@@ -187,6 +187,7 @@ void C2DXiOSShareSDK::registerAppAndSetPlatformConfig(const char *appKey, C2DXDi
     onConfiguration:^(SSDKPlatformType platformType, NSMutableDictionary *appInfo)
     {
         NSMutableDictionary * dict = [platformsDic objectForKey:[NSString stringWithFormat:@"%zi",platformType]];
+        
         [appInfo addEntriesFromDictionary:dict];
         [appInfo setObject:@"both" forKey:@"auth"];
         

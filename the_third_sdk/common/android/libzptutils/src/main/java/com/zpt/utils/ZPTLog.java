@@ -3,7 +3,7 @@ package com.zpt.utils;
 import android.util.Log;
 
 public class ZPTLog {
-	public static boolean enable = false;
+	public static boolean enable = true;
 	private static final String TAG_DEFAULT = "---zpt";
 	
 	public static void v(String tag, String msg){

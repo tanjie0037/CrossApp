@@ -97,6 +97,11 @@ import android.widget.TextView.OnEditorActionListener;
 	
 	public static void updateImage()
 	{
+		if (dict == null) {
+			assert (false);
+			return;
+		}
+
 		Set<Integer> keys = (Set<Integer>) dict.keySet() ; 
 		Iterator<Integer> iterator = keys.iterator() ; 
 		while (iterator.hasNext())

@@ -1,17 +1,17 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.zpt.libumeng">
 
-    <!--<application android:allowBackup="true" android:label="@string/app_name">-->
-        <!--<application>-->
-            <!--<activity android:name="com.umeng.fb.ConversationActivity" />-->
-        <!--</application>-->
-        <!--<meta-data android:value="YOUR_APP_KEY" android:name="UMENG_APPKEY"></meta-data>-->
-        <!--<meta-data android:value="Channel ID" android:name="UMENG_CHANNEL"/>-->
-    <!--</application>-->
+    <application>
+        <application>
+            <activity android:name="com.umeng.fb.ConversationActivity" />
+        </application>
+        <!--copy to root poroject-->
+        <!--<meta-data android:value="${UMENG_APPKEY}" android:name="UMENG_APPKEY"/>-->
+        <!--<meta-data android:value="${UMENG_CHANNEL}" android:name="UMENG_CHANNEL"/>-->
+    </application>
 
-    <!--<uses-permission android:name="android.permission.INTERNET" />-->
-    <!--<uses-permission android:name="android.permission.READ_PHONE_STATE" />-->
-    <!--<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />-->
-    <!--<uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />-->
-    <!--<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />-->
-
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 </manifest>

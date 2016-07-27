@@ -19,11 +19,10 @@ repositories {
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile 'com.android.support:appcompat-v7:23.3.0'
-    compile 'com.android.support:design:23.3.0'
-    compile 'com.android.support:support-v4:23.3.0'
-    compile 'com.google.android.gms:play-services-ads:8.4.0'
-    compile 'com.google.code.gson:gson:2.5'
+    compile 'com.android.support:appcompat-v7'
+    compile 'com.android.support:design'
+    compile 'com.google.code.gson:gson:2.7'
+    compile 'com.google.android.gms:play-services-ads'
     compile 'com.squareup.picasso:picasso:2.5.2'
     compile 'com.adscendmedia.sdk:adscendmedia:2.1.3'
 }

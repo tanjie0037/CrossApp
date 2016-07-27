@@ -75,7 +75,7 @@ void C2DXShareSDK::registerAppAndSetPlatformConfig(const char *appKey, C2DXDicti
     
     //Andorid
     // This is not a necessary method for Android, you can setup your platform configs more efficiently in "assets/ShareSDK.xml"
-    registerAppAndSetPlatformConfigJNI(appKey, configInfo);
+//    registerAppAndSetPlatformConfigJNI(appKey, configInfo);
     
 #elif CC_TARGET_PLATFORM == CC_PLATFORM_IOS
     

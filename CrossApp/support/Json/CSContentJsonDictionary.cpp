@@ -59,6 +59,7 @@ CSJsonDictionary *CSJsonDictionary::create(const char *pszDescription)
 CSJsonDictionary *CSJsonDictionary::create()
 {
     CSJsonDictionary *ret = new CSJsonDictionary();
+    ret->initWithDescription("{}");
     ret->autorelease();
     return ret;
 }
