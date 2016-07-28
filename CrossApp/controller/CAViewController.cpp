@@ -68,7 +68,16 @@ void CAViewController::parser()
 #if CC_TARGET_PLATFORM == CC_PLATFORM_WIN32
     name = name.substr(6, name.length() - 6);
 #else
-    name = name.substr(2, name.length() - 2);
+    
+    if (name.length() <= 10)
+    {
+        name = name.substr(1, name.length() - 1);
+    }
+    else
+    {
+        name = name.substr(2, name.length() - 2);
+    }
+
 #endif
     
     std::string filePath = "r/" + name + ".xib";
@@ -550,14 +559,14 @@ void CANavigationController::replaceViewController(CrossApp::CAViewController *v
     {
         CAViewAnimation::beginAnimations("", NULL);
         CAViewAnimation::setAnimationDuration(0.25f);
-        CAViewAnimation::setAnimationDelay(1/30.0f);
+        CAViewAnimation::setAnimationDelay(1/10.0f);
         CAViewAnimation::setAnimationCurve(CAViewAnimationCurveEaseOut);
         lastContainer->setFrameOrigin(DPoint(-x/3.0f, 0));
         CAViewAnimation::commitAnimations();
         
         CAViewAnimation::beginAnimations("", NULL);
         CAViewAnimation::setAnimationDuration(0.25f);
-        CAViewAnimation::setAnimationDelay(1/60.0f);
+        CAViewAnimation::setAnimationDelay(1/20.0f);
         CAViewAnimation::setAnimationCurve(CAViewAnimationCurveEaseOut);
         CAViewAnimation::setAnimationDidStopSelector(this, CAViewAnimation0_selector(CANavigationController::replaceViewControllerFinish));
         newContainer->setFrameOrigin(DPointZero);
@@ -607,14 +616,14 @@ void CANavigationController::pushViewController(CAViewController* viewController
     {
         CAViewAnimation::beginAnimations("", NULL);
         CAViewAnimation::setAnimationDuration(0.25f);
-        CAViewAnimation::setAnimationDelay(1/30.0f);
+        CAViewAnimation::setAnimationDelay(1/10.0f);
         CAViewAnimation::setAnimationCurve(CAViewAnimationCurveEaseOut);
         lastContainer->setFrameOrigin(DPoint(-x/3.0f, 0));
         CAViewAnimation::commitAnimations();
         
         CAViewAnimation::beginAnimations("", NULL);
         CAViewAnimation::setAnimationDuration(0.25f);
-        CAViewAnimation::setAnimationDelay(1/60.0f);
+        CAViewAnimation::setAnimationDelay(1/20.0f);
         CAViewAnimation::setAnimationCurve(CAViewAnimationCurveEaseOut);
         CAViewAnimation::setAnimationDidStopSelector(this, CAViewAnimation0_selector(CANavigationController::pushViewControllerFinish));
         newContainer->setFrameOrigin(DPointZero);

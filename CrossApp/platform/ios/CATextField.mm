@@ -212,18 +212,23 @@ CATextField::CATextField()
 CATextField::~CATextField()
 {
     [textField_iOS removeTextField];
+    m_pDelegate = NULL;
 }
 
 void CATextField::onEnterTransitionDidFinish()
 {
-    CAView::onEnterTransitionDidFinish();
+    CAControl::onEnterTransitionDidFinish();
     
     this->delayShowImage();
 }
 
 void CATextField::onExitTransitionDidStart()
 {
-    CAView::onExitTransitionDidStart();
+    CAControl::onExitTransitionDidStart();
+    if (this->isFirstResponder())
+    {
+        this->resignFirstResponder();
+    }
 }
 
 bool CATextField::resignFirstResponder()
@@ -233,7 +238,7 @@ bool CATextField::resignFirstResponder()
         return false;
     }
     
-    bool result = CAView::resignFirstResponder();
+    bool result = CAControl::resignFirstResponder();
 
     if ([textField_iOS isFirstResponder])
     {
@@ -255,7 +260,7 @@ bool CATextField::becomeFirstResponder()
         return false;
     }
     
-    bool result = CAView::becomeFirstResponder();
+    bool result = CAControl::becomeFirstResponder();
     
     this->hideTextField();
     
@@ -386,7 +391,7 @@ void CATextField::update(float dt)
 
 void CATextField::setContentSize(const DSize& contentSize)
 {
-    CAView::setContentSize(contentSize);
+    CAControl::setContentSize(contentSize);
     
     DSize worldContentSize = this->convertToWorldSize(m_obContentSize);
     

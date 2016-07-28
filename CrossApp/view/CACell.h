@@ -14,7 +14,8 @@
 
 NS_CC_BEGIN
 
-class CC_DLL CACell: public CAControl
+class CAUIEditorParser;
+class CC_DLL CACell: public CAView
 {
     
 public:
@@ -37,6 +38,8 @@ public:
     
     CC_SYNTHESIZE_IS(bool, m_bAllowsSelected, AllowsSelected);
 
+    CAView* getViewWithID(const std::string &tag);
+    
 protected:
 
     virtual void normalCell();
@@ -50,18 +53,34 @@ protected:
     virtual void recoveryCell(){};
     
     void setControlState(const CAControlState& var);
+
+    const CAControlState& getControlState();
+    
+    void setControlStateNormal();
+    
+    void setControlStateHighlighted();
+    
+    void setControlStateDisabled();
+    
+    void setControlStateSelected();
     
     void resetCell();
     
+    void parser();
+    
 private:
 
-    using CAControl::init;
+    using CAView::init;
     
-    using CAControl::initWithCenter;
+    using CAView::initWithCenter;
     
-    using CAControl::initWithFrame;
+    using CAView::initWithFrame;
     
-    using CAControl::initWithLayout;
+    using CAView::initWithLayout;
+    
+    CAControlState m_eControlState;
+    
+    CAUIEditorParser* m_pParser;
 };
 
 NS_CC_END;

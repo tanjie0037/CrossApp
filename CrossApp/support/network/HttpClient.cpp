@@ -153,9 +153,9 @@ static void* networkThread(void *data)
         }
 
         
-        pthread_mutex_lock(&httpClient->s_requestQueueMutex);
+        pthread_mutex_lock(&httpClient->s_responseQueueMutex);
         httpClient->s_responseQueue.pushBack(response);
-        pthread_mutex_unlock(&httpClient->s_requestQueueMutex);
+        pthread_mutex_unlock(&httpClient->s_responseQueueMutex);
         
         CAScheduler::getScheduler()->resumeTarget(httpClient);
     }
@@ -215,7 +215,8 @@ static bool configureCURL(CURL *handle, CAHttpClient* httpClient)
     }
     
     curl_easy_setopt(handle, CURLOPT_NOSIGNAL, 1L);
-
+    curl_easy_setopt(handle, CURLOPT_ACCEPT_ENCODING, "");
+    
     return true;
 }
 
@@ -279,7 +280,7 @@ public:
         if (CURLE_OK != curl_easy_perform(m_curl))
             return false;
         CURLcode code = curl_easy_getinfo(m_curl, CURLINFO_RESPONSE_CODE, responseCode);
-        if (code != CURLE_OK || *responseCode != 200)
+        if (code != CURLE_OK || !(*responseCode >= 200 && *responseCode < 300))
             return false;
         
         return true;

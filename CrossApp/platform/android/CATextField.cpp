@@ -354,15 +354,9 @@ extern "C"
     
     JNIEXPORT void JNICALL Java_org_CrossApp_lib_CrossAppTextField_text(JNIEnv *env, jclass cls, jint key, jbyteArray textBuffer, int lenght)
     {
-        char* buffer = (char*)malloc(sizeof(char) * lenght);
-        env->GetByteArrayRegion(textBuffer, 0, lenght, (jbyte *)buffer);
-        
         std::string text;
         text.resize(lenght);
-        for (int i=0; i<lenght; i++)
-        {
-            text[i] = buffer[i];
-        }
+        env->GetByteArrayRegion(textBuffer, 0, lenght, (jbyte *)&text[0]);
         
         s_lock = true;
         CATextField* textField = s_map[(int)key];
@@ -408,19 +402,19 @@ CATextField::~CATextField()
     s_map.erase(m_u__ID);
     onRemoveView(m_u__ID);
     CAViewAnimation::removeAnimations(m_s__StrID + "showImage");
+    m_pDelegate = NULL;
 }
 
 void CATextField::onEnterTransitionDidFinish()
 {
-    CAView::onEnterTransitionDidFinish();
+    CAControl::onEnterTransitionDidFinish();
     
     this->delayShowImage();
 }
 
 void CATextField::onExitTransitionDidStart()
 {
-    CAView::onExitTransitionDidStart();
-    
+    CAControl::onExitTransitionDidStart();
     if (this->isFirstResponder())
     {
         this->resignFirstResponder();
@@ -449,7 +443,7 @@ bool CATextField::resignFirstResponder()
 		return false;
 	}
 
-    bool result = CAView::resignFirstResponder();
+    bool result = CAControl::resignFirstResponder();
 
     resignFirstResponderID(m_u__ID);
     
@@ -471,7 +465,7 @@ bool CATextField::becomeFirstResponder()
 		return false;
 	}
 
-	bool result = CAView::becomeFirstResponder();
+	bool result = CAControl::becomeFirstResponder();
 
     becomeFirstResponderID(m_u__ID);
     
@@ -597,7 +591,7 @@ void CATextField::update(float dt)
 
 void CATextField::setContentSize(const DSize& contentSize)
 {
-    CAView::setContentSize(contentSize);
+    CAControl::setContentSize(contentSize);
     
     if (m_eClearBtn == WhileEditing)
     {

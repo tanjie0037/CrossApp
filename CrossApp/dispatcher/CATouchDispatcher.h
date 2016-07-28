@@ -101,6 +101,8 @@ protected:
     
     CAVector<CAResponder*> m_vTouchesViews;
     
+    bool m_bBanMultipleTouch;
+    
     DPoint m_tFirstPoint;
 };
 
@@ -137,6 +139,10 @@ public:
     void addMouseScrollWheel(CAResponder* responder);
     
     void removeMouseScrollWheel(CAResponder* responder);
+    
+    CAEvent* eventWithTouch(CATouch* touch);
+    
+    CAEvent* eventWithTouchID(int touchID);
     
 public:
 
@@ -178,6 +184,8 @@ protected:
     CC_SYNTHESIZE_RETAIN(CAResponder*, m_pFirstResponder, FirstResponder);
     
     CC_SYNTHESIZE_READONLY(CAResponder*, m_pScrollRunningResponder, ScrollRunningResponder);
+    
+    bool m_bBanMultipleTouch;
     
     int m_iDispatchEvents;
     

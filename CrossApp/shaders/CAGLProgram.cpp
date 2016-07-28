@@ -10,9 +10,11 @@
 #include "kazmath/GL/matrix.h"
 #include "kazmath/kazmath.h"
 
-#if (CC_TARGET_PLATFORM == CC_PLATFORM_WINRT) || (CC_TARGET_PLATFORM == CC_PLATFORM_WP8)
-#include "CCPrecompiledShaders.h"
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_WIN32)
+#include "CAGPUAdapter.h"
 #endif
+
+#define GLSL_VERSION_CODE_LEN 64
 
 NS_CC_BEGIN
 
@@ -162,10 +164,19 @@ bool CAGLProgram::compileShader(GLuint * shader, GLenum type, const GLchar* sour
         return false;
     }
     
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_WIN32)
+	std::string szGLSLVer = CAGPUAdapter::create()->getGLSLGenerationString();
+#endif
+
     const GLchar *sources[] = {
 #if (CC_TARGET_PLATFORM != CC_PLATFORM_WIN32 && CC_TARGET_PLATFORM != CC_PLATFORM_LINUX && CC_TARGET_PLATFORM != CC_PLATFORM_MAC)
         (type == GL_VERTEX_SHADER ? "precision highp float;\n" : "precision mediump float;\n"),
 #endif
+
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_WIN32)
+		szGLSLVer.c_str(),
+#endif
+		
         "uniform mat4 CC_PMatrix;\n"
         "uniform mat4 CC_MVMatrix;\n"
         "uniform mat4 CC_MVPMatrix;\n"
@@ -308,9 +319,10 @@ const char* CAGLProgram::logForOpenGLObject(GLuint object, GLInfoFunction infoFu
     char *logBytes = (char*)malloc(logLength);
     logFunc(object, logLength, &charsWritten, logBytes);
 
-    std::string log = logBytes;
+	static std::string szlog;
+	szlog = logBytes;
     free(logBytes);
-    return log.c_str();
+	return szlog.c_str();
 }
 
 const char* CAGLProgram::vertexShaderLog()

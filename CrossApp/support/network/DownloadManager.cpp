@@ -160,6 +160,8 @@ double CADownloadManager::getDownloadFileSize(const std::string& downloadUrl, co
     curl_easy_setopt(handle, CURLOPT_URL, downloadUrl.c_str());
     curl_easy_setopt(handle, CURLOPT_HEADER, 1);
     curl_easy_setopt(handle, CURLOPT_NOBODY, 1);
+	curl_easy_setopt(handle, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V6);
+	
     if (curl_easy_perform(handle) == CURLE_OK)
     {
         curl_easy_getinfo(handle, CURLINFO_CONTENT_LENGTH_DOWNLOAD, &downloadFileSize);
@@ -745,7 +747,7 @@ public:
 		MsgListTemp.clear();
 	}
 
-	bool downLoad(const std::string& downHeaders, const std::string& downloadUrl, double initialFileSize, FILE *fp)
+	bool downLoad(CADownloadResponse* pDownloadRes, const std::string& downHeaders, const std::string& downloadUrl, double initialFileSize, FILE *fp)
 	{
 		_curl = curl_easy_init();
 		if (_curl == NULL)
@@ -771,7 +773,8 @@ public:
 		curl_easy_setopt(_curl, CURLOPT_WRITEDATA, fp);
 		curl_easy_setopt(_curl, CURLOPT_NOPROGRESS, false);
 		curl_easy_setopt(_curl, CURLOPT_PROGRESSFUNCTION, CADownloadResponseProgressFunc);
-		curl_easy_setopt(_curl, CURLOPT_PROGRESSDATA, this);
+		curl_easy_setopt(_curl, CURLOPT_PROGRESSDATA, pDownloadRes);
+		curl_easy_setopt(_curl, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V6);
 
 		res = curl_easy_perform(_curl);
 		curl_easy_cleanup(_curl);
@@ -1134,7 +1137,7 @@ bool CADownloadResponse::downLoad()
     chmod(outFileName.c_str(), 0666);
 #endif
     
-	if (!_schedule->downLoad(_downHeaders, _downloadUrl, _initialFileSize, fp))
+	if (!_schedule->downLoad(this, _downHeaders, _downloadUrl, _initialFileSize, fp))
 	{
 		sendErrorMessage(CADownloadManager::kNetwork);
 		fclose(fp);

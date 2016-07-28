@@ -3,11 +3,13 @@
 #ifndef __CAObject_H__
 #define __CAObject_H__
 
+#include "CASyncQueue.h"
 #include "platform/CCPlatformMacros.h"
 #include "float.h"
 #include <string>
 #include <vector>
 #include <deque>
+
 #ifdef EMSCRIPTEN
 #include <GLES2/gl2.h>
 #endif // EMSCRIPTEN
@@ -90,6 +92,10 @@ public:
     
     void performSelector(SEL_CallFunc callFunc, float afterDelay);
     
+	void performSelector(SEL_CallFuncO callFunc, CAObject* objParam, float afterDelay);
+
+	static void updateDelayTimers(float t);
+    
     CC_SYNTHESIZE(void*, m_pUserData, UserData);
     
     CC_SYNTHESIZE_RETAIN(CAObject*, m_pUserObject, UserObject);
@@ -111,6 +117,7 @@ public:
     
     CAObject *m_pCopyObject;
 };
+
 
 const float FLOAT_NONE = FLT_MAX;
 const int INT_NONE = 0x8FFFFFFF;

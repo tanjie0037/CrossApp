@@ -16,6 +16,7 @@
 #import <SystemConfiguration/CaptiveNetwork.h>
 #import "CABlueTooth.h"
 #import "Reachability.h"
+#import "CAGyroscope.h"
 
 NS_CC_BEGIN
 
@@ -79,7 +80,7 @@ void OpenURL(const std::string &url)
 #endif
 }
     
-void sendLocalNotification(const char* title,const char* content,unsigned long time)
+void sendLocalNotification(const char* title,const char* content,int time)
 {
     if ([[[UIDevice currentDevice] systemVersion] floatValue] >= 8.0) {
         
@@ -100,8 +101,9 @@ void sendLocalNotification(const char* title,const char* content,unsigned long t
     }
     
     UILocalNotification *notification = [[[UILocalNotification alloc] init] autorelease];
-    NSDate *pushDate = [NSDate dateWithTimeIntervalSinceNow:10];
-    if (notification != nil) {
+    NSDate *pushDate = [NSDate dateWithTimeIntervalSinceNow:time];
+    if (notification != nil)
+    {
         notification.fireDate = pushDate;
         notification.timeZone = [NSTimeZone defaultTimeZone];
         notification.repeatInterval = kCFCalendarUnitDay;
@@ -245,6 +247,20 @@ void stopAccelerometer()
     CAAccelerometer::sharedAccelerometer()->stopAccelerometer();
 }
     
+void startGyroscope(CAGyroDelegate* delegate)
+{
+    [[CAGyroscope sharedGyroscope] addGyroDelegate:delegate];
+}
+
+void setGyroInterval(float value)
+{
+    [[CAGyroscope sharedGyroscope] setGyroInterval:value];
+}
+    
+void stopGyroscope()
+{
+    [[CAGyroscope sharedGyroscope] stopUpdatingGyroscope];
+}
 }
 
 NS_CC_END

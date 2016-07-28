@@ -6,6 +6,11 @@ LOCAL_MODULE := CrossApp_static
 
 LOCAL_MODULE_FILENAME := libCrossApp
 
+ifeq ($(USE_ARM_MODE),1)
+LOCAL_ARM_MODE := arm
+endif
+
+
 LOCAL_SRC_FILES := \
 CrossApp.cpp \
 animation/CAViewAnimation.cpp \
@@ -218,6 +223,6 @@ $(call import-module,tiff/prebuilt/android)
 $(call import-module,webp/prebuilt/android)
 $(call import-module,freetype/prebuilt/android)
 $(call import-module,curl/prebuilt/android)
-$(call import-module,websockets/android)
+$(call import-module,websockets/prebuilt/android)
 $(call import-module,FFmpeg/prebuilt/android)
 $(call import-module,SDL/prebuilt/android)

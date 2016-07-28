@@ -94,6 +94,8 @@ void CollectionViewTest::collectionViewDidSelectCellAtIndexPath(CACollectionView
     cell->getContentView()->setRotation(0);
     cell->getContentView()->setScale(1.0f);
     CAViewAnimation::commitAnimations();
+    
+    p_Conllection->startPullToHeaderRefreshView();
 }
 
 void CollectionViewTest::collectionViewDidDeselectCellAtIndexPath(CACollectionView *collectionView, unsigned int section, unsigned int row, unsigned int item)
@@ -114,7 +116,6 @@ CACollectionViewCell* CollectionViewTest::collectionCellAtIndex(CACollectionView
     {
         p_Cell = CACollectionViewCell::create("CrossApp");
         
-        //生成Item背景
         CAView* itemImage = CAView::createWithLayout(DLayoutFill);
         itemImage->setTag(99);
         p_Cell->getContentView()->addSubview(itemImage);
@@ -127,7 +128,6 @@ CACollectionViewCell* CollectionViewTest::collectionCellAtIndex(CACollectionView
         p_Cell->getContentView()->addSubview(itemText);
     }
     
-    //设置Item背景颜色
     CAView* itemImageView = p_Cell->getContentView()->getSubviewByTag(99);
     itemImageView->setColor(colorArr.at(row * 3 + item));
     CCLog("row = %d", item);

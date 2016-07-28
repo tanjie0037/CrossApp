@@ -167,7 +167,7 @@ void CAAutoCollectionView::setSelectRowAtIndexPath(unsigned int section, unsigne
 	CAIndexPath3E indexPath = CAIndexPath3E(section, 0, item);
 	if (CACollectionViewCell* cell = m_mpUsedCollectionCells.at(indexPath))
 	{
-		cell->setControlStateSelected();
+		cell->setControlState(CAControlStateSelected);
 	}
 	m_pSelectedCollectionCells.insert(indexPath);
 }
@@ -180,7 +180,7 @@ void CAAutoCollectionView::setUnSelectRowAtIndexPath(unsigned int section, unsig
 	CC_RETURN_IF(m_pSelectedCollectionCells.find(indexPath) == m_pSelectedCollectionCells.end());
 	if (CACollectionViewCell* cell = m_mpUsedCollectionCells.at(indexPath))
 	{
-		cell->setControlStateNormal();
+		cell->setControlState(CAControlStateNormal);
 	}
 	m_pSelectedCollectionCells.erase(indexPath);
 }
@@ -249,7 +249,7 @@ bool CAAutoCollectionView::ccTouchBegan(CATouch *pTouch, CAEvent *pEvent)
                 {
                     if (m_pHighlightedCollectionCells)
                     {
-                        m_pHighlightedCollectionCells->setControlStateNormal();
+                        m_pHighlightedCollectionCells->setControlState(CAControlStateNormal);
                     }
                     
                     m_pHighlightedCollectionCells = pCell;
@@ -279,7 +279,7 @@ void CAAutoCollectionView::ccTouchMoved(CATouch *pTouch, CAEvent *pEvent)
 
 		if (m_pHighlightedCollectionCells->getControlState() == CAControlStateHighlighted)
 		{
-			m_pHighlightedCollectionCells->setControlStateNormal();
+			m_pHighlightedCollectionCells->setControlState(CAControlStateNormal);
 		}
 
 		m_pHighlightedCollectionCells = NULL;
@@ -319,7 +319,7 @@ void CAAutoCollectionView::ccTouchEnded(CATouch *pTouch, CAEvent *pEvent)
 		{
 			if (CACollectionViewCell* cell = m_mpUsedCollectionCells[deselectedIndexPath])
 			{
-				cell->setControlStateNormal();
+				cell->setControlState(CAControlStateNormal);
 			}
 			if (m_pCollectionViewDelegate)
 			{
@@ -331,7 +331,7 @@ void CAAutoCollectionView::ccTouchEnded(CATouch *pTouch, CAEvent *pEvent)
 		{
 			if (CACollectionViewCell* cell = m_mpUsedCollectionCells[selectedIndexPath])
 			{
-				cell->setControlStateSelected();
+				cell->setControlState(CAControlStateSelected);
 			}
 			if (m_pCollectionViewDelegate)
 			{
@@ -354,7 +354,7 @@ void CAAutoCollectionView::ccTouchCancelled(CATouch *pTouch, CAEvent *pEvent)
 
         if (m_pHighlightedCollectionCells->getControlState() == CAControlStateHighlighted)
         {
-            m_pHighlightedCollectionCells->setControlStateNormal();
+            m_pHighlightedCollectionCells->setControlState(CAControlStateNormal);
         }
 		m_pHighlightedCollectionCells = NULL;
 	}
@@ -382,17 +382,17 @@ void CAAutoCollectionView::mouseMoved(CATouch* pTouch, CAEvent* pEvent)
                                                         m_pHighlightedCollectionCells->getItem());
                     if (m_pSelectedCollectionCells.count(index))
                     {
-                        m_pHighlightedCollectionCells->setControlStateHighlighted();
+                        m_pHighlightedCollectionCells->setControlState(CAControlStateHighlighted);
                     }
                     else
                     {
-                        m_pHighlightedCollectionCells->setControlStateNormal();
+                        m_pHighlightedCollectionCells->setControlState(CAControlStateNormal);
                     }
                     
                 }
                 
                 m_pHighlightedCollectionCells = cell;
-                cell->setControlStateHighlighted();
+                cell->setControlState(CAControlStateHighlighted);
                 
                 break;
             }
@@ -409,11 +409,11 @@ void CAAutoCollectionView::mouseMovedOutSide(CATouch* pTouch, CAEvent* pEvent)
                                             m_pHighlightedCollectionCells->getItem());
         if (m_pSelectedCollectionCells.count(index))
         {
-            m_pHighlightedCollectionCells->setControlStateSelected();
+            m_pHighlightedCollectionCells->setControlState(CAControlStateSelected);
         }
         else
         {
-            m_pHighlightedCollectionCells->setControlStateNormal();
+            m_pHighlightedCollectionCells->setControlState(CAControlStateNormal);
         }
         m_pHighlightedCollectionCells = NULL;
     }
@@ -429,7 +429,7 @@ bool CAAutoCollectionView::fillSectionRowData(CollectionViewRow& r, DSize rSize)
 {
 	if (m_eOrientation == Vertical)
 	{
-		int dw = this->getBounds().size.width - 2 * m_iHoriMargins;
+		int dw = m_obContentSize.width - 2 * m_iHoriMargins;
 
 		if (r.iIniValue + rSize.width > dw && r.iMaxValue > 0)
 			return false;
@@ -447,7 +447,7 @@ bool CAAutoCollectionView::fillSectionRowData(CollectionViewRow& r, DSize rSize)
 	}
 	else
 	{
-		int dw = this->getBounds().size.height - 2 * m_iVertMargins;
+		int dw = m_obContentSize.height - 2 * m_iVertMargins;
 
 		if (r.iIniValue + rSize.height > dw && r.iMaxValue > 0)
 			return false;
@@ -532,7 +532,7 @@ void CAAutoCollectionView::reloadViewSizeData()
 	viewHeight += m_nCollectionHeaderHeight;
 	viewHeight += m_nCollectionFooterHeight;
 
-	DSize size = this->getBounds().size;
+	DSize size = m_obContentSize;
 	if (m_eOrientation == Vertical)
 	{
 		size.height = viewHeight;
@@ -661,13 +661,13 @@ int CAAutoCollectionView::calculateAllRects()
 	int dw = 0, dd = 0, dv = 0;
 	if (m_eOrientation == Vertical)
 	{
-		dw = this->getBounds().size.width - 2 * m_iHoriMargins;
+		dw = m_obContentSize.width - 2 * m_iHoriMargins;
 		dd = m_iVertMargins + m_nCollectionHeaderHeight;
 		dv = m_nVertCellInterval;
 	}
 	else
 	{
-		dw = this->getBounds().size.height - 2 * m_iVertMargins;
+		dw = m_obContentSize.height - 2 * m_iVertMargins;
 		dd = m_iHoriMargins + m_nCollectionHeaderHeight;
 		dv = m_nHoriCellInterval;
 	}
@@ -786,10 +786,10 @@ void CAAutoCollectionView::reloadData()
 		addSubview(m_pCollectionFooterView);
 	}
     
+    this->loadCollectionCell();
 	this->updateSectionHeaderAndFooterRects();
 	this->layoutPullToRefreshView();
-	this->startDeaccelerateScroll();
-	this->loadCollectionCell();
+    this->startDeaccelerateScroll();
 }
 
 void CAAutoCollectionView::firstReloadData()
@@ -852,7 +852,7 @@ void CAAutoCollectionView::loadCollectionCell()
             
 			if (m_pSelectedCollectionCells.count(r))
 			{
-				cell->setControlStateSelected();
+				cell->setControlState(CAControlStateSelected);
 			}
             
             if (m_pCollectionViewDataSource)
@@ -900,7 +900,7 @@ void CAAutoCollectionView::updateSectionHeaderAndFooterRects()
 		if (footer && m_bAlwaysBottomSectionFooter)
 		{
 			DPoint p2 = rect.origin;
-			p2.y = MIN(rect.origin.y + this->getBounds().size.height - footerHeight,
+			p2.y = MIN(rect.origin.y + m_obContentSize.height - footerHeight,
 				cvs.rSectionRect.origin.y + cvs.rSectionRect.size.height - footerHeight);
 			p2.y = MAX(p2.y, cvs.rSectionRect.origin.y + headerHeight);
 			footer->setFrameOrigin(p2);

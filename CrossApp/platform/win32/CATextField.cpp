@@ -646,18 +646,23 @@ CATextField::CATextField()
 CATextField::~CATextField()
 {
     CAViewAnimation::removeAnimations(m_s__StrID + "showImage");
+    m_pDelegate = NULL;
 }
 
 void CATextField::onEnterTransitionDidFinish()
 {
-    CAView::onEnterTransitionDidFinish();
+    CAControl::onEnterTransitionDidFinish();
 }
 
 void CATextField::onExitTransitionDidStart()
 {
-    CAView::onExitTransitionDidStart();
+    CAControl::onExitTransitionDidStart();
 
 	CAViewAnimation::removeAnimations(m_s__StrID + "showImage");
+    if (this->isFirstResponder())
+    {
+        this->resignFirstResponder();
+    }
 }
 
 bool CATextField::resignFirstResponder()
@@ -667,7 +672,7 @@ bool CATextField::resignFirstResponder()
 		return false;
 	}
 
-    bool result = CAView::resignFirstResponder();
+    bool result = CAControl::resignFirstResponder();
 
 	if (m_eClearBtn == WhileEditing)
 	{
@@ -683,7 +688,7 @@ bool CATextField::becomeFirstResponder()
 		return false;
 	}
 
-	bool result = CAView::becomeFirstResponder();
+	bool result = CAControl::becomeFirstResponder();
 
 	if (m_eClearBtn == WhileEditing)
 	{
@@ -758,7 +763,7 @@ CATextField* CATextField::createWithLayout(const DLayout& layout)
 
 bool CATextField::init()
 {
-	if (!CAView::init())
+	if (!CAControl::init())
 	{
 		return false;
 	}
@@ -798,7 +803,7 @@ void CATextField::update(float dt)
 
 void CATextField::setContentSize(const DSize& contentSize)
 {
-    CAView::setContentSize(contentSize);
+    CAControl::setContentSize(contentSize);
 
 	if (m_pTextField)
 	{
@@ -896,7 +901,12 @@ void CATextField::setMarginImageLeft(const DSize& imgSize, const std::string& fi
 		ima->setTag(1010);
 		this->addSubview(ima);
 	}
-	ima->setCenter(DRect(imgSize.width / 2, getBounds().size.height / 2, imgSize.width, imgSize.height));
+	DLayout layout;
+	layout.horizontal.left = 0;
+	layout.horizontal.width = imgSize.width;
+	layout.vertical.height = imgSize.height;
+	layout.vertical.center = 0.5f;
+	ima->setLayout(layout);
 	ima->setImage(CAImage::create(filePath));
 }
 
@@ -911,7 +921,12 @@ void CATextField::setMarginImageRight(const DSize& imgSize, const std::string& f
 		ima->setTag(1011);
 		this->addSubview(ima);
 	}
-	ima->setCenter(DRect(getBounds().size.width - imgSize.width / 2, getBounds().size.height / 2, imgSize.width, imgSize.height));
+	DLayout layout;
+	layout.horizontal.right = 0;
+	layout.horizontal.width = imgSize.width;
+	layout.vertical.height = imgSize.height;
+	layout.vertical.center = 0.5f;
+	ima->setLayout(layout);
 	ima->setImage(CAImage::create(filePath));
 }
 
