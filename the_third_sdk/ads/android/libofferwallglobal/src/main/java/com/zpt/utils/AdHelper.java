@@ -503,16 +503,13 @@ public class AdHelper {
 	}
 
 	public static void onResume(Activity ctx) {
-
 		if (_mMediationAgent != null) {
-
 			_mMediationAgent.onResume(ctx);
 			Tapjoy.onActivityStart(ctx);
 		}
 	}
 
 	public static void onPause(Activity ctx) {
-
 		if (_mMediationAgent != null) {
 			_mMediationAgent.onPause(ctx);
 		}

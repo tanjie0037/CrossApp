@@ -264,19 +264,19 @@ public class ZPTNativeHelper {
 	}
 
 	public static void closeApp() {
-		//// TODO: init these
-		String goldminePkg = "com.zero.diaobaole";
-		String activityName = "com.zero.diaobaole.MainActivity";
-		String intentName = "com.diao.diaobaole.OFFERWALL";
-
-		JSONObject data = new JSONObject();
-		try {
-			data.put("function", "exit");
-			callGoldMine(goldminePkg, activityName, intentName, data.toString());
-
-		} catch (JSONException e) {
-			e.printStackTrace();
-		}
+//		//// TODO: need to rewrite
+//		String goldminePkg = "com.zero.diaobaole";
+//		String activityName = "com.zero.diaobaole.MainActivity";
+//		String intentName = "com.diao.diaobaole.OFFERWALL";
+//
+//		JSONObject data = new JSONObject();
+//		try {
+//			data.put("function", "exit");
+//			callGoldMine(goldminePkg, activityName, intentName, data.toString());
+//
+//		} catch (JSONException e) {
+//			e.printStackTrace();
+//		}
 
 		new AsyncTask() {
 			@Override
