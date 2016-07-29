@@ -140,7 +140,7 @@ public class UmengHelper {
 	}
 
 	static void showFeedback(final String uId) {
-		// todo: need java 1.7
+		// need java 1.7
 		 _context.runOnUiThread(new Runnable() {
 
 		 @Override

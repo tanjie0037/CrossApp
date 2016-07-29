@@ -58,9 +58,7 @@ class MyNativeXListener implements OnAdEventV2, RewardListener, SessionListener 
 	}
 
 	@Override
-	public void onRedeem(RedeemRewardData paramRedeemRewardData) {
-		// TODO Auto-generated method stub
-	}
+	public void onRedeem(RedeemRewardData paramRedeemRewardData) {}
 
 	@Override
 	public void onEvent(AdEvent event, AdInfo adInfo, String message) {
@@ -502,10 +500,17 @@ public class AdHelper {
 		});
 	}
 
+	public static void onStart(Activity ctx) {
+		Tapjoy.onActivityStart(ctx);
+	}
+
+	public static void onStop(Activity ctx) {
+		Tapjoy.onActivityStop(ctx);
+	}
+
 	public static void onResume(Activity ctx) {
 		if (_mMediationAgent != null) {
 			_mMediationAgent.onResume(ctx);
-			Tapjoy.onActivityStart(ctx);
 		}
 	}
 
@@ -513,9 +518,5 @@ public class AdHelper {
 		if (_mMediationAgent != null) {
 			_mMediationAgent.onPause(ctx);
 		}
-	}
-	
-	public static void onStop(Activity ctx) {
-		Tapjoy.onActivityStop(ctx);
 	}
 }
