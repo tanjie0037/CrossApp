@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="ssl_cert_error">SSL certificate of this website is unsafe, do you want to continue anyway?</string>
+    <string name="ssl_warning">Warning</string>
+    <string name="key_continue">continue</string>
+    <string name="key_cancel">cancel</string>
+</resources>

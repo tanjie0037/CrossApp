@@ -6,9 +6,12 @@ import java.net.URI;
 import java.nio.ByteBuffer;
 
 import android.annotation.SuppressLint;
+import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.net.http.SslError;
+import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.KeyEvent;
@@ -17,6 +20,7 @@ import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.FrameLayout;
+import android.widget.Toast;
 
 public class CrossAppWebView extends WebView {
     private static final String TAG = CrossAppWebViewHelper.class.getSimpleName();
@@ -24,6 +28,7 @@ public class CrossAppWebView extends WebView {
     private int viewTag;
     private String jsScheme;
     private String szWebViewRect;
+    private Context _ctx;
 
     public CrossAppWebView(Context context) {
         this(context, -1);
@@ -35,6 +40,7 @@ public class CrossAppWebView extends WebView {
         this.viewTag = viewTag;
         this.jsScheme = "";
         this.szWebViewRect = "0-0-0-0";
+        this._ctx = context;
 
         this.setFocusable(true);
         this.setFocusableInTouchMode(true);
@@ -109,8 +115,25 @@ public class CrossAppWebView extends WebView {
         }
 
 	@Override
-	public void onReceivedSslError(WebView view, SslErrorHandler handler, SslError error) {
-		handler.proceed();
+	public void onReceivedSslError(WebView view,final SslErrorHandler handler, SslError error) {
+        final AlertDialog.Builder builder = new AlertDialog.Builder(CrossAppActivity.getContext());
+        builder.setTitle(R.string.ssl_warning);
+        builder.setMessage(R.string.ssl_cert_error);
+        builder.setPositiveButton(R.string.key_continue, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                handler.proceed();
+            }
+        });
+        builder.setNegativeButton(R.string.key_cancel, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                handler.cancel();
+            }
+        });
+        builder.setCancelable(false);
+        final AlertDialog dialog = builder.create();
+        dialog.show();
 	}
     }
     

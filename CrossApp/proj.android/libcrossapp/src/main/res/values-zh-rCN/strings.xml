@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="ssl_cert_error">该网站的SSL证书不安全，你要继续访问吗？</string>
+    <string name="ssl_warning">警告</string>
+    <string name="key_continue">继续</string>
+    <string name="key_cancel">取消</string>
+</resources>
