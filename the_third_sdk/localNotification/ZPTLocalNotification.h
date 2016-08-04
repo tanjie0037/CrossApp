@@ -12,7 +12,6 @@
 #include <stdio.h>
 #include <string>
 #include "CrossApp.h"
-#include "CrossAppExt.h"
 
 #define REPEAT_ID_START 1000000
 

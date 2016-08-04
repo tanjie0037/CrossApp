@@ -2,11 +2,10 @@ LOCAL_PATH := $(call my-dir)
 include $(CLEAR_VARS)
 
 LOCAL_MODULE := The_third_sdk_static
-
 LOCAL_MODULE_FILENAME := libthe_third_sdk
 
 LOCAL_WHOLE_STATIC_LIBRARIES := CrossApp_static
-LOCAL_WHOLE_STATIC_LIBRARIES += CrossApp_extension_static
+LOCAL_WHOLE_STATIC_LIBRARIES += Zpt_crypto_static
 
 LOCAL_SRC_FILES := share/C2DXShareSDK/Android/ShareSDKUtils.cpp \
 				share/C2DXShareSDK/C2DXShareSDK.cpp \
@@ -33,5 +32,5 @@ LOCAL_CFLAGS := -fexceptions
                     
 include $(BUILD_STATIC_LIBRARY)
 
-$(call import-module,extensions)
+$(call import-module,extensions/zpt_crypto)
 $(call import-module,CrossApp)

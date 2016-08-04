@@ -10,7 +10,6 @@
 
 #include <stdint.h>
 #include "CrossApp.h"
-#include "CrossAppExt.h"
 
 USING_NS_CC;
 

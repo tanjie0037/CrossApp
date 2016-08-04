@@ -13,7 +13,6 @@
 #include "platform/android/jni/JniHelper.h"
 #include <jni.h>
 #include "SDKCommon.h"
-#include "CrossAppExt.h"
 
 USING_NS_CC;
 using namespace CSJson;

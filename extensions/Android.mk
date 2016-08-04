@@ -20,9 +20,6 @@ gameswf/base/triangulate_float.cpp \
 gameswf/base/triangulate_sint32.cpp \
 gameswf/base/tu_file.cpp \
 gameswf/base/tu_file_SDL.cpp \
-crypto/CACrypto.cpp \
-crypto/base64/libbase64.c \
-crypto/xxtea/xxtea.c \
 gameswf/base/tu_gc_singlethreaded_marksweep.cpp \
 gameswf/base/tu_gc_test.cpp \
 gameswf/base/tu_loadlib.cpp \
@@ -107,15 +104,18 @@ gameswf/CAFlashView.cpp \
 LOCAL_WHOLE_STATIC_LIBRARIES := CrossApp_static
 LOCAL_WHOLE_STATIC_LIBRARIES += cocosdenshion_static
 
+LOCAL_CFLAGS += -DCC_ENABLE_CHIPMUNK_INTEGRATION=1
+LOCAL_EXPORT_CFLAGS += -DCC_ENABLE_CHIPMUNK_INTEGRATION=1
+LOCAL_CPPFLAGS += -DCC_ENABLE_CHIPMUNK_INTEGRATION=1
+LOCAL_EXPORT_CPPFLAGS += -DCC_ENABLE_CHIPMUNK_INTEGRATION=1
+
 LOCAL_EXPORT_C_INCLUDES := $(LOCAL_PATH) \
                            $(LOCAL_PATH)/gameswf \
                            $(LOCAL_PATH)/gameswf/base \
                            $(LOCAL_PATH)/gameswf/gameswf/gameswf \
-                           $(LOCAL_PATH)/gameswf/gameswf/gameswf/gameswf_as_classes \
-						   $(LOCAL_PATH)/crypto \
-						   $(LOCAL_PATH)/crypto/xxtea \
-						   $(LOCAL_PATH)/crypto/md5 \
-						   $(LOCAL_PATH)/crypto/base64
+                           $(LOCAL_PATH)/gameswf/gameswf/gameswf/gameswf_as_classes
+
+
 
 LOCAL_CFLAGS := -fexceptions
 

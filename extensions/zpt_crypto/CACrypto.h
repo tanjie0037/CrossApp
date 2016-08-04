@@ -10,12 +10,8 @@
 #define __AppGift__CACrypto__
 
 #include <stdio.h>
-
 #include <iostream>
 #include "CrossApp.h"
-#include "CrossAppExt.h"
-
-NS_CC_EXT_BEGIN
 
 class CACrypto
 {
@@ -68,7 +64,5 @@ public:
 private:
     CACrypto(void) {}
 };
-
-NS_CC_EXT_END
 
 #endif /* defined(__AppGift__CACrypto__) */

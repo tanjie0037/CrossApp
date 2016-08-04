@@ -15,7 +15,6 @@
 #include "SDKCommon.h"
 
 USING_NS_CC;
-USING_NS_CC_EXT;
 using namespace CSJson;
 
 static const char *UmengHelperPath = "com/zpt/libumeng/UmengHelper";

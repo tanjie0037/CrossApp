@@ -11,7 +11,6 @@
 
 #include <stdio.h>
 #include "CrossApp.h"
-#include "CrossAppExt.h"
 
 class ZPTNativeHelper
 {

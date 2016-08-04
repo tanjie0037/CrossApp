@@ -12,7 +12,6 @@
 #include <stdlib.h>
 #include <iostream>
 #include "CrossApp.h"
-#include "CrossAppExt.h"
 
 class UMHelper {
 public:

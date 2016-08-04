@@ -9,12 +9,10 @@
 #include "CACrypto.h"
 
 extern "C" {
-#include "crypto/base64/libbase64.h"
-#include "crypto/xxtea/xxtea.h"
-#include "crypto/md5/md5.h"
+#include "base64/libbase64.h"
+#include "xxtea/xxtea.h"
+#include "md5/md5.h"
 }
-
-NS_CC_EXT_BEGIN
 
 unsigned char* CACrypto::encryptXXTEA(unsigned char* plaintext,
                                       int plaintextLength,
@@ -168,6 +166,3 @@ char *CACrypto::hex2bin(char* hex, int hexLength)
     
     return bin;
 }
-
-
-NS_CC_EXT_END

@@ -4,8 +4,8 @@
 #include <curl/curl.h>
 #define MAX_Thread 16
 
-#ifndef usleep
-#include "libwebsockets.h"
+#if CC_TARGET_PLATFORM != CC_PLATFORM_WIN32
+#include <unistd.h>
 #endif
 
 NS_CC_BEGIN
