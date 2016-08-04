@@ -3,9 +3,14 @@ package com.zpt.utils;
 import android.util.Log;
 
 public class ZPTLog {
-	public static boolean enable = true;
-	private static final String TAG_DEFAULT = "---zpt";
-	
+	private static boolean enable = true;
+	private static String TAG_DEFAULT = "---zpt";
+
+	public static void init(boolean debug, String tag) {
+		enable = debug;
+		TAG_DEFAULT = tag;
+	}
+
 	public static void v(String tag, String msg){
 		if(enable){
 			Log.v(tag, msg);

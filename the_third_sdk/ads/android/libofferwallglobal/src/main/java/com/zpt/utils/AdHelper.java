@@ -2,7 +2,6 @@ package com.zpt.utils;
 
 import java.util.HashMap;
 import java.util.Hashtable;
-import com.adscendmedia.sdk.ui.OffersActivity;
 import com.nativex.monetization.MonetizationManager;
 import com.nativex.monetization.communication.RedeemRewardData;
 import com.nativex.monetization.enums.AdEvent;
@@ -15,17 +14,12 @@ import com.supersonic.mediationsdk.sdk.OfferwallListener;
 import com.supersonic.mediationsdk.sdk.Supersonic;
 import com.supersonic.mediationsdk.sdk.SupersonicFactory;
 import android.app.Activity;
-import android.content.ComponentName;
 import android.content.Context;
-import android.content.Intent;
-import android.os.Bundle;
-
 import net.adxmi.android.AdManager;
 import net.adxmi.android.os.OffersManager;
 import net.adxmi.android.video.VideoAdListener;
 import net.adxmi.android.video.VideoAdManager;
 import net.adxmi.android.video.VideoAdRequestListener;
-
 import com.tapjoy.TJActionRequest;
 import com.tapjoy.TJConnectListener;
 import com.tapjoy.TJError;
@@ -255,6 +249,7 @@ public class AdHelper {
 	private static final int OFFERWALL_REQUEST_CODE = 879510; // fyber
 
 	private static Activity _activity = null;
+	private static boolean _debug = false;
 	private static TJPlacement _TJPlacementOfferwall;
 	private static TJPlacement _TJPlacementVideo;
 
@@ -273,8 +268,9 @@ public class AdHelper {
 		public static final int AdSuperrewards = 6;
 	};
 
-	public static void initContext(Activity activity) {
+	public static void initContext(Activity activity, boolean debug) {
 		_activity = activity;
+		_debug = debug;
 	}
 
 	public static Activity getActivity() {
@@ -307,11 +303,11 @@ public class AdHelper {
 						_AdStep.put(K_NATIVEX_PLACEMENT_OFFER, AD_FREE);
 						_AdStep.put(K_NATIVEX_PLACEMENT_VIDEO, AD_FREE);
 
-						MonetizationManager.enableLogging(RR.debug());
+						MonetizationManager.enableLogging(_debug);
 						MonetizationManager.createSession(_activity, appkey, uId, _myNativeXListener);
 						break;
 					case AdType.AdAdxmi:
-						AdManager.getInstance(_activity).setEnableDebugLog(RR.debug());
+						AdManager.getInstance(_activity).setEnableDebugLog(_debug);
 						AdManager.getInstance(_activity).init(appkey, token);
 
 						OffersManager.getInstance(_activity).setCustomUserId(uId);
@@ -335,14 +331,14 @@ public class AdHelper {
 						break;
 					case AdType.AdTapjoy:
 						Hashtable<String, Object> connectFlags = new Hashtable<String, Object>();
-						connectFlags.put(TapjoyConnectFlag.ENABLE_LOGGING, RR.debug() ? "true" : "false");
+						connectFlags.put(TapjoyConnectFlag.ENABLE_LOGGING, _debug ? "true" : "false");
 						connectFlags.put(TapjoyConnectFlag.STORE_NAME, "Google Play");
 						connectFlags.put(TapjoyConnectFlag.USER_ID, uId);
 
 						AdHelper._AdStep.put(AdHelper.K_TAPJOY_PLACEMENT_OFFER, AdHelper.AD_FREE);
 						AdHelper._AdStep.put(AdHelper.K_TAPJOY_PLACEMENT_VIDEO, AdHelper.AD_FREE);
 
-						Tapjoy.setDebugEnabled(RR.debug());
+						Tapjoy.setDebugEnabled(_debug);
 
 						Tapjoy.connect(_activity, appkey, connectFlags, new TJConnectListener() {
 
@@ -370,7 +366,7 @@ public class AdHelper {
 						SuperrewardsWrapper.init(_activity, uId, appkey);
 						break;
 					default:
-						assert (false);
+						ZPTAssert.check(false, "no offerwall of this key");
 						break;
 				}
 			}
