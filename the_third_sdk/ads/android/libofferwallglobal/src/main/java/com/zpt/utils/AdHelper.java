@@ -27,6 +27,9 @@ import com.tapjoy.TJPlacement;
 import com.tapjoy.TJPlacementListener;
 import com.tapjoy.Tapjoy;
 import com.tapjoy.TapjoyConnectFlag;
+import com.woobi.Woobi;
+import com.woobi.WoobiError;
+import com.woobi.WoobiEventListener;
 import com.zpt.libadscend.AdscendWrapper;
 import com.zpt.libsuperrewards.SuperrewardsWrapper;
 
@@ -236,6 +239,99 @@ class MyTJPlacementListener implements TJPlacementListener {
 	}
 }
 
+class MyWoobiEventListener implements WoobiEventListener {
+
+	@Override
+	public void onInitialized() {
+
+	}
+
+	@Override
+	public void onError(WoobiError woobiError) {
+
+	}
+
+	@Override
+	public void onShowOffers() {
+
+	}
+
+	@Override
+	public void onCloseOffers() {
+
+	}
+
+	@Override
+	public void onShowPopup() {
+
+	}
+
+	@Override
+	public void onClosePopup() {
+
+	}
+
+	@Override
+	public void onShowWoobiBoard() {
+
+	}
+
+	@Override
+	public void onCloseWoobiBoard() {
+
+	}
+
+	@Override
+	public void onShowWoobProDialog() {
+
+	}
+
+	@Override
+	public void onCloseWoobProDialog() {
+
+	}
+
+	@Override
+	public void onShowCarousel() {
+
+	}
+
+	@Override
+	public void onCloseCarousel() {
+
+	}
+
+	@Override
+	public void onShowSplash() {
+
+	}
+
+	@Override
+	public void onCloseSplash() {
+
+	}
+
+	@Override
+	public void onShowDisplay() {
+
+	}
+
+	@Override
+	public void onCloseDisplay() {
+
+	}
+
+	@Override
+	public void onShowVidget() {
+
+	}
+
+	@Override
+	public void onCloseVidget() {
+
+	}
+}
+
 public class AdHelper {
 	public static final int AD_FREE = 0;
 	public static final int AD_READY = 1;
@@ -252,11 +348,14 @@ public class AdHelper {
 	private static boolean _debug = false;
 	private static TJPlacement _TJPlacementOfferwall;
 	private static TJPlacement _TJPlacementVideo;
+	private static String _woobiAppId = null;
+	private static String _woobiUId = null;
 
 	private static Supersonic _mMediationAgent = null;
 	private static MySupersonicListener _mySupersonicListener = new MySupersonicListener();
 	private static MyNativeXListener _myNativeXListener = new MyNativeXListener();
 	private static MyTJPlacementListener _myTJPlacementListener = new MyTJPlacementListener();
+	private static MyWoobiEventListener _myWoobiEventListener = new MyWoobiEventListener();
 
 	class AdType {
 		public static final int AdFyber = 0;
@@ -266,6 +365,7 @@ public class AdHelper {
 		public static final int AdTapjoy = 4;
 		public static final int AdAdscend = 5;
 		public static final int AdSuperrewards = 6;
+		public static final int AdWoobi = 7;
 	};
 
 	public static void initContext(Activity activity, boolean debug) {
@@ -365,6 +465,11 @@ public class AdHelper {
 					case AdType.AdSuperrewards:
 						SuperrewardsWrapper.init(_activity, uId, appkey);
 						break;
+					case AdType.AdWoobi:
+						_woobiAppId = appkey;
+						_woobiUId = uId;
+						Woobi.init(_activity, appkey, _myWoobiEventListener);
+						break;
 					default:
 						ZPTAssert.check(false, "no offerwall of this key");
 						break;
@@ -425,6 +530,9 @@ public class AdHelper {
 						break;
 					case AdType.AdSuperrewards:
 						SuperrewardsWrapper.showOfferwall();
+						break;
+					case AdType.AdWoobi:
+						Woobi.showWoobiBoard(_activity, _woobiAppId, _woobiUId);
 						break;
 					default:
 						assert (false);
