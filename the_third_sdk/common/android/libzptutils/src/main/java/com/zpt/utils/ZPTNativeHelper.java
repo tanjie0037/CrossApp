@@ -278,19 +278,7 @@ public class ZPTNativeHelper {
 //			e.printStackTrace();
 //		}
 
-		new AsyncTask() {
-			@Override
-			protected Object doInBackground(Object[] params) {
-				try {
-					Thread.sleep(100);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-
-				android.os.Process.killProcess(android.os.Process.myPid());
-				return null;
-			}
-		}.execute();
+		android.os.Process.killProcess(android.os.Process.myPid());
 	}
 
 	public static boolean isAppInstalled(String packageName, int requiredBuild) {
