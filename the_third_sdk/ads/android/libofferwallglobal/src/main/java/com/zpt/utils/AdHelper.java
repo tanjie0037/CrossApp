@@ -27,9 +27,9 @@ import com.tapjoy.TJPlacement;
 import com.tapjoy.TJPlacementListener;
 import com.tapjoy.Tapjoy;
 import com.tapjoy.TapjoyConnectFlag;
-import com.woobi.Woobi;
-import com.woobi.WoobiError;
-import com.woobi.WoobiEventListener;
+//import com.woobi.Woobi;
+//import com.woobi.WoobiError;
+//import com.woobi.WoobiEventListener;
 import com.zpt.libadscend.AdscendWrapper;
 import com.zpt.libsuperrewards.SuperrewardsWrapper;
 
@@ -239,6 +239,7 @@ class MyTJPlacementListener implements TJPlacementListener {
 	}
 }
 
+/*
 class MyWoobiEventListener implements WoobiEventListener {
 
 	@Override
@@ -266,7 +267,231 @@ class MyWoobiEventListener implements WoobiEventListener {
 
 	}
 
-	@Override
+	@OverridewardListener, SessionListener {
+		@Override
+		public void createSessionCompleted(boolean success, boolean arg1, String arg2) {
+			if (success) {
+				// a session with our servers was established
+				// successfully.
+				// the app is now ready to show ads.
+				System.out.println("Wahoo! Now I'm ready to show an ad.");
+
+				MonetizationManager.fetchAd(AdHelper.getActivity(), AdHelper.K_NATIVEX_PLACEMENT_OFFER, this);
+				MonetizationManager.fetchAd(AdHelper.getActivity(), AdHelper.K_NATIVEX_PLACEMENT_VIDEO, this);
+			} else {
+				// establishing a session with our servers failed;
+				// the app will be unable to show ads until a session is
+				// established
+				System.out.println(
+						"Oh no! Something isn't set up correctly - re-read the documentation or ask customer support for some help -"
+								+ " https://selfservice.nativex.com/Help");
+			}
+		}
+
+		@Override
+		public void onRedeem(RedeemRewardData paramRedeemRewardData) {}
+
+		@Override
+		public void onEvent(AdEvent event, AdInfo adInfo, String message) {
+			ZPTLog.v("Placement: " + adInfo.getPlacement());
+
+			switch (event) {
+				case ALREADY_SHOWN:
+					// showAd() is called with an Ad Name and there
+					// is an ad already being shown with the same
+					// name at this moment.
+					break;
+				case BEFORE_DISPLAY:
+					// Just before the Ad is displayed on the
+					// screen.
+					break;
+				case DISMISSED:
+					// The ad is dismissed by the user or by the
+					// application.
+					break;
+				case DISPLAYED:
+					// The ad is shown on the screen. For fetched
+					// ads this event will fire when the showAd()
+					// method is called.
+					break;
+				case DOWNLOADING:
+					// fetchAd() is called with an Ad Name and there
+					// is an ad already being fetched with the same
+					// name at this moment.
+					break;
+				case ERROR:
+					// An error has occurred and the ad is going to
+					// be closed.
+					// More information about the error is passed in
+					// the "message" parameter.
+					break;
+				case EXPIRED:
+					// A fetched ad expires. All fetched ads will
+					// expire after a certain time period if not
+					// shown.
+					break;
+				case ALREADY_FETCHED:
+					// fetchAd() is called with an Ad Name and there
+					// is already a fetched ad with the same name
+					// ready to be shown.
+				case FETCHED:
+					// The ad is ready to be shown. For fetched ads
+					// this method means that the ad is fetched
+					// successfully.
+					// You may want to initially put the
+					// showReadyAd() call here when you're doing
+					// your initial testing, but for production you
+					// should move it to a more appropriate place,
+					// as described in the Show an Ad section.
+					String placement = adInfo.getPlacement();
+					ZPTLog.v("Placement: " + placement);
+
+					if (placement.equals(AdHelper.K_NATIVEX_PLACEMENT_OFFER)) {
+						if (AdHelper._AdStep.get(AdHelper.K_NATIVEX_PLACEMENT_OFFER) == AdHelper.AD_READY) {
+							AdHelper._AdStep.put(AdHelper.K_NATIVEX_PLACEMENT_OFFER, AdHelper.AD_FREE);
+							MonetizationManager.showReadyAd(AdHelper.getActivity(), placement, this);
+
+						} else {
+							AdHelper._AdStep.put(AdHelper.K_NATIVEX_PLACEMENT_OFFER, AdHelper.AD_READY);
+						}
+
+					} else if (placement.equals(AdHelper.K_NATIVEX_PLACEMENT_VIDEO)) {
+						if (AdHelper._AdStep.get(AdHelper.K_NATIVEX_PLACEMENT_VIDEO) == AdHelper.AD_READY) {
+							AdHelper._AdStep.put(AdHelper.K_NATIVEX_PLACEMENT_VIDEO, AdHelper.AD_FREE);
+							MonetizationManager.showReadyAd(AdHelper.getActivity(), placement, this);
+
+						} else {
+							AdHelper._AdStep.put(AdHelper.K_NATIVEX_PLACEMENT_VIDEO, AdHelper.AD_READY);
+						}
+
+					} else {
+						ZPTLog.v("unknown placement");
+						assert(false);
+					}
+
+					break;
+				case NO_AD:
+					// The device contacts the server, but there is
+					// no ad ready to be shown at this time.
+					break;
+				case USER_NAVIGATES_OUT_OF_APP:
+					// The user clicks on a link or a button in the
+					// ad and is going to navigate out of the app
+					// to the Google Play or a browser applications.
+					break;
+				case VIDEO_COMPLETED:
+					// Video has completed playing; rewards will be
+					// rewarded if applicable
+					break;
+				default:
+					// Others do not apply to Interstitial ads.
+					break;
+			}
+		}
+	}
+
+	class MySupersonicListener implements OfferwallListener {
+
+		@Override
+		public void onOfferwallShowFail(SupersonicError arg0) {
+			ZPTLog.v("AdSupersonic:" + arg0.getErrorMessage());
+		}
+
+		@Override
+		public void onOfferwallOpened() {
+			ZPTLog.v("AdSupersonic:onOfferwallOpened");
+		}
+
+		@Override
+		public void onOfferwallInitSuccess() {
+			ZPTLog.v("AdSupersonic:onOfferwallInitSuccess");
+		}
+
+		@Override
+		public void onOfferwallInitFail(SupersonicError arg0) {
+			ZPTLog.v("AdSupersonic:" + arg0.getErrorMessage());
+		}
+
+		@Override
+		public void onOfferwallClosed() {
+			ZPTLog.v("AdSupersonic:onOfferwallClosed");
+		}
+
+		@Override
+		public boolean onOfferwallAdCredited(int arg0, int arg1, boolean arg2) {
+			ZPTLog.v("AdSupersonic:onOfferwallAdCredited");
+			return true;
+		}
+
+		@Override
+		public void onGetOfferwallCreditsFail(SupersonicError arg0) {
+			ZPTLog.v("AdSupersonic:" + arg0.getErrorMessage());
+		}
+	}
+
+	class MyTJPlacementListener implements TJPlacementListener {
+		@Override
+		public void onRequestSuccess(TJPlacement tjPlacement) {
+			ZPTLog.v("onRequestSuccess:" + tjPlacement.getName());
+		}
+
+		@Override
+		public void onRequestFailure(TJPlacement tjPlacement, TJError tjError) {
+
+		}
+
+		@Override
+		public void onContentReady(TJPlacement tjPlacement) {
+			ZPTLog.v("onContentReady:" + tjPlacement.getName());
+
+			if (tjPlacement.getName().equals(AdHelper.K_TAPJOY_PLACEMENT_OFFER)) {
+				if (AdHelper._AdStep.get(AdHelper.K_TAPJOY_PLACEMENT_OFFER).equals(AdHelper.AD_READY)) {
+					AdHelper._AdStep.put(AdHelper.K_TAPJOY_PLACEMENT_OFFER, AdHelper.AD_FREE);
+					tjPlacement.showContent();
+				}
+			}
+		}
+
+		@Override
+		public void onContentShow(TJPlacement tjPlacement) {
+
+		}
+
+		@Override
+		public void onContentDismiss(TJPlacement tjPlacement) {
+
+		}
+
+		@Override
+		public void onPurchaseRequest(TJPlacement tjPlacement, TJActionRequest tjActionRequest, String s) {
+
+		}
+
+		@Override
+		public void onRewardRequest(TJPlacement tjPlacement, TJActionRequest tjActionRequest, String s, int i) {
+
+		}
+	}
+
+	class MyWoobiEventListener implements WoobiEventListener {
+
+		@Override
+		public void onInitialized() {
+
+		}
+
+		@Override
+		public void onError(WoobiError woobiError) {
+
+		}
+
+		@Override
+		public void onShowOffers() {
+
+		}
+
+		@Override
+		public voi
 	public void onClosePopup() {
 
 	}
@@ -331,7 +556,7 @@ class MyWoobiEventListener implements WoobiEventListener {
 
 	}
 }
-
+*/
 public class AdHelper {
 	public static final int AD_FREE = 0;
 	public static final int AD_READY = 1;
@@ -355,7 +580,7 @@ public class AdHelper {
 	private static MySupersonicListener _mySupersonicListener = new MySupersonicListener();
 	private static MyNativeXListener _myNativeXListener = new MyNativeXListener();
 	private static MyTJPlacementListener _myTJPlacementListener = new MyTJPlacementListener();
-	private static MyWoobiEventListener _myWoobiEventListener = new MyWoobiEventListener();
+//	private static MyWoobiEventListener _myWoobiEventListener = new MyWoobiEventListener();
 
 	class AdType {
 		public static final int AdFyber = 0;
@@ -468,7 +693,7 @@ public class AdHelper {
 					case AdType.AdWoobi:
 						_woobiAppId = appkey;
 						_woobiUId = uId;
-						Woobi.init(_activity, appkey, _myWoobiEventListener);
+//						Woobi.init(_activity, appkey, _myWoobiEventListener);
 						break;
 					default:
 						ZPTAssert.check(false, "no offerwall of this key");
@@ -532,7 +757,7 @@ public class AdHelper {
 						SuperrewardsWrapper.showOfferwall();
 						break;
 					case AdType.AdWoobi:
-						Woobi.showWoobiBoard(_activity, _woobiAppId, _woobiUId);
+//						Woobi.showWoobiBoard(_activity, _woobiAppId, _woobiUId);
 						break;
 					default:
 						assert (false);

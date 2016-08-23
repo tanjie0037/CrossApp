@@ -24,5 +24,5 @@ dependencies {
     compile project(':libtapjoy')
     compile project(':libadscend')
     compile project(':libsuperrewards')
-    compile project(':libwoobi')
+//    compile project(':libwoobi')
 }
