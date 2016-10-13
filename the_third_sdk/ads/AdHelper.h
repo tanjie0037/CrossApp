@@ -49,6 +49,7 @@ public:
     static std::string PLUGIN_APK;
     static CSJson::Value _configCache;
     static bool _debug;
+    static int _willShowTapjoy;
     
 public:
     static void initAd(AdType type, const std::string &uId, const std::string &appkey, const std::string &token);
