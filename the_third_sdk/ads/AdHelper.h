@@ -41,17 +41,21 @@ public:
     
     static std::string K_NATIVEX_PLACEMENT_OFFER;
     static std::string K_NATIVEX_PLACEMENT_VIDEO;
+    static std::string K_TAPJOY_PLACEMENT_OFFER;
+    static std::string K_TAPJOY_PLACEMENT_VIDEO;
     static std::string PLUGIN_PACKAGE;
     static std::string PLUGIN_ACTIVITY;
     static std::string PLUGIN_INTENT;
     static std::string PLUGIN_APK;
     static CSJson::Value _configCache;
+    static bool _debug;
     
 public:
     static void initAd(AdType type, const std::string &uId, const std::string &appkey, const std::string &token);
     static void initAdInGoldMine(const CSJson::Value &params);
     static void callOfferwall(AdType type, bool inGoldMine = false);
     static void playVideo(AdType type, bool inGoldMine = false);
+    static void setDebug(bool debug) {_debug = debug;}
 };
 
 #endif
