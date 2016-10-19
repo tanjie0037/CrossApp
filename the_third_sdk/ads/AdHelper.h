@@ -56,7 +56,7 @@ public:
     static void initAdInGoldMine(const CSJson::Value &params);
     static void callOfferwall(AdType type, bool inGoldMine = false);
     static void playVideo(AdType type, bool inGoldMine = false);
-    static void setDebug(bool debug) {_debug = debug;}
+    static void setDebug(bool debug);
 };
 
 #endif

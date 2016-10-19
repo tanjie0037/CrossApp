@@ -29,6 +29,11 @@ Value AdHelper::_configCache;
 
 static const char *AdHelperPath = "com/zpt/utils/AdHelper";
 static const char *ZPTNativeHelperPath = "com/zpt/utils/ZPTNativeHelper";
+bool AdHelper::_debug = false;
+
+void AdHelper::setDebug(bool debug) {
+    AdHelper::_debug = debug;
+}
 
 void AdHelper::initAdInGoldMine(const CSJson::Value &params) {
     JniMethodInfo mi;

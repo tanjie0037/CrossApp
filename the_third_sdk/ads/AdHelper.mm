@@ -29,7 +29,6 @@ static const int TJ_FREE = 0;
 static const int TJ_OFFER = 1;
 static const int TJ_VIDEO = 2;
 
-bool AdHelper::_debug = false;
 int AdHelper::_willShowTapjoy = TJ_FREE;
 string AdHelper::K_NATIVEX_PLACEMENT_OFFER = "Store Open Offerwall";
 string AdHelper::K_NATIVEX_PLACEMENT_VIDEO = "Game Launch Video";
@@ -41,6 +40,11 @@ string AdHelper::K_TAPJOY_PLACEMENT_OFFER = "offerwall_unit";
 string AdHelper::K_TAPJOY_PLACEMENT_VIDEO = "video_unit";
 
 static std::map<std::string, int> _nativeXStep;
+
+bool AdHelper::_debug = false;
+void AdHelper::setDebug(bool debug) {
+    AdHelper::_debug = debug;
+}
 
 #pragma mark MySupersonicDelegate
 
