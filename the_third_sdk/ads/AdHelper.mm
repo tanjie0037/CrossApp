@@ -16,21 +16,35 @@
 //#import "FyberSDK.h"
 #import "Supersonic/Supersonic.h"
 //#import <AdscendMedia/AdscendMedia.h>
+#import <Tapjoy/Tapjoy.h>
+#import <Tapjoy/TJPlacement.h>
 
 #include "SDKCommon.h"
 
 USING_NS_CC;
 
-static const int NX_FREE = 0;
-static const int NX_READY = 1;
+//static const int NX_FREE = 0;
+//static const int NX_READY = 1;
+static const int TJ_FREE = 0;
+static const int TJ_OFFER = 1;
+static const int TJ_VIDEO = 2;
+
+int AdHelper::_willShowTapjoy = TJ_FREE;
 string AdHelper::K_NATIVEX_PLACEMENT_OFFER = "Store Open Offerwall";
 string AdHelper::K_NATIVEX_PLACEMENT_VIDEO = "Game Launch Video";
 string AdHelper::PLUGIN_PACKAGE = "com.zero.diaobaole";
 string AdHelper::PLUGIN_ACTIVITY = "com.zero.diaobaole.MainActivity";
 string AdHelper::PLUGIN_INTENT = "com.diao.diaobaole.OFFERWALL";
 string AdHelper::PLUGIN_APK = "goldmine.apk";
+string AdHelper::K_TAPJOY_PLACEMENT_OFFER = "offerwall_unit";
+string AdHelper::K_TAPJOY_PLACEMENT_VIDEO = "video_unit";
 
 static std::map<std::string, int> _nativeXStep;
+
+bool AdHelper::_debug = false;
+void AdHelper::setDebug(bool debug) {
+    AdHelper::_debug = debug;
+}
 
 #pragma mark MySupersonicDelegate
 
@@ -257,11 +271,67 @@ static std::map<std::string, int> _nativeXStep;
 //}
 //@end
 
+#pragma mark TJDelegate
+@interface MyTJDelegate : NSObject<TJPlacementDelegate>
+@property (strong, nonatomic) TJPlacement *tjPlacementOffer;
+@property (strong, nonatomic) TJPlacement *tjPlacementVideo;
+@end
+
+@implementation MyTJDelegate
+-(void)tjcConnectSuccess:(NSNotification*)notifyObj
+{
+    NSLog(@"Tapjoy connect Succeeded");
+    
+    [_tjPlacementOffer requestContent];
+    [_tjPlacementVideo requestContent];
+}
+
+- (void)tjcConnectFail:(NSNotification*)notifyObj
+{
+    NSLog(@"Tapjoy connect Failed");
+}
+
+- (void)requestDidSucceed:(TJPlacement*)placement
+{
+    NSLog(@"Tapjoy request did succeed, contentIsAvailable:%d", placement.isContentAvailable);
+}
+
+- (void)contentIsReady:(TJPlacement*)placement
+{
+    NSLog(@"Tapjoy placement content is ready to display");
+    
+    if(AdHelper::_willShowTapjoy == TJ_OFFER) {
+        [_tjPlacementOffer showContentWithViewController: (UIViewController*)[AppController getRootView]];
+        AdHelper::_willShowTapjoy = TJ_FREE;
+        
+    } else if (AdHelper::_willShowTapjoy == TJ_VIDEO) {
+        [_tjPlacementVideo showContentWithViewController: (UIViewController*)[AppController getRootView]];
+        AdHelper::_willShowTapjoy = TJ_FREE;
+    }
+}
+
+- (void)requestDidFail:(TJPlacement*)placement error:(NSError *)error
+{
+    NSLog(@"Tapjoy request failed with error: %@", [error localizedDescription]);
+}
+
+- (void)contentDidAppear:(TJPlacement*)placement
+{
+    NSLog(@"Content did appear for %@ placement", [placement placementName]);
+}
+
+- (void)contentDidDisappear:(TJPlacement*)placement
+{
+    NSLog(@"Content did disappear for %@ placement", [placement placementName]);
+}
+
+@end
+
+#pragma mark AdHelper
 static MySupersonicDelegate *_mySupersonicDelegate = [[MySupersonicDelegate alloc] init];
 //static MyNaviteXDeleagte *_myNaviteXDeleagte = [[MyNaviteXDeleagte alloc] init];
 //static MyADOffersViewControllerDelegate *_myADOffersViewControllerDelegate = [[MyADOffersViewControllerDelegate alloc] init];
-
-#pragma mark AdHelper
+static MyTJDelegate *_myTJDelegate = [[MyTJDelegate alloc] init];
 
 //AdFyber = 0,
 //AdSupersonic = 1,
@@ -313,6 +383,28 @@ void AdHelper::initAd(AdType type, const std::string &uId, const std::string &ap
             _appkey = appkey;
             _token = token;
             break;
+        case AdTapjoy:
+            //Turn on Tapjoy debug mode
+            [Tapjoy setDebugEnabled: _debug ? YES : NO]; //Do not set this for any version of the app released to an app store
+            
+            //Set up success and failure notifications
+            [[NSNotificationCenter defaultCenter] addObserver:_myTJDelegate
+                                                     selector:@selector(tjcConnectSuccess:)
+                                                         name:TJC_CONNECT_SUCCESS
+                                                       object:nil];
+            
+            [[NSNotificationCenter defaultCenter] addObserver:_myTJDelegate
+                                                     selector:@selector(tjcConnectFail:)
+                                                         name:TJC_CONNECT_FAILED
+                                                       object:nil];
+            
+            //Tapjoy connect call
+            [Tapjoy connect: nsstr(appkey.c_str())];
+            [Tapjoy setUserID: nsstr(uId.c_str())];
+            
+            _myTJDelegate.tjPlacementOffer = [TJPlacement placementWithName:nsstr(K_TAPJOY_PLACEMENT_OFFER.c_str()) delegate:_myTJDelegate ];
+            _myTJDelegate.tjPlacementVideo = [TJPlacement placementWithName:nsstr(K_TAPJOY_PLACEMENT_VIDEO.c_str()) delegate:_myTJDelegate ];
+            break;
         default:
             break;
     }
@@ -344,11 +436,10 @@ void AdHelper::callOfferwall(AdHelper::AdType type, bool inGoldMine)
 //            }];   
             break;
         }
-            
         case AdSupersonic:
             [[Supersonic sharedInstance] showOW];
             break;
-        case AdNativeX:
+        case AdNativeX: {
 //            _nativeXStep[K_NATIVEX_PLACEMENT_OFFER] = NX_READY;
 //        
 //            if ([[NativeXSDK sharedInstance] isAdReadyWithCustomPlacement:nsstr(K_NATIVEX_PLACEMENT_OFFER.c_str())]) {
@@ -358,14 +449,28 @@ void AdHelper::callOfferwall(AdHelper::AdType type, bool inGoldMine)
 //            } else {
 //                [[NativeXSDK sharedInstance] fetchAdWithCustomPlacement: nsstr(K_NATIVEX_PLACEMENT_OFFER.c_str()) delegate: _myNaviteXDeleagte];
 //            }
-        
             break;
+        }
         case AdAdxmi:
             break;
         case AdAdscend: {
 //            _offersVC = [ADOffersViewController newOffersWallForPublisherId:nsstr(_appkey.c_str()) adwallId:nsstr(_token.c_str()) subId1:nsstr(_uId.c_str()) delegate:_myADOffersViewControllerDelegate];
 //            _myADOffersViewControllerDelegate.controller = _offersVC;
 //            [(UIViewController*)[AppController getRootView] presentViewController:_offersVC animated:YES completion:nil];
+            break;
+        }
+        case AdTapjoy: {
+            AdHelper::_willShowTapjoy = TJ_OFFER;
+            
+            if(_myTJDelegate.tjPlacementOffer.isContentReady) {
+                [_myTJDelegate.tjPlacementOffer showContentWithViewController: (UIViewController*)[AppController getRootView]];
+                AdHelper::_willShowTapjoy = TJ_FREE;
+            }
+            else {
+                [_myTJDelegate.tjPlacementOffer requestContent];
+                //handle situation where there is no content to show, or it has not yet downloaded.
+                NSLog(@"Tapjoy offerwall is not ready");
+            }
             break;
         }
         default:
@@ -379,13 +484,14 @@ void AdHelper::playVideo(AdHelper::AdType type, bool inGoldMine)
         case AdFyber:
             break;
             
-        case AdSupersonic:
+        case AdSupersonic: {
             if ([[Supersonic sharedInstance] isAdAvailable]) {
                 CCLOG("Supersonic AdAvailable");
                 [[Supersonic sharedInstance] showRV];
             }
             break;
-        case AdNativeX:
+        }
+        case AdNativeX: {
 //            _nativeXStep[K_NATIVEX_PLACEMENT_VIDEO] = NX_READY;
 //            
 //            if ([[NativeXSDK sharedInstance] isAdReadyWithCustomPlacement:nsstr(K_NATIVEX_PLACEMENT_VIDEO.c_str())]) {
@@ -396,6 +502,21 @@ void AdHelper::playVideo(AdHelper::AdType type, bool inGoldMine)
 //                [[NativeXSDK sharedInstance] fetchAdWithCustomPlacement: nsstr(K_NATIVEX_PLACEMENT_VIDEO.c_str()) delegate: _myNaviteXDeleagte];
 //            }
             break;
+        }
+        case AdTapjoy: {
+            AdHelper::_willShowTapjoy = TJ_VIDEO;
+            
+            if(_myTJDelegate.tjPlacementVideo.isContentReady) {
+                [_myTJDelegate.tjPlacementVideo showContentWithViewController: (UIViewController*)[AppController getRootView]];
+                AdHelper::_willShowTapjoy = TJ_FREE;
+            }
+            else {
+                [_myTJDelegate.tjPlacementVideo requestContent];
+                //handle situation where there is no content to show, or it has not yet downloaded.
+                NSLog(@"Tapjoy video is not ready");
+            }
+            break;
+        }
         default:
             break;
     }
