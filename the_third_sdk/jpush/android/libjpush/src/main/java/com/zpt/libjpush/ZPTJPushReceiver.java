@@ -32,9 +32,7 @@ public class ZPTJPushReceiver extends BroadcastReceiver {
 	public void onReceive(Context context, Intent intent) {
 		Bundle bundle = intent.getExtras();
 		String bundleStr = toNativeMessage(context, bundle);
-
-		ZPTLog.d("bundle:" + bundle.toString());
-
+		
 		ZPTLog.v("[MyReceiver] onReceive - " + intent.getAction() + ", info: " + bundleStr);
 
 		if (JPushInterface.ACTION_REGISTRATION_ID.equals(intent.getAction())) {
