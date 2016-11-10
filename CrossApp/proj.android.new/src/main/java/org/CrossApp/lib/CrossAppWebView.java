@@ -45,7 +45,7 @@ public class CrossAppWebView extends WebView {
         this.setFocusable(true);
         this.setFocusableInTouchMode(true);
 
-        this.getSettings().setSupportZoom(false);
+        this.getSettings().setSupportZoom(true);
         this.getSettings().setBuiltInZoomControls(true);
         this.getSettings().setJavaScriptEnabled(true);
         this.addJavascriptInterface(new InJavaScriptLocalObj(), "local_obj");
