@@ -45,10 +45,6 @@ CSJsonDictionary::~CSJsonDictionary()
 
 CSJsonDictionary *CSJsonDictionary::create(const char *pszDescription)
 {
-    if (pszDescription == NULL || strlen(pszDescription) == 0) {
-        return NULL;
-    }
-    
     CSJsonDictionary *ret = new CSJsonDictionary();
     ret->initWithDescription(pszDescription);
     ret->autorelease();
@@ -59,7 +55,7 @@ CSJsonDictionary *CSJsonDictionary::create(const char *pszDescription)
 CSJsonDictionary *CSJsonDictionary::create()
 {
     CSJsonDictionary *ret = new CSJsonDictionary();
-    ret->initWithDescription("{}");
+    ret->initWithDescription(NULL);
     ret->autorelease();
     return ret;
 }
@@ -68,13 +64,11 @@ void CSJsonDictionary::initWithDescription(const char *pszDescription)
 {
     CSJson::Reader cReader;
     m_cValue.clear();
-    if (pszDescription && *pszDescription)
+    if (!pszDescription || !cReader.parse(string(pszDescription), m_cValue, false))
     {
-        std::string strValue = pszDescription;
-        cReader.parse(strValue, m_cValue, false);
+        cReader.parse("{}", m_cValue, false);
     }
 }
-
 
 void CSJsonDictionary::initWithValue(CSJson::Value& value)
 {
@@ -456,3 +450,9 @@ inline CSJson::Value * CSJsonDictionary::validateArrayItem(const char *pszArrayK
     
     return &m_cValue[pszArrayKey];
 }
+
+bool CSJsonDictionary::isArray() {
+    return m_cValue.isArray();
+}
+
+
