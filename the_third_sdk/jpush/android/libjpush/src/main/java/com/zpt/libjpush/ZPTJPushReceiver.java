@@ -44,7 +44,15 @@ public class ZPTJPushReceiver extends BroadcastReceiver {
 			ZPTLog.v("[MyReceiver] 接收到推送下来的自定义消息: " + bundle.getString(JPushInterface.EXTRA_MESSAGE));
 
 			// 转发到native
-			CrossAppHelper.postNotification(CrossAppHelper.kNotiRemoteNotiRecived, bundleStr);
+			if (_cls != null) {
+				CrossAppHelper.postNotification(CrossAppHelper.kNotiRemoteNotiRecived, bundleStr);
+			} else {
+				try {
+					JPushHelper.saveNoti(context.getApplicationContext(), bundleStr);
+				} catch(Exception e) {
+					e.printStackTrace();
+				}
+			}
 
 		} else if (JPushInterface.ACTION_NOTIFICATION_RECEIVED.equals(intent.getAction())) {
 			ZPTLog.v("[MyReceiver] 接收到推送下来的通知");
@@ -54,6 +62,12 @@ public class ZPTJPushReceiver extends BroadcastReceiver {
 			// 转发到native
 			if (_cls != null) {
 				CrossAppHelper.postNotification(CrossAppHelper.kNotiRemoteNotiRecived, bundleStr);
+			} else {
+				try {
+					JPushHelper.saveNoti(context.getApplicationContext(), bundleStr);
+				} catch(Exception e) {
+					e.printStackTrace();
+				}
 			}
 
 		} else if (JPushInterface.ACTION_NOTIFICATION_OPENED.equals(intent.getAction())) {
