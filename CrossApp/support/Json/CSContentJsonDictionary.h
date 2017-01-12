@@ -58,6 +58,7 @@ public:
     std::string getDescription();
     std::string getStyledDescription();
     
+    bool    isArray();
     bool    insertItemToArray(const char *pszArrayKey, int nValue);
     bool    insertItemToArray(const char *pszArrayKey, double fValue);
     bool    insertItemToArray(const char *pszArrayKey, const char * pszValue);
