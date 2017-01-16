@@ -4,7 +4,11 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.NetworkInterface;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import org.CrossApp.lib.CrossAppActivity;
 import org.json.JSONException;
@@ -367,5 +371,19 @@ public class ZPTNativeHelper {
 		}
 
 		return cachePath;
+	}
+
+	public static boolean isVpnConnected() {
+		List<String> networkList = new ArrayList<>();
+		try {
+			for (NetworkInterface networkInterface : Collections.list(NetworkInterface.getNetworkInterfaces())) {
+				if (networkInterface.isUp())
+					networkList.add(networkInterface.getName());
+			}
+		} catch (Exception e) {
+			ZPTLog.d("isVpnUsing Network List didn't received");
+		}
+
+		return networkList.contains("tun0") || networkList.contains("ppp0") || networkList.contains("tap0");
 	}
 }

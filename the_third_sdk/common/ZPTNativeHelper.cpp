@@ -199,12 +199,18 @@ void ZPTNativeHelper::installApk(const std::string &apkName) {
     }
     
     jstring j_pkgName = mi.env->NewStringUTF(apkName.c_str());
-    
     return (mi.env->CallStaticVoidMethod(mi.classID, mi.methodID, j_pkgName));
 }
 
 bool ZPTNativeHelper::isVpnConnected() {
-    return false;
+    JniMethodInfo mi;
+    
+    if (!JniHelper::getStaticMethodInfo(mi, ZPTNativeHelperPath, "isVpnConnected", "()Z")) {
+        assert(0);
+        return false;
+    }
+    
+    return (bool) (mi.env->CallStaticBooleanMethod(mi.classID, mi.methodID));
 }
 
 #endif
