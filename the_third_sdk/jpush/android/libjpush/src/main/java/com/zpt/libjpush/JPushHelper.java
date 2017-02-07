@@ -148,7 +148,7 @@ public class JPushHelper {
 			fileData = new String(buffer, "UTF-8");
 			fin.close();
 		} catch(Exception e){
-			e.printStackTrace();
+//			e.printStackTrace();
 			fileData = "";
 		}
 
@@ -158,7 +158,7 @@ public class JPushHelper {
 		try {
 			json = new JSONObject(fileData);
 		} catch (Exception e) {
-			e.printStackTrace();
+//			e.printStackTrace();
 			ZPTLog.d("[jpush_helper] read empty file.");
 			return;
 		}
