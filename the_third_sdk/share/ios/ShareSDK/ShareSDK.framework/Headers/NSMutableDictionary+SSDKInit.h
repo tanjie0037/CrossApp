@@ -15,6 +15,15 @@
 @interface NSMutableDictionary (SSDKInit)
 
 /**
+ *  设置平台的授权配置
+ *
+ *  @param authSettings 授权配置信息
+ *                      例如在配置新浪微博的初始化信息中设置授权配置信息:
+ *                      [appInfo SSDKSetAuthSettings:@[@"follow_app_official_microblog"]];
+ */
+- (void)SSDKSetAuthSettings:(NSArray *)authSettings;
+
+/**
  *  设置新浪微博应用信息
  *
  *  @param appKey       应用标识
@@ -67,6 +76,19 @@
  */
 - (void)SSDKSetupFacebookByApiKey:(NSString *)apiKey
                         appSecret:(NSString *)appSecret
+                         authType:(NSString *)authType;
+
+/**
+ *  设置Facebook应用信息
+ *
+ *  @param apiKey       应用标识
+ *  @param appSecret    应用密钥
+ *  @param displayName  分享后显示的app名称 需与facebook后台配置一致 使用SSO分享必须
+ *  @param authType     授权方式。值可以是：SSDKAuthTypeSSO、SSDKAuthTypeWeb、SSDKAuthTypeBoth，分别代表SSO、网页授权、SSO＋网页授权。
+ */
+- (void)SSDKSetupFacebookByApiKey:(NSString *)apiKey
+                        appSecret:(NSString *)appSecret
+                      displayName:(NSString *)displayName
                          authType:(NSString *)authType;
 
 
@@ -287,5 +309,10 @@
  */
 - (void)SSDKSetupInstapaperByConsumerKey:(NSString *)consumerKey
                           consumerSecret:(NSString *)consumerSecret;
-
+/**
+ *  设置钉钉应用信息
+ *
+ *  @param appId 应用标识
+ */
+- (void)SSDKSetupDingTalkByAppId:(NSString *)appId;
 @end

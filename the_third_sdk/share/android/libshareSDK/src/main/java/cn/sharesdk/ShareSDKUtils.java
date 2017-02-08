@@ -3,7 +3,6 @@ package cn.sharesdk;
 import java.util.HashMap;
 import java.util.Map.Entry;
 
-import org.CrossApp.lib.CrossAppActivity;
 import android.content.Context;
 import android.os.Handler.Callback;
 import android.os.Message;
@@ -18,6 +17,8 @@ import cn.sharesdk.onekeyshare.OnekeyShare;
 
 import com.mob.tools.utils.Hashon;
 import com.mob.tools.utils.UIHandler;
+
+import org.CrossApp.lib.CrossAppActivity;
 
 public class ShareSDKUtils {
 	public static boolean DEBUG = true;
@@ -116,7 +117,7 @@ public class ShareSDKUtils {
 		String name = ShareSDK.platformIdToName(platformId);
 		Platform plat = ShareSDK.getPlatform(context, name);
 		return plat.isClientValid();
-	}
+	}	
 	
 	public static void showUser(int reqID, int platformId) {
 		if (DEBUG) {
@@ -147,6 +148,7 @@ public class ShareSDKUtils {
 			map.put("userGender", db.getUserGender());
 			map.put("userID", db.getUserId());
 			map.put("openID", db.get("openid"));
+			map.put("unionID", db.get("unionid"));
 			map.put("userName", db.getUserName());
 			map.put("userIcon", db.getUserIcon());
 		}
@@ -283,7 +285,9 @@ public class ShareSDKUtils {
 		}
 		if (content.get("url") != null) {
 			map.put("url", content.get("url"));
-			map.put("titleUrl", content.get("url"));
+		}
+		if (content.get("titleUrl") != null) {
+			map.put("titleUrl", content.get("titleUrl"));
 		}
 		if (content.get("site") != null) {
 			map.put("site", content.get("site"));
