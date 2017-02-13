@@ -13,7 +13,7 @@
 #import <ShareSDKUI/ShareSDKUI.h>
 #import <ShareSDKExtension/ShareSDK+Extension.h>
 #import <ShareSDKExtension/SSEShareHelper.h>
-#import <ShareSDK/SSDKFriendsPaging.h>
+//#import <ShareSDK/SSDKFriendsPaging.h>
 #import <MOBFoundation/MOBFRegex.h>
 #import <ShareSDK/NSMutableDictionary+SSDKShare.h>
 
@@ -676,6 +676,7 @@ void C2DXiOSShareSDK::showShareEditView(int reqID,C2DXPlatType platType, C2DXDic
 
 void C2DXiOSShareSDK::getFriendList(int reqID,C2DXPlatType platType,int count, int page, C2DXAddFriendResultEvent callback)
 {
+/*
     [ShareSDK getFriends:(SSDKPlatformType)platType
                   cursor:page
                     size:count
@@ -720,10 +721,12 @@ void C2DXiOSShareSDK::getFriendList(int reqID,C2DXPlatType platType,int count, i
                   callback(reqID,(C2DXResponseState)state,(C2DXPlatType)platType,userInfoDict);
               }
           }];
+ */
 }
 
 void C2DXiOSShareSDK::addFriend(int reqID,C2DXPlatType platType,const char* account ,C2DXGetFriendsResultEvent callback)
 {
+    /*
     SSDKPlatformType type = (SSDKPlatformType)platType;
     SSDKUser *user = [[SSDKUser alloc] init];
     
@@ -763,6 +766,7 @@ void C2DXiOSShareSDK::addFriend(int reqID,C2DXPlatType platType,const char* acco
                  callback(reqID,(C2DXResponseState)state,(C2DXPlatType)platType,userInfoDict);
              }
          }];
+    */
 }
 
 void C2DXiOSShareSDK::alertLog(const char *msg)
